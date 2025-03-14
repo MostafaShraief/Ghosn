@@ -32,7 +32,7 @@ const AIPrompt = () => {
   };
 
   return (
-    <Paper sx={{ p: 3, maxWidth: 800, mx: "auto", mt: 4 }}>
+    <Paper sx={{ p: 3, minWidth: "100%", mx: "auto", mt: 4 }}>
       <Typography variant="h5" gutterBottom>
         AI Assistant
       </Typography>

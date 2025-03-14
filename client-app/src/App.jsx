@@ -6,9 +6,8 @@ import {
   Alert,
   CircularProgress,
 } from "@mui/material";
-import AIPrompt from "../components/AIPrompt";
-import { testBackendConnection } from "../services/api";
-import "./App.css";
+import { testBackendConnection } from "@/services/api";
+import AIPrompt from "@/components/AIPrompt";
 
 function App() {
   const [backendConnected, setBackendConnected] = useState(false);
@@ -56,6 +55,7 @@ function App() {
         )
       )}
 
+      {/*  AIPrompt is now a separate route, so remove it from here */}
       <AIPrompt />
     </Container>
   );
