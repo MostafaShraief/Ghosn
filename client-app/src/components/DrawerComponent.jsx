@@ -10,7 +10,9 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import { deepOrange } from "@mui/material/colors";
-import { Link } from "react-router-dom"; // Import Link from react-router-dom
+import { Link } from "react-router-dom";
+import Divider from "@mui/material/Divider";
+import { Typography } from "@mui/material";
 
 function DrawerComponent({ drawerWidth }) {
   const [recentChatsOpen, setRecentChatsOpen] = useState(false);
@@ -21,72 +23,112 @@ function DrawerComponent({ drawerWidth }) {
 
   return (
     <Drawer
-      variant="permanent" //  Make the drawer permanent
+      variant="permanent"
       sx={{
         width: drawerWidth,
         flexShrink: 0,
         [`& .MuiDrawer-paper`]: {
           width: drawerWidth,
           boxSizing: "border-box",
-          backgroundColor: "#f8f8ff",
+          background: "linear-gradient(180deg, #ffffff, #f8f9fc)",
+          borderRight: "none",
+          boxShadow: "2px 0 8px rgba(0,0,0,0.08)",
         },
       }}
     >
-      <Box sx={{ overflow: "auto" }}>
-        {" "}
-        {/* Make the drawer content scrollable if needed */}
-        <List>
+      <Typography
+        variant="h4"
+        p={2}
+        sx={{ fontWeight: 600, color: "primary.main" }}
+        align="center"
+      >
+        Ghosn
+      </Typography>
+      <Divider />
+      <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+        <List sx={{ px: 1 }}>
+          {[
+            { text: "AI Prompt", to: "/" },
+            { text: "New Chat", to: "/chat", icon: <AddIcon /> },
+          ].map((item) => (
+            <ListItem key={item.text} disablePadding>
+              <ListItemButton
+                component={Link}
+                to={item.to}
+                sx={{
+                  borderRadius: 2,
+                  mb: 0.5,
+                  "&:hover": { bgcolor: "rgba(25, 118, 210, 0.08)" },
+                }}
+              >
+                <ListItemText
+                  primary={item.text}
+                  primaryTypographyProps={{ fontWeight: 500 }}
+                />
+                {item.icon}
+              </ListItemButton>
+            </ListItem>
+          ))}
+
           <ListItem disablePadding>
-            <ListItemButton component={Link} to="/">
-              <ListItemText primary="AI Prompt" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/chat">
-              <ListItemText primary="New Chat" />
-              <AddIcon />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton onClick={handleRecentChatsClick}>
-              <ListItemText primary="Recent Chats" />
+            <ListItemButton
+              onClick={handleRecentChatsClick}
+              sx={{ borderRadius: 2 }}
+            >
+              <ListItemText
+                primary="Recent Chats"
+                primaryTypographyProps={{ fontWeight: 500 }}
+              />
               {recentChatsOpen ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
           </ListItem>
+
           {recentChatsOpen && (
-            <>
-              <ListItem disablePadding>
-                <ListItemButton component={Link} to="/chat/1">
-                  <ListItemText primary="Chat 1" sx={{ pl: 4 }} />
-                </ListItemButton>
-              </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton component={Link} to="/chat/2">
-                  <ListItemText primary="Chat 2" sx={{ pl: 4 }} />
-                </ListItemButton>
-              </ListItem>
-              <ListItem disablePadding>
-                <ListItemButton component={Link} to="/chat/3">
-                  <ListItemText primary="Chat 3" sx={{ pl: 4 }} />
-                </ListItemButton>
-              </ListItem>
-            </>
+            <List disablePadding sx={{ pl: 2 }}>
+              {[1, 2, 3].map((num) => (
+                <ListItem key={num} disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    to={`/chat/${num}`}
+                    sx={{
+                      borderRadius: 2,
+                      py: 0.5,
+                      "&:hover": { bgcolor: "rgba(25, 118, 210, 0.08)" },
+                    }}
+                  >
+                    <ListItemText
+                      primary={`Chat ${num}`}
+                      primaryTypographyProps={{ color: "text.secondary" }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
           )}
         </List>
-        <Box sx={{ flexGrow: 1 }} /> {/* Push username to bottom */}
-        <ListItem sx={{ pb: 2 }}>
+
+        <Box sx={{ mt: "auto", p: 2 }}>
+          <Divider sx={{ mb: 2 }} />
           <ListItemButton
-            sx={{ backgroundColor: "#212121", color: "white", borderRadius: 1 }}
+            sx={{
+              color: "primary.main",
+              borderRadius: 2,
+              p: 1,
+              "&:hover": { opacity: 0.9 },
+              borderColor: "primary.main",
+            }}
           >
             <Avatar
-              sx={{ bgcolor: deepOrange[500], mr: 1, width: 24, height: 24 }}
+              sx={{ bgcolor: deepOrange[500], mr: 1.5, width: 32, height: 32 }}
             >
               U
             </Avatar>
-            <ListItemText primary="Username" />
-            <ExpandLess />
+            <ListItemText
+              primary="Username"
+              primaryTypographyProps={{ fontWeight: 500 }}
+            />
           </ListItemButton>
-        </ListItem>
+        </Box>
       </Box>
     </Drawer>
   );

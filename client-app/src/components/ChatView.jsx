@@ -14,7 +14,7 @@ function ChatView() {
       text: "This AI chatbot has been developed to optimize communication and simplify work processes, ultimately leading to smoother operations.",
       sender: "ai",
     },
-    { text: "Thank You :)", sender: "user" },
+    { text: "Thank You", sender: "user" },
   ]);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
@@ -23,20 +23,16 @@ function ChatView() {
     if (newMessage.trim() !== "") {
       setMessages([...messages, { text: newMessage, sender: "user" }]);
       setNewMessage("");
-      // Simulate AI response (replace with actual API call)
       setTimeout(() => {
-        setMessages((prevMessages) => [
-          ...prevMessages,
+        setMessages((prev) => [
+          ...prev,
           { text: "I'm a simulated AI response!", sender: "ai" },
         ]);
       }, 500);
     }
   };
 
-  const handleInputChange = (event) => {
-    setNewMessage(event.target.value);
-  };
-
+  const handleInputChange = (event) => setNewMessage(event.target.value);
   const handleKeyPress = (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
@@ -53,81 +49,99 @@ function ChatView() {
   };
 
   return (
-    <Box sx={{ backgroundColor: "#f0f0fa", height: "100vh" }}>
-      <Box sx={{ overflowY: "auto", height: "calc(100% - 70px)", pb: 2 }}>
+    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <Typography
+        variant="h5"
+        sx={{
+          mb: 3,
+          fontWeight: 600,
+          color: "primary.main",
+        }}
+      >
+        Chat
+      </Typography>
+
+      <Paper
+        elevation={1}
+        sx={{
+          flex: 1,
+          overflowY: "auto",
+          p: 3,
+          mb: 2,
+          bgcolor: "white",
+          borderRadius: 2,
+        }}
+      >
         {messages.map((message, index) => (
           <Box
             key={index}
             sx={{
               display: "flex",
+              alignItems: "flex-end",
               justifyContent:
                 message.sender === "user" ? "flex-end" : "flex-start",
-              mb: 1,
+              mb: 2,
             }}
           >
-            <Paper
-              elevation={3}
-              sx={{
-                p: 1.5,
-                maxWidth: "70%",
-                borderRadius: "12px",
-                backgroundColor: message.sender === "user" ? "#ffe0b2" : "#fff",
-                ml: message.sender === "ai" ? 1 : 0,
-                mr: message.sender === "user" ? 1 : 0,
-              }}
-            >
-              <Typography variant="body1">{message.text}</Typography>
-            </Paper>
             {message.sender === "ai" && (
               <Avatar
-                sx={{
-                  bgcolor: lightBlue[500],
-                  width: 10,
-                  height: 10,
-                  mt: 1,
-                  ml: 0.5,
-                }}
-              ></Avatar>
+                sx={{ bgcolor: lightBlue[500], mr: 1, width: 32, height: 32 }}
+              >
+                AI
+              </Avatar>
             )}
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2,
+                maxWidth: "70%",
+                borderRadius: 3,
+                bgcolor:
+                  message.sender === "user" ? "primary.light" : "grey.100",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              }}
+            >
+              <Typography variant="body1" sx={{ wordBreak: "break-word" }}>
+                {message.text}
+              </Typography>
+            </Paper>
             {message.sender === "user" && (
               <Avatar
-                sx={{
-                  bgcolor: deepOrange[500],
-                  width: 10,
-                  height: 10,
-                  mt: 1,
-                  mr: 0.5,
-                }}
-              ></Avatar>
+                sx={{ bgcolor: deepOrange[500], ml: 1, width: 32, height: 32 }}
+              >
+                U
+              </Avatar>
             )}
           </Box>
         ))}
         <div ref={messagesEndRef} />
-      </Box>
+      </Paper>
 
-      {/* Input Area */}
-      <Box
-        sx={{
-          position: "sticky",
-          bottom: 0,
-          backgroundColor: "#f0f0fa",
-          pt: 1,
-        }}
-      >
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Type a new message here"
+          placeholder="Type your message..."
           value={newMessage}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 12,
+              bgcolor: "white",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            },
+          }}
           InputProps={{
             endAdornment: (
-              <IconButton color="primary" onClick={handleSendMessage}>
+              <IconButton
+                color="primary"
+                onClick={handleSendMessage}
+                disabled={!newMessage.trim()}
+              >
                 <SendIcon />
               </IconButton>
             ),
-            sx: { borderRadius: "24px", backgroundColor: "white" },
           }}
         />
       </Box>
