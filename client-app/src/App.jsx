@@ -9,6 +9,7 @@ import {
 import AIPrompt from "../components/AIPrompt";
 import { testBackendConnection } from "../services/api";
 import "./App.css";
+import PlantingForm from "../components/PlantingForm";
 
 function App() {
   const [backendConnected, setBackendConnected] = useState(false);
@@ -55,8 +56,9 @@ function App() {
           </Alert>
         )
       )}
-
       <AIPrompt />
+      <PlantingForm />
+
     </Container>
   );
 }
