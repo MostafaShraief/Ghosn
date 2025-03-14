@@ -99,12 +99,12 @@ const AIPrompt = () => {
 
         {error && (
           <Typography
-            color="error"
+            color="white"
             sx={{
               mt: 2,
               p: 2,
-              bgcolor: "error.light",
-              borderRadius: 1,
+              bgcolor: "error.dark",
+              borderRadius: 2,
             }}
           >
             {error}

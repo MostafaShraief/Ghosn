@@ -19,6 +19,7 @@ function App() {
   useEffect(() => {
     const checkBackendConnection = async () => {
       try {
+        setLoading(true);
         await testBackendConnection();
         setBackendConnected(true);
       } catch (error) {
@@ -32,21 +33,7 @@ function App() {
   }, []);
 
   return (
-    <Container maxWidth="md">
-      <Fade in={true} timeout={500}>
-        <Box sx={{ my: 6, textAlign: "center" }}>
-          <Typography
-            variant="h2"
-            component="h1"
-            sx={{
-              fontWeight: 700,
-            }}
-          >
-            Ghosn
-          </Typography>
-        </Box>
-      </Fade>
-
+    <Container>
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", my: 6 }}>
           <CircularProgress size={48} thickness={4} />
@@ -85,7 +72,6 @@ function App() {
       )}
       <AIPrompt />
       <PlantingForm />
-
     </Container>
   );
 }
