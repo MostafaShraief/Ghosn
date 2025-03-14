@@ -96,6 +96,7 @@ function ChatView() {
                 p: 2,
                 maxWidth: "70%",
                 borderRadius: 3,
+                color: message.sender === "user" ? "grey.100" : "grey.800",
                 bgcolor:
                   message.sender === "user" ? "primary.light" : "grey.100",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",

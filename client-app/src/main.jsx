@@ -2,12 +2,13 @@ import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import App from "./App.jsx";
-import ChatView from "@/components/ChatView.jsx";
-import AIPrompt from "@/components/AIPrompt.jsx";
-import DrawerComponent from "@/components/DrawerComponent.jsx";
+import ChatView from "@/components/ChatView";
+import DrawerComponent from "@/components/DrawerComponent";
 import Box from "@mui/material/Box";
 import { CssBaseline } from "@mui/material";
+import HomePage from "@/pages/HomePage";
+import AIPromptPage from "@/pages/AIPromptPage";
+import PlantingFormPage from "@/pages/PlantingFormPage";
 
 const drawerWidth = 260;
 
@@ -69,9 +70,10 @@ createRoot(document.getElementById("root")).render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<RootLayout />}>
-            <Route index element={<App />} />
+            <Route index element={<HomePage />} />
             <Route path="chat" element={<ChatView />} />
-            <Route path="ai-prompt" element={<AIPrompt />} />
+            <Route path="ai-prompt" element={<AIPromptPage />} />
+            <Route path="planting-form" element={<PlantingFormPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
