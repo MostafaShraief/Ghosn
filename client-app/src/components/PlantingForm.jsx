@@ -15,8 +15,8 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-// Styled Paper component
 const FormPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
   margin: theme.spacing(4, "auto"),
@@ -41,6 +41,8 @@ const PlantingForm = () => {
   });
   const [plantHealth, setPlantHealth] = useState("");
   const [pesticide, setPesticide] = useState("");
+
+  const navigate = useNavigate();
 
   const handleCheckboxChange = (setState, value) => {
     setState((prev) =>
@@ -72,6 +74,8 @@ const PlantingForm = () => {
       .catch((error) => {
         console.error("حدث خطأ أثناء إرسال البيانات:", error);
       });
+    // Navigate to the chat view and pass the form data as state
+    navigate("/chat", { state: { formData } });
   };
 
   return (

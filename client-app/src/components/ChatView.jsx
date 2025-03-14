@@ -7,22 +7,35 @@ import Avatar from "@mui/material/Avatar";
 import Paper from "@mui/material/Paper";
 import { deepOrange, lightBlue } from "@mui/material/colors";
 import { IconButton } from "@mui/material";
+import { useLocation } from "react-router-dom";
 
 function ChatView() {
-  const [messages, setMessages] = useState([
-    {
-      text: "This AI chatbot has been developed to optimize communication and simplify work processes, ultimately leading to smoother operations.",
-      sender: "ai",
-    },
-    { text: "Thank You", sender: "user" },
-  ]);
+  const location = useLocation();
+  const { formData } = location.state || { formData: {} };
+
+  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    if (formData && Object.keys(formData).length > 0) {
+      const initialAIMessage = `Form data received:\n${JSON.stringify(
+        formData,
+        null,
+        2
+      )}`;
+      setMessages([
+        { text: initialAIMessage, sender: "ai" },
+        { text: "Data received.  Processing...", sender: "ai" },
+      ]);
+    }
+  }, [formData]);
 
   const handleSendMessage = () => {
     if (newMessage.trim() !== "") {
       setMessages([...messages, { text: newMessage, sender: "user" }]);
       setNewMessage("");
+
       setTimeout(() => {
         setMessages((prev) => [
           ...prev,
@@ -70,6 +83,8 @@ function ChatView() {
           mb: 2,
           bgcolor: "white",
           borderRadius: 2,
+          // Add maxHeight to constrain the height and ensure scrollbar appears
+          maxHeight: "calc(100vh - 200px)", // Adjust 200px as needed
         }}
       >
         {messages.map((message, index) => (
