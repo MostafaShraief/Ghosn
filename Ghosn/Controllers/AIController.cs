@@ -1,40 +1,70 @@
-// Ghosn/Controllers/AIController.cs
 using Microsoft.AspNetCore.Mvc;
 using Ghosn_BLL.Services;
+using Ghosn_BLL;
 
 namespace Ghosn.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AIController : ControllerBase
+public class ClientsController : ControllerBase
 {
-    private readonly AIService _aiService;
-
-    public AIController(AIService aiService)
+    [HttpGet("All", Name = "GetAllClients")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<IEnumerable<ClientDTO>> GetAllClients()
     {
-        _aiService = aiService;
+        var clients = clsClients_BAL.GetAllClients();
+        return clients.Count > 0 ? Ok(clients) : NotFound("No clients found.");
     }
 
-    [HttpPost("completion")]
-    public async Task<IActionResult> GetCompletion([FromBody] PromptRequest request)
+    [HttpGet("{id}", Name = "GetClientById")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<ClientDTO> GetClientById(int id)
     {
-        if (string.IsNullOrEmpty(request.Prompt))
-        {
-            return BadRequest("Prompt cannot be empty");
-        }
-
-        var result = await _aiService.GetAICompletionAsync(request.Prompt);
-
-        if (result.Error)
-        {
-            return StatusCode(500, result);
-        }
-
-        return Ok(result);
+        var client = clsClients_BAL.GetClientById(id);
+        return client != null ? Ok(client) : NotFound($"Client with ID {id} not found.");
     }
-}
 
-public class PromptRequest
-{
-    public string Prompt { get; set; } = string.Empty;
+    [HttpPost(Name = "AddClient")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public ActionResult<ClientDTO> AddClient([FromBody] ClientDTO newClient)
+    {
+        if (string.IsNullOrEmpty(newClient.Username) || string.IsNullOrEmpty(newClient.Password))
+            return BadRequest("Username and Password are required.");
+
+        int newId = clsClients_BAL.AddClient(newClient);
+        newClient.ClientID = newId;
+        return CreatedAtRoute("GetClientById", new { id = newId }, newClient);
+    }
+
+    [HttpPut("{id}", Name = "UpdateClient")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<ClientDTO> UpdateClient(int id, [FromBody] ClientDTO updatedClient)
+    {
+        if (string.IsNullOrEmpty(updatedClient.Username) || string.IsNullOrEmpty(updatedClient.Password))
+            return BadRequest("Username and Password are required.");
+
+        var existingClient = clsClients_BAL.GetClientById(id);
+        if (existingClient == null)
+            return NotFound($"Client with ID {id} not found.");
+
+        updatedClient.ClientID = id;
+        clsClients_BAL.UpdateClient(updatedClient);
+        return Ok(updatedClient);
+    }
+
+    [HttpDelete("{id}", Name = "DeleteClient")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult DeleteClient(int id)
+    {
+        bool isDeleted = clsClients_BAL.DeleteClient(id);
+        return isDeleted
+            ? Ok($"Client with ID {id} deleted successfully.")
+            : NotFound($"Client with ID {id} not found.");
+    }
 }
