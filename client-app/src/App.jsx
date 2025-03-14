@@ -8,7 +8,8 @@ import {
   Fade,
 } from "@mui/material";
 import { testBackendConnection } from "@/services/api";
-import AIPrompt from "./components/AIPrompt";
+import AIPrompt from "@/components/AIPrompt";
+import PlantingForm from "@/components/PlantingForm";
 
 function App() {
   const [backendConnected, setBackendConnected] = useState(false);
@@ -83,6 +84,8 @@ function App() {
         </Fade>
       )}
       <AIPrompt />
+      <PlantingForm />
+
     </Container>
   );
 }
