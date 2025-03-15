@@ -89,7 +89,7 @@ function HomePage() {
         }}
       >
         <Typography variant="h4" component="h1" gutterBottom>
-          مرحبا بك في صفحة الرئيسية!
+          مرحبا بك في الصفحة الرئيسية!
         </Typography>
         <Typography variant="subtitle1">
           إدارة زراعتك بسهولة وفعالية.
