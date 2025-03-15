@@ -74,8 +74,9 @@ const PlantingForm = () => {
       .catch((error) => {
         console.error("حدث خطأ أثناء إرسال البيانات:", error);
       });
-    // Navigate to the chat view and pass the form data as state
-    navigate("/chat", { state: { formData } });
+
+    // Navigate to the output view and pass the form data
+    navigate("/planting-output", { state: { formData } });
   };
 
   return (

@@ -50,7 +50,7 @@ function DrawerComponent({ drawerWidth }) {
           {[
             { text: "Home", to: "/" },
             { text: "AI Prompt", to: "/ai-prompt" },
-            { text: "Planting Form", to: "/planting-form" },
+            { text: "Add a planting plan", to: "/planting-form" },
             { text: "New Chat", to: "/chat", icon: <AddIcon /> },
           ].map((item) => (
             <ListItem key={item.text} disablePadding>

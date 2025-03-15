@@ -9,6 +9,7 @@ import { CssBaseline } from "@mui/material";
 import HomePage from "@/pages/HomePage";
 import AIPromptPage from "@/pages/AIPromptPage";
 import PlantingFormPage from "@/pages/PlantingFormPage";
+import PlantingOutputPage from "@/pages/PlantingOutputPage";
 
 const drawerWidth = 260;
 
@@ -74,6 +75,10 @@ createRoot(document.getElementById("root")).render(
             <Route path="chat" element={<ChatView />} />
             <Route path="ai-prompt" element={<AIPromptPage />} />
             <Route path="planting-form" element={<PlantingFormPage />} />
+            <Route
+              path="planting-output"
+              element={<PlantingOutputPage />}
+            />{" "}
           </Route>
         </Routes>
       </BrowserRouter>
