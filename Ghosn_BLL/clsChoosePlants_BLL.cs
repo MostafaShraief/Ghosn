@@ -14,6 +14,11 @@ namespace Ghosn_BLL
         public string Step { get; set; }
     }
 
+    public class ChoosePlantsStepDTO
+    {
+        public string Step { get; set; }
+    }
+
     public class clsChoosePlants_BLL
     {
         public static List<ChoosePlantsDTO> GetAllChoosePlants()
@@ -67,6 +72,33 @@ namespace Ghosn_BLL
         {
             return new ChoosePlantsObject(dto.ChoosePlantsID, dto.PlantingStepsID, dto.Step);
         }
-    }
 
+        // New function to retrieve only the Step property
+        public static List<ChoosePlantsStepDTO> GetAllChoosePlantsSteps()
+        {
+            var choosePlantsObjects = clsChoosePlants_DAL.GetAllChoosePlants();
+            return choosePlantsObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        public static ChoosePlantsStepDTO? GetChoosePlantsStepById(int id)
+        {
+            var choosePlantsObject = clsChoosePlants_DAL.GetChoosePlantsById(id);
+            return choosePlantsObject != null ? ConvertToStepDTO(choosePlantsObject) : null;
+        }
+
+        public static List<ChoosePlantsStepDTO> GetChoosePlantsStepsByPlantingStepsID(int plantingStepsID)
+        {
+            var choosePlantsObjects = clsChoosePlants_DAL.GetChoosePlantsByPlantingStepsID(plantingStepsID);
+            return choosePlantsObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        // Conversion method for Step-only DTO
+        private static ChoosePlantsStepDTO ConvertToStepDTO(ChoosePlantsObject obj)
+        {
+            return new ChoosePlantsStepDTO
+            {
+                Step = obj.Step
+            };
+        }
+    }
 }

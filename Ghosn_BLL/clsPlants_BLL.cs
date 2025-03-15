@@ -12,6 +12,12 @@ namespace Ghosn_BLL
         public int PlantTypeID { get; set; }
         public string PlantName { get; set; }
     }
+
+    public class PlantNameDTO
+    {
+        public string PlantName { get; set; }
+    }
+
     internal static class PlantMapper
     {
         public static PlantObject ConvertDtoToObject(PlantDTO dto)
@@ -67,6 +73,29 @@ namespace Ghosn_BLL
                 throw new ArgumentException("Invalid Plant ID.");
 
             return clsPlants_DAL.DeletePlant(id);
+        }
+
+        // New function to retrieve all PlantNames
+        public static List<PlantNameDTO> GetAllPlantNames()
+        {
+            var plantObjects = clsPlants_DAL.GetAllPlants();
+            return plantObjects.Select(ConvertToNameDTO).ToList();
+        }
+
+        // New function to retrieve PlantName by PlantID
+        public static PlantNameDTO? GetPlantNameById(int id)
+        {
+            var plantObject = clsPlants_DAL.GetPlantById(id);
+            return plantObject != null ? ConvertToNameDTO(plantObject) : null;
+        }
+
+        // Conversion method for Name-only DTO
+        private static PlantNameDTO ConvertToNameDTO(PlantObject obj)
+        {
+            return new PlantNameDTO
+            {
+                PlantName = obj.PlantName
+            };
         }
     }
 }

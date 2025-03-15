@@ -13,6 +13,11 @@ namespace Ghosn_BLL
         public string IrrigationSystemName { get; set; }
     }
 
+    public class IrrigationSystemNameDTO
+    {
+        public string IrrigationSystemName { get; set; }
+    }
+
     public class clsIrrigationSystems_BLL
     {
         public static List<IrrigationSystemDTO> GetAllIrrigationSystems()
@@ -57,6 +62,29 @@ namespace Ghosn_BLL
         private static IrrigationSystemObject ConvertToDALObject(IrrigationSystemDTO dto)
         {
             return new IrrigationSystemObject(dto.IrrigationSystemID, dto.IrrigationSystemName);
+        }
+
+        // New function to retrieve all IrrigationSystemNames
+        public static List<IrrigationSystemNameDTO> GetAllIrrigationSystemNames()
+        {
+            var irrigationSystemObjects = clsIrrigationSystems_DAL.GetAllIrrigationSystems();
+            return irrigationSystemObjects.Select(ConvertToNameDTO).ToList();
+        }
+
+        // New function to retrieve IrrigationSystemName by IrrigationSystemID
+        public static IrrigationSystemNameDTO? GetIrrigationSystemNameById(int id)
+        {
+            var irrigationSystemObject = clsIrrigationSystems_DAL.GetIrrigationSystemById(id);
+            return irrigationSystemObject != null ? ConvertToNameDTO(irrigationSystemObject) : null;
+        }
+
+        // Conversion method for Name-only DTO
+        private static IrrigationSystemNameDTO ConvertToNameDTO(IrrigationSystemObject obj)
+        {
+            return new IrrigationSystemNameDTO
+            {
+                IrrigationSystemName = obj.IrrigationSystemName
+            };
         }
     }
 }

@@ -13,6 +13,11 @@ namespace Ghosn_BLL
         public string FarmingToolName { get; set; }
     }
 
+    public class FarmingToolNameDTO
+    {
+        public string FarmingToolName { get; set; }
+    }
+
     public class clsFarmingTools_BLL
     {
         public static List<FarmingToolDTO> GetAllFarmingTools()
@@ -57,6 +62,28 @@ namespace Ghosn_BLL
         private static FarmingToolObject ConvertToDALObject(FarmingToolDTO dto)
         {
             return new FarmingToolObject(dto.FarmingToolID, dto.FarmingToolName);
+        }
+
+        // New function to retrieve only the FarmingToolName property
+        public static List<FarmingToolNameDTO> GetAllFarmingToolNames()
+        {
+            var farmingToolObjects = clsFarmingTools_DAL.GetAllFarmingTools();
+            return farmingToolObjects.Select(ConvertToNameDTO).ToList();
+        }
+
+        public static FarmingToolNameDTO? GetFarmingToolNameById(int id)
+        {
+            var farmingToolObject = clsFarmingTools_DAL.GetFarmingToolById(id);
+            return farmingToolObject != null ? ConvertToNameDTO(farmingToolObject) : null;
+        }
+
+        // Conversion method for Name-only DTO
+        private static FarmingToolNameDTO ConvertToNameDTO(FarmingToolObject obj)
+        {
+            return new FarmingToolNameDTO
+            {
+                FarmingToolName = obj.FarmingToolName
+            };
         }
     }
 }

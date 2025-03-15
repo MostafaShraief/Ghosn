@@ -16,6 +16,11 @@ namespace Ghosn_BLL
         public string PlantName { get; set; } // Added
     }
 
+    public class SuggestedPlantNameDTO
+    {
+        public string PlantName { get; set; }
+    }
+
     public class clsSuggestedPlants_BLL
     {
         public static List<SuggestedPlantDTO> GetAllSuggestedPlants()
@@ -70,6 +75,36 @@ namespace Ghosn_BLL
         private static SuggestedPlantObject ConvertToDALObject(SuggestedPlantDTO dto)
         {
             return new SuggestedPlantObject(dto.SuggestedPlantID, dto.PlantID, dto.OutputID, dto.PlantTypeID, dto.PlantName);
+        }
+
+        // New function to retrieve all PlantNames
+        public static List<SuggestedPlantNameDTO> GetAllSuggestedPlantNames()
+        {
+            var suggestedPlantObjects = clsSuggestedPlants_DAL.GetAllSuggestedPlants();
+            return suggestedPlantObjects.Select(ConvertToNameDTO).ToList();
+        }
+
+        // New function to retrieve PlantName by SuggestedPlantID
+        public static SuggestedPlantNameDTO? GetSuggestedPlantNameById(int id)
+        {
+            var suggestedPlantObject = clsSuggestedPlants_DAL.GetSuggestedPlantById(id);
+            return suggestedPlantObject != null ? ConvertToNameDTO(suggestedPlantObject) : null;
+        }
+
+        // New function to retrieve PlantNames by OutputID
+        public static List<SuggestedPlantNameDTO> GetSuggestedPlantNamesByOutputID(int outputID)
+        {
+            var suggestedPlantObjects = clsSuggestedPlants_DAL.GetSuggestedPlantsByOutputID(outputID);
+            return suggestedPlantObjects.Select(ConvertToNameDTO).ToList();
+        }
+
+        // Conversion method for Name-only DTO
+        private static SuggestedPlantNameDTO ConvertToNameDTO(SuggestedPlantObject obj)
+        {
+            return new SuggestedPlantNameDTO
+            {
+                PlantName = obj.PlantName
+            };
         }
     }
 }

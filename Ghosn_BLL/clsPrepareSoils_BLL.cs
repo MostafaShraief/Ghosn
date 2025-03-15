@@ -14,6 +14,11 @@ namespace Ghosn_BLL
         public string Step { get; set; }
     }
 
+    public class PrepareSoilStepDTO
+    {
+        public string Step { get; set; }
+    }
+
     public class clsPrepareSoils_BLL
     {
         public static List<PrepareSoilDTO> GetAllPrepareSoils()
@@ -66,6 +71,36 @@ namespace Ghosn_BLL
         private static PrepareSoilObject ConvertToDALObject(PrepareSoilDTO dto)
         {
             return new PrepareSoilObject(dto.PrepareSoilID, dto.PlantingStepsID, dto.Step);
+        }
+
+        // New function to retrieve all Steps
+        public static List<PrepareSoilStepDTO> GetAllPrepareSoilSteps()
+        {
+            var prepareSoilObjects = clsPrepareSoils_DAL.GetAllPrepareSoils();
+            return prepareSoilObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        // New function to retrieve Step by PrepareSoilID
+        public static PrepareSoilStepDTO? GetPrepareSoilStepById(int id)
+        {
+            var prepareSoilObject = clsPrepareSoils_DAL.GetPrepareSoilById(id);
+            return prepareSoilObject != null ? ConvertToStepDTO(prepareSoilObject) : null;
+        }
+
+        // New function to retrieve Steps by PlantingStepsID
+        public static List<PrepareSoilStepDTO> GetPrepareSoilStepsByPlantingStepsID(int plantingStepsID)
+        {
+            var prepareSoilObjects = clsPrepareSoils_DAL.GetPrepareSoilsByPlantingStepsID(plantingStepsID);
+            return prepareSoilObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        // Conversion method for Step-only DTO
+        private static PrepareSoilStepDTO ConvertToStepDTO(PrepareSoilObject obj)
+        {
+            return new PrepareSoilStepDTO
+            {
+                Step = obj.Step
+            };
         }
     }
 }

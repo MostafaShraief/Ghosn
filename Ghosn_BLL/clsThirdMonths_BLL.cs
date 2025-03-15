@@ -13,6 +13,12 @@ namespace Ghosn_BLL
         public int SuggestedTimelineID { get; set; }
         public string Step { get; set; }
     }
+
+    public class ThirdMonthStepDTO
+    {
+        public string Step { get; set; }
+    }
+
     public class clsThirdMonths_BLL
     {
         public static List<ThirdMonthDTO> GetAllThirdMonths()
@@ -65,6 +71,36 @@ namespace Ghosn_BLL
         private static ThirdMonthObject ConvertToDALObject(ThirdMonthDTO dto)
         {
             return new ThirdMonthObject(dto.ThirdMonthID, dto.SuggestedTimelineID, dto.Step);
+        }
+
+        // New function to retrieve all Steps
+        public static List<ThirdMonthStepDTO> GetAllThirdMonthSteps()
+        {
+            var thirdMonthObjects = clsThirdMonths_DAL.GetAllThirdMonths();
+            return thirdMonthObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        // New function to retrieve Step by ThirdMonthID
+        public static ThirdMonthStepDTO? GetThirdMonthStepById(int id)
+        {
+            var thirdMonthObject = clsThirdMonths_DAL.GetThirdMonthById(id);
+            return thirdMonthObject != null ? ConvertToStepDTO(thirdMonthObject) : null;
+        }
+
+        // New function to retrieve Steps by SuggestedTimelineID
+        public static List<ThirdMonthStepDTO> GetThirdMonthStepsBySuggestedTimelineID(int suggestedTimelineID)
+        {
+            var thirdMonthObjects = clsThirdMonths_DAL.GetThirdMonthsBySuggestedTimelineID(suggestedTimelineID);
+            return thirdMonthObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        // Conversion method for Step-only DTO
+        private static ThirdMonthStepDTO ConvertToStepDTO(ThirdMonthObject obj)
+        {
+            return new ThirdMonthStepDTO
+            {
+                Step = obj.Step
+            };
         }
     }
 }

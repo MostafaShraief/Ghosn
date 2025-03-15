@@ -6,7 +6,6 @@ using Ghosn_DAL;
 
 namespace Ghosn_DAL
 {
-
     public class PlantObject
     {
         public int PlantID { get; set; }
@@ -20,6 +19,7 @@ namespace Ghosn_DAL
             PlantName = plantName;
         }
     }
+
     public class clsPlants_DAL
     {
         public static List<PlantObject> GetAllPlants()
