@@ -8,8 +8,9 @@ namespace Ghosn_BLL
     public class CurrentlyPlantedDTO
     {
         public int CurrentlyPlantedID { get; set; }
-        public int InputID { get; set; }
         public int PlantID { get; set; }
+        public int OutputID { get; set; }
+        public string PlantName { get; set; } // Added
     }
 
     public class clsCurrentlyPlanted_BLL
@@ -43,20 +44,28 @@ namespace Ghosn_BLL
             return clsCurrentlyPlanted_DAL.DeleteCurrentlyPlanted(id);
         }
 
-      
+        // Function to retrieve all CurrentlyPlanted by OutputID
+        public static List<CurrentlyPlantedDTO> GetCurrentlyPlantedByOutputID(int outputID)
+        {
+            var currentlyPlantedObjects = clsCurrentlyPlanted_DAL.GetCurrentlyPlantedByOutputID(outputID);
+            return currentlyPlantedObjects.Select(ConvertToDTO).ToList();
+        }
+
+        // Conversion methods
         private static CurrentlyPlantedDTO ConvertToDTO(CurrentlyPlantedObject obj)
         {
             return new CurrentlyPlantedDTO
             {
                 CurrentlyPlantedID = obj.CurrentlyPlantedID,
-                InputID = obj.InputID,
-                PlantID = obj.PlantID
+                PlantID = obj.PlantID,
+                OutputID = obj.OutputID,
+                PlantName = obj.PlantName // Added
             };
         }
 
         private static CurrentlyPlantedObject ConvertToDALObject(CurrentlyPlantedDTO dto)
         {
-            return new CurrentlyPlantedObject(dto.CurrentlyPlantedID, dto.InputID, dto.PlantID);
+            return new CurrentlyPlantedObject(dto.CurrentlyPlantedID, dto.PlantID, dto.OutputID, dto.PlantName);
         }
     }
 }

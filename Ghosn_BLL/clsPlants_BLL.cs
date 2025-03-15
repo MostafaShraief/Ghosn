@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Ghosn_DAL;
-using Ghosn_DAL;
 
 namespace Ghosn_BLL
 {
