@@ -71,7 +71,7 @@ public class ClientsController : ControllerBase
     [HttpGet("AllInputs", Name = "GetAllInputsWithPlants")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<IEnumerable<AllInputResponseDTO>> GetAllInputsWithPlants()
+    public ActionResult<IEnumerable<InputResponseDTO>> GetAllInputsWithPlants()
     {
         var inputs = clsInputs_BLL.GetAllInputsWithPlants();
         return inputs.Count > 0 ? Ok(inputs) : NotFound("No inputs found.");
@@ -80,7 +80,7 @@ public class ClientsController : ControllerBase
     [HttpGet("Input/{id}", Name = "GetInputWithPlantsById")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<AllInputResponseDTO> GetInputWithPlantsById(int id)
+    public ActionResult<InputResponseDTO> GetInputWithPlantsById(int id)
     {
         var input = clsInputs_BLL.GetInputWithPlantsById(id);
         return input != null ? Ok(input) : NotFound($"Input with ID {id} not found.");
@@ -89,7 +89,7 @@ public class ClientsController : ControllerBase
     [HttpPost("Input", Name = "AddInputWithPlants")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public ActionResult<AllInputResponseDTO> AddInputWithPlants([FromBody] AllInputRequestDTO newInput)
+    public ActionResult<InputResponseDTO> AddInputWithPlants([FromBody] InputRequestDTO newInput)
     {
         if (newInput == null)
             return BadRequest("Input data is required.");
@@ -103,7 +103,7 @@ public class ClientsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<AllInputResponseDTO> UpdateInputWithPlants(int id, [FromBody] AllInputRequestDTO updatedInput)
+    public ActionResult<InputResponseDTO> UpdateInputWithPlants(int id, [FromBody] InputRequestDTO updatedInput)
     {
         if (updatedInput == null)
             return BadRequest("Input data is required.");

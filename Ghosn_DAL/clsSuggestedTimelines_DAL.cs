@@ -1,32 +1,30 @@
 ﻿using Microsoft.Data.SqlClient;
-using System;
 using System.Collections.Generic;
 
 namespace Ghosn_DAL
 {
-    public class OutputObject
+    public class SuggestedTimelineObject
     {
+        public int SuggestedTimelineID { get; set; }
         public int OutputID { get; set; }
-        public int PlantTypeID { get; set; }
 
-        public OutputObject(int outputID, int plantTypeID)
+        public SuggestedTimelineObject(int suggestedTimelineID, int outputID)
         {
+            SuggestedTimelineID = suggestedTimelineID;
             OutputID = outputID;
-            PlantTypeID = plantTypeID;
         }
     }
 
-    public class clsOutputs_DAL
+    public class clsSuggestedTimelines_DAL
     {
         private static string _connectionString = clsSettings.connectionString;
 
-        // Retrieve all Outputs
-        public static List<OutputObject> GetAllOutputs()
+        public static List<SuggestedTimelineObject> GetAllSuggestedTimelines()
         {
-            var outputs = new List<OutputObject>();
+            var suggestedTimelines = new List<SuggestedTimelineObject>();
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "SELECT * FROM Outputs";
+                string query = "SELECT * FROM SuggestedTimelines";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     conn.Open();
@@ -34,34 +32,33 @@ namespace Ghosn_DAL
                     {
                         while (reader.Read())
                         {
-                            outputs.Add(new OutputObject(
-                                reader.GetInt32(reader.GetOrdinal("OutputID")),
-                                reader.GetInt32(reader.GetOrdinal("PlantTypeID"))
+                            suggestedTimelines.Add(new SuggestedTimelineObject(
+                                reader.GetInt32(reader.GetOrdinal("SuggestedTimelineID")),
+                                reader.GetInt32(reader.GetOrdinal("OutputID"))
                             ));
                         }
                     }
                 }
             }
-            return outputs;
+            return suggestedTimelines;
         }
 
-        // Retrieve an Output by ID
-        public static OutputObject? GetOutputById(int outputID)
+        public static SuggestedTimelineObject? GetSuggestedTimelineById(int suggestedTimelineId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "SELECT * FROM Outputs WHERE OutputID = @OutputID";
+                string query = "SELECT * FROM SuggestedTimelines WHERE SuggestedTimelineID = @SuggestedTimelineID";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@OutputID", outputID);
+                    cmd.Parameters.AddWithValue("@SuggestedTimelineID", suggestedTimelineId);
                     conn.Open();
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
-                            return new OutputObject(
-                                reader.GetInt32(reader.GetOrdinal("OutputID")),
-                                reader.GetInt32(reader.GetOrdinal("PlantTypeID"))
+                            return new SuggestedTimelineObject(
+                                reader.GetInt32(reader.GetOrdinal("SuggestedTimelineID")),
+                                reader.GetInt32(reader.GetOrdinal("OutputID"))
                             );
                         }
                         return null;
@@ -70,31 +67,29 @@ namespace Ghosn_DAL
             }
         }
 
-        // Add a new Output
-        public static int AddOutput(OutputObject output)
+        public static int AddSuggestedTimeline(SuggestedTimelineObject suggestedTimeline)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "INSERT INTO Outputs (PlantTypeID) VALUES (@PlantTypeID); SELECT SCOPE_IDENTITY();";
+                string query = "INSERT INTO SuggestedTimelines (OutputID) VALUES (@OutputID); SELECT SCOPE_IDENTITY();";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@PlantTypeID", output.PlantTypeID);
+                    cmd.Parameters.AddWithValue("@OutputID", suggestedTimeline.OutputID);
                     conn.Open();
                     return Convert.ToInt32(cmd.ExecuteScalar());
                 }
             }
         }
 
-        // Update an existing Output
-        public static bool UpdateOutput(OutputObject output)
+        public static bool UpdateSuggestedTimeline(SuggestedTimelineObject suggestedTimeline)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "UPDATE Outputs SET PlantTypeID = @PlantTypeID WHERE OutputID = @OutputID";
+                string query = "UPDATE SuggestedTimelines SET OutputID = @OutputID WHERE SuggestedTimelineID = @SuggestedTimelineID";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@OutputID", output.OutputID);
-                    cmd.Parameters.AddWithValue("@PlantTypeID", output.PlantTypeID);
+                    cmd.Parameters.AddWithValue("@SuggestedTimelineID", suggestedTimeline.SuggestedTimelineID);
+                    cmd.Parameters.AddWithValue("@OutputID", suggestedTimeline.OutputID);
                     conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
                     return rowsAffected > 0;
@@ -102,15 +97,14 @@ namespace Ghosn_DAL
             }
         }
 
-        // Delete an Output by ID
-        public static bool DeleteOutput(int outputID)
+        public static bool DeleteSuggestedTimeline(int suggestedTimelineId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "DELETE FROM Outputs WHERE OutputID = @OutputID";
+                string query = "DELETE FROM SuggestedTimelines WHERE SuggestedTimelineID = @SuggestedTimelineID";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@OutputID", outputID);
+                    cmd.Parameters.AddWithValue("@SuggestedTimelineID", suggestedTimelineId);
                     conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
                     return rowsAffected > 0;
