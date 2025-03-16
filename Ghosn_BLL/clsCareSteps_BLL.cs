@@ -45,9 +45,9 @@ namespace Ghosn_BLL
             return clsCareSteps_DAL.UpdateCareStep(careStepObject);
         }
 
-        public static bool DeleteCareStep(int id)
+        public static bool DeleteCareStepByFK(int id)
         {
-            return clsCareSteps_DAL.DeleteCareStep(id);
+            return clsCareSteps_DAL.DeleteCareStepsByPlantingStep(id);
         }
 
         // Function to retrieve all CareSteps by PlantingStepsID

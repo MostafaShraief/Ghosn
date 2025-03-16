@@ -45,9 +45,9 @@ namespace Ghosn_BLL
             return clsWateringSteps_DAL.UpdateWateringStep(wateringStepObject);
         }
 
-        public static bool DeleteWateringStep(int id)
+        public static bool DeleteWateringStepByPlantingStepFK(int PlantingStepID)
         {
-            return clsWateringSteps_DAL.DeleteWateringStep(id);
+            return clsWateringSteps_DAL.DeleteWateringStepsByPlantingStep(PlantingStepID);
         }
 
         // Function to retrieve all WateringSteps by PlantingStepsID

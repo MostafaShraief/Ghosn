@@ -107,20 +107,21 @@ namespace Ghosn_DAL
             }
         }
 
-        public static bool DeleteFertilization(int fertilizationId)
+        public static bool DeleteFertilizationsByPlantingStep(int plantingStepId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "DELETE FROM Fertilizations WHERE FertilizationID = @FertilizationID";
+                string query = "DELETE FROM Fertilizations WHERE PlantingStepsID = @PlantingStepsID";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@FertilizationID", fertilizationId);
+                    cmd.Parameters.AddWithValue("@PlantingStepsID", plantingStepId);
                     conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
                     return rowsAffected > 0;
                 }
             }
         }
+
 
         // Function to retrieve all Fertilizations by PlantingStepsID
         public static List<FertilizationObject> GetFertilizationsByPlantingStepsID(int plantingStepsID)

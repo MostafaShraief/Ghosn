@@ -9,11 +9,10 @@ namespace Ghosn_BLL
 {
     public class FertilizationDTO
     {
-        public int FertilizationID { get; set; }
-        public int PlantingStepsID { get; set; }
-        public string Step { get; set; }
+        public int FertilizationID { get; set; }  
+        public int PlantingStepsID { get; set; }  
+        public string Step { get; set; } = string.Empty; 
     }
-
     public class FertilizationStepDTO
     {
         public string Step { get; set; }
@@ -45,9 +44,9 @@ namespace Ghosn_BLL
             return clsFertilizations_DAL.UpdateFertilization(fertilizationObject);
         }
 
-        public static bool DeleteFertilization(int id)
+        public static bool DeleteFertilizationByPlantingStepFK(int ByPlantingStepID)
         {
-            return clsFertilizations_DAL.DeleteFertilization(id);
+            return clsFertilizations_DAL.DeleteFertilizationsByPlantingStep(ByPlantingStepID);
         }
 
         // Function to retrieve all Fertilizations by PlantingStepsID

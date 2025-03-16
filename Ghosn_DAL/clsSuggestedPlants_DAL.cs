@@ -122,7 +122,21 @@ namespace Ghosn_DAL
             }
         }
 
-        public static bool DeleteSuggestedPlant(int suggestedPlantId)
+        public static bool DeleteSuggestedPlantByOutputIDFK(int OutputID)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM SuggestedPlants WHERE OutputID = @OutputID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@OutputID", OutputID);
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+        }
+        public static bool DeleteSuggestedPlantBySuggestedPlantIDPK(int suggestedPlantId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {

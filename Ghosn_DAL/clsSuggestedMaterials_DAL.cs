@@ -118,7 +118,7 @@ namespace Ghosn_DAL
             }
         }
 
-        public static bool DeleteSuggestedMaterial(int suggestedMaterialId)
+        public static bool DeleteSuggestedMaterialByPK(int suggestedMaterialId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -132,7 +132,20 @@ namespace Ghosn_DAL
                 }
             }
         }
-
+        public static bool DeleteSuggestedMaterialByFK(int OutputID)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM SuggestedMaterials WHERE OutputID = @OutputID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@OutputID", OutputID);
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+        }
         // Function to retrieve all SuggestedMaterials by OutputID
         public static List<SuggestedMaterialObject> GetSuggestedMaterialsByOutputID(int outputID)
         {

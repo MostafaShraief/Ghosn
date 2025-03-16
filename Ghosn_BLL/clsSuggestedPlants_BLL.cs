@@ -55,9 +55,15 @@ namespace Ghosn_BLL
         }
 
         // Delete a SuggestedPlant by ID
+        //FK
         public static bool DeleteSuggestedPlantByOutputID(int id)
         {
-            return clsSuggestedPlants_DAL.DeleteSuggestedPlant(id);
+            return clsSuggestedPlants_DAL.DeleteSuggestedPlantByOutputIDFK(id);
+        }
+        //PK
+        public static bool DeleteSuggestedPlantBySuggestedPlantIDPK(int id)
+        {
+            return clsSuggestedPlants_DAL.DeleteSuggestedPlantBySuggestedPlantIDPK(id);
         }
 
         // Retrieve all SuggestedPlants by OutputID

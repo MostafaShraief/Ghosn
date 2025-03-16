@@ -54,9 +54,15 @@ namespace Ghosn_BLL
         }
 
         // Delete a SuggestedMaterial by ID
+        //FK
         public static bool DeleteSuggestedMaterialByOutputID(int id)
         {
-            return clsSuggestedMaterials_DAL.DeleteSuggestedMaterial(id);
+            return clsSuggestedMaterials_DAL.DeleteSuggestedMaterialByFK(id);
+        }
+        // PK
+        public static bool DeleteSuggestedMaterialBySuggestedMaterialID(int id)
+        {
+            return clsSuggestedMaterials_DAL.DeleteSuggestedMaterialByPK(id);
         }
 
         // Retrieve all SuggestedMaterials by OutputID

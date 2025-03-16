@@ -9,10 +9,11 @@ namespace Ghosn_BLL
 {
     public class ChoosePlantsDTO
     {
-        public int ChoosePlantsID { get; set; }
+        public int ChoosePlantID { get; set; }
         public int PlantingStepsID { get; set; }
-        public string Step { get; set; }
+        public string Step { get; set; } = string.Empty;
     }
+
 
     public class ChoosePlantsStepDTO
     {
@@ -45,9 +46,9 @@ namespace Ghosn_BLL
             return clsChoosePlants_DAL.UpdateChoosePlants(choosePlantsObject);
         }
 
-        public static bool DeleteChoosePlants(int id)
+        public static bool DeleteChoosePlantsByPlantingStepFK(int PlantingStepsID)
         {
-            return clsChoosePlants_DAL.DeleteChoosePlants(id);
+            return clsChoosePlants_DAL.DeleteChoosePlantsByPlantingStepsID(PlantingStepsID);
         }
 
         // Function to retrieve all ChoosePlants by PlantingStepsID
@@ -62,7 +63,7 @@ namespace Ghosn_BLL
         {
             return new ChoosePlantsDTO
             {
-                ChoosePlantsID = obj.ChoosePlantsID,
+                ChoosePlantID = obj.ChoosePlantsID,
                 PlantingStepsID = obj.PlantingStepsID,
                 Step = obj.Step
             };
@@ -70,7 +71,7 @@ namespace Ghosn_BLL
 
         private static ChoosePlantsObject ConvertToDALObject(ChoosePlantsDTO dto)
         {
-            return new ChoosePlantsObject(dto.ChoosePlantsID, dto.PlantingStepsID, dto.Step);
+            return new ChoosePlantsObject(dto.ChoosePlantID, dto.PlantingStepsID, dto.Step);
         }
 
         // New function to retrieve only the Step property

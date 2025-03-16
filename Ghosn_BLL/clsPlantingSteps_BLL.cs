@@ -94,7 +94,7 @@ namespace Ghosn_BLL
             if (isUpdated)
             {
                 // Delete existing related steps
-                DeleteRelatedSteps(dto.PlantingStepsID);
+                DeleteRelatedStepsByPlantingStepIDFK(dto.PlantingStepsID);
 
                 // Add updated related steps
                 AddRelatedSteps(dto.PlantingStepsID, dto);
@@ -107,7 +107,7 @@ namespace Ghosn_BLL
         public static bool DeleteAll(int plantingStepsID)
         {
             // Delete related steps
-            DeleteRelatedSteps(plantingStepsID);
+            DeleteRelatedStepsByPlantingStepIDFK(plantingStepsID);
 
             // Delete the PlantingStep
             return clsPlantingSteps_DAL.DeletePlantingStep(plantingStepsID);
@@ -143,14 +143,22 @@ namespace Ghosn_BLL
         }
 
         // Helper method to delete related steps
-        private static void DeleteRelatedSteps(int plantingStepsID)
+        private static void DeleteRelatedStepsByPlantingStepIDFK(int plantingStepsID)
         {
-            clsCareSteps_BLL.DeleteCareStep(plantingStepsID);
-            clsFertilizations_BLL.DeleteFertilization(plantingStepsID);
-            clsWateringSteps_BLL.DeleteWateringStep(plantingStepsID);
-            clsChoosePlants_BLL.DeleteChoosePlants(plantingStepsID);
-            clsPrepareSoils_BLL.DeletePrepareSoil(plantingStepsID);
+            clsCareSteps_BLL.DeleteCareStepByFK(plantingStepsID);
+            clsFertilizations_BLL.DeleteFertilizationByPlantingStepFK(plantingStepsID);
+            clsWateringSteps_BLL.DeleteWateringStepByPlantingStepFK(plantingStepsID);
+            clsChoosePlants_BLL.DeleteChoosePlantsByPlantingStepFK(plantingStepsID);
+            clsPrepareSoils_BLL.DeletePrepareSoilByPlantingStepFK(plantingStepsID);
         }
+        //private static void DeleteRelatedStepsByOutputIDPK(int PlantingStepID)
+        //{
+        //    clsCareSteps_BLL.DeleteCareStepByFK(PlantingStepID);
+        //    clsFertilizations_BLL.DeleteFertilizationByPlantingStepFK(PlantingStepID);
+        //    clsWateringSteps_BLL.DeleteWateringStepByPlantingStepFK(PlantingStepID);
+        //    clsChoosePlants_BLL.DeleteChoosePlantsByPlantingStepFK(PlantingStepID);
+        //    clsPrepareSoils_BLL.DeletePrepareSoilByPlantingStepFK(PlantingStepID);
+        //}
 
         // Conversion methods
         private static PlantingStepDTO ConvertToDTO(PlantingStepObject obj)

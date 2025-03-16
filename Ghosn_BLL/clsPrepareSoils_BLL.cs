@@ -45,9 +45,9 @@ namespace Ghosn_BLL
             return clsPrepareSoils_DAL.UpdatePrepareSoil(prepareSoilObject);
         }
 
-        public static bool DeletePrepareSoil(int id)
+        public static bool DeletePrepareSoilByPlantingStepFK(int PlantingStepID)
         {
-            return clsPrepareSoils_DAL.DeletePrepareSoil(id);
+            return clsPrepareSoils_DAL.DeletePrepareSoilByPlantingSteps(PlantingStepID);
         }
 
         // Function to retrieve all PrepareSoils by PlantingStepsID

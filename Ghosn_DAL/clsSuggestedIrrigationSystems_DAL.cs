@@ -118,7 +118,7 @@ namespace Ghosn_DAL
             }
         }
 
-        public static bool DeleteSuggestedIrrigationSystem(int suggestedIrrigationSystemId)
+        public static bool DeleteSuggestedIrrigationSystemBySuggestedIrrigationSystemIDPK(int suggestedIrrigationSystemId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -132,6 +132,21 @@ namespace Ghosn_DAL
                 }
             }
         }
+        public static bool DeleteSuggestedIrrigationSystemByOutputIDFK(int OutputID)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM SuggestedIrrigationSystems WHERE OutputID = @OutputID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@OutputID", OutputID);
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+        }
+
 
         // Function to retrieve all SuggestedIrrigationSystems by OutputID
         public static List<SuggestedIrrigationSystemObject> GetSuggestedIrrigationSystemsByOutputID(int outputID)

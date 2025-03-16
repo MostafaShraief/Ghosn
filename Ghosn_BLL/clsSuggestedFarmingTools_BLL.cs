@@ -54,9 +54,15 @@ namespace Ghosn_BLL
         }
 
         // Delete a SuggestedFarmingTool by ID
+        //FK
         public static bool DeleteSuggestedFarmingToolByOutputID(int id)
         {
-            return clsSuggestedFarmingTools_DAL.DeleteSuggestedFarmingTool(id);
+            return clsSuggestedFarmingTools_DAL.DeleteSuggestedFarmingToolByOutputIDFK(id);
+        }
+        //PK
+        public static bool DeleteSuggestedFarmingToolBySuggestedFarmingToolID(int id)
+        {
+            return clsSuggestedFarmingTools_DAL.DeleteSuggestedFarmingToolBySuggestedFarmingToolIDPK(id);
         }
 
         // Retrieve all SuggestedFarmingTools by OutputID

@@ -118,7 +118,7 @@ namespace Ghosn_DAL
             }
         }
 
-        public static bool DeleteSuggestedFarmingTool(int suggestedFarmingToolId)
+        public static bool DeleteSuggestedFarmingToolBySuggestedFarmingToolIDPK(int suggestedFarmingToolId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -126,6 +126,20 @@ namespace Ghosn_DAL
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@SuggestedFarmingToolID", suggestedFarmingToolId);
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+        }
+        public static bool DeleteSuggestedFarmingToolByOutputIDFK(int OutputID)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM SuggestedFarmingTools WHERE OutputID = @OutputID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@OutputID", OutputID);
                     conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
                     return rowsAffected > 0;

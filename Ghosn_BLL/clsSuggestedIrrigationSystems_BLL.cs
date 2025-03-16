@@ -54,9 +54,15 @@ namespace Ghosn_BLL
         }
 
         // Delete a SuggestedIrrigationSystem by ID
+        //FK
         public static bool DeleteSuggestedIrrigationSystemByOutputID(int id)
         {
-            return clsSuggestedIrrigationSystems_DAL.DeleteSuggestedIrrigationSystem(id);
+            return clsSuggestedIrrigationSystems_DAL.DeleteSuggestedIrrigationSystemByOutputIDFK(id);
+        }
+        //PK
+        public static bool DeleteSuggestedIrrigationSystemBySuggestedIrrigationSystemID(int id)
+        {
+            return clsSuggestedIrrigationSystems_DAL.DeleteSuggestedIrrigationSystemBySuggestedIrrigationSystemIDPK(id);
         }
 
         // Retrieve all SuggestedIrrigationSystems by OutputID

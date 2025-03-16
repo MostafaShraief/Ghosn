@@ -68,63 +68,147 @@ public class ClientsController : ControllerBase
             : NotFound($"Client with ID {id} not found.");
     }
 
-    [HttpGet("AllInputs", Name = "GetAllInputsWithPlants")]
+    //[HttpGet("AllInputs", Name = "GetAllInputsWithPlants")]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status404NotFound)]
+    //public ActionResult<IEnumerable<InputResponseDTO>> GetAllInputsWithPlants()
+    //{
+    //    var inputs = clsInputs_BLL.GetAllInputsWithPlants();
+    //    return inputs.Count > 0 ? Ok(inputs) : NotFound("No inputs found.");
+    //}
+
+    //[HttpGet("Input/{id}", Name = "GetInputWithPlantsById")]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status404NotFound)]
+    //public ActionResult<InputResponseDTO> GetInputWithPlantsById(int id)
+    //{
+    //    var input = clsInputs_BLL.GetInputWithPlantsById(id);
+    //    return input != null ? Ok(input) : NotFound($"Input with ID {id} not found.");
+    //}
+
+    //[HttpPost("Input", Name = "AddInputWithPlants")]
+    //[ProducesResponseType(StatusCodes.Status201Created)]
+    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+    //public ActionResult<InputResponseDTO> AddInputWithPlants([FromBody] InputRequestDTO newInput)
+    //{
+    //    if (newInput == null)
+    //        return BadRequest("Input data is required.");
+
+    //    int newId = clsInputs_BLL.AddInputWithPlants(newInput);
+    //    newInput.InputID = newId;
+    //    return CreatedAtRoute("GetInputWithPlantsById", new { id = newId }, newInput);
+    //}
+
+    //[HttpPut("Input/{id}", Name = "UpdateInputWithPlants")]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+    //[ProducesResponseType(StatusCodes.Status404NotFound)]
+    //public ActionResult<InputResponseDTO> UpdateInputWithPlants(int id, [FromBody] InputRequestDTO updatedInput)
+    //{
+    //    if (updatedInput == null)
+    //        return BadRequest("Input data is required.");
+
+    //    var existingInput = clsInputs_BLL.GetInputWithPlantsById(id);
+    //    if (existingInput == null)
+    //        return NotFound($"Input with ID {id} not found.");
+
+    //    updatedInput.InputID = id;
+    //    bool isUpdated = clsInputs_BLL.UpdateInputWithPlants(updatedInput);
+    //    return isUpdated ? Ok(updatedInput) : BadRequest("Failed to update input.");
+    //}
+
+    //[HttpDelete("Input/{id}", Name = "DeleteInputWithPlants")]
+    //[ProducesResponseType(StatusCodes.Status200OK)]
+    //[ProducesResponseType(StatusCodes.Status404NotFound)]
+    //public ActionResult DeleteInputWithPlants(int id)
+    //{
+    //    bool isDeleted = clsInputs_BLL.DeleteInputWithPlants(id);
+    //    return isDeleted
+    //        ? Ok($"Input with ID {id} deleted successfully.")
+    //        : NotFound($"Input with ID {id} not found.");
+    //}
+
+    // Retrieve all Plans with related data
+    
+    [HttpGet("AllPlans", Name = "GetAllPlansWithDetails")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<IEnumerable<InputResponseDTO>> GetAllInputsWithPlants()
+    public ActionResult<IEnumerable<PlanResponseDTO>> GetAllPlansWithDetails()
     {
-        var inputs = clsInputs_BLL.GetAllInputsWithPlants();
-        return inputs.Count > 0 ? Ok(inputs) : NotFound("No inputs found.");
+        var plans = clsPlans_BLL.GetAllPlansWithDetails();
+        return plans.Count > 0 ? Ok(plans) : NotFound("No plans found.");
     }
 
-    [HttpGet("Input/{id}", Name = "GetInputWithPlantsById")]
+    // Retrieve a Plan by ID with related data
+    [HttpGet("Plan/PlanID/{id}", Name = "GetPlanWithDetailsById")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<InputResponseDTO> GetInputWithPlantsById(int id)
+    public ActionResult<PlanResponseDTO> GetPlanWithDetailsById(int id)
     {
-        var input = clsInputs_BLL.GetInputWithPlantsById(id);
-        return input != null ? Ok(input) : NotFound($"Input with ID {id} not found.");
+        if (id <= 0)
+            return BadRequest($"ID {id} is not valid.");
+
+        var plan = clsPlans_BLL.GetPlanWithDetailsById(id);
+        return plan != null ? Ok(plan) : NotFound($"Plan with ID {id} not found.");
     }
 
-    [HttpPost("Input", Name = "AddInputWithPlants")]
+    // Add a new Plan with related data
+    [HttpPost("Plan", Name = "AddPlanWithDetails")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public ActionResult<InputResponseDTO> AddInputWithPlants([FromBody] InputRequestDTO newInput)
+    public ActionResult<PlanResponseDTO> AddPlanWithDetails([FromBody] PlanRequestDTO newPlan)
     {
-        if (newInput == null)
-            return BadRequest("Input data is required.");
+        if (newPlan == null || newPlan.Output == null || newPlan.Input == null)
+            return BadRequest("Plan data, Output, and Input are required.");
 
-        int newId = clsInputs_BLL.AddInputWithPlants(newInput);
-        newInput.InputID = newId;
-        return CreatedAtRoute("GetInputWithPlantsById", new { id = newId }, newInput);
+        int newId = clsPlans_BLL.AddPlanWithDetails(newPlan);
+        newPlan.PlanID = newId;
+        return CreatedAtRoute("GetPlanWithDetailsById", new { id = newId }, newPlan);
     }
 
-    [HttpPut("Input/{id}", Name = "UpdateInputWithPlants")]
+    // Update an existing Plan with related data
+    [HttpPut("Plan/PlanID/{id}", Name = "UpdatePlanWithDetails")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<InputResponseDTO> UpdateInputWithPlants(int id, [FromBody] InputRequestDTO updatedInput)
+    public ActionResult<PlanResponseDTO> UpdatePlanWithDetails(int id, [FromBody] PlanRequestDTO updatedPlan)
     {
-        if (updatedInput == null)
-            return BadRequest("Input data is required.");
+        if (updatedPlan == null || updatedPlan.Output == null || updatedPlan.Input == null)
+            return BadRequest("Plan data, Output, and Input are required.");
 
-        var existingInput = clsInputs_BLL.GetInputWithPlantsById(id);
-        if (existingInput == null)
-            return NotFound($"Input with ID {id} not found.");
+        var existingPlan = clsPlans_BLL.GetPlanWithDetailsById(id);
+        if (existingPlan == null)
+            return NotFound($"Plan with ID {id} not found.");
 
-        updatedInput.InputID = id;
-        bool isUpdated = clsInputs_BLL.UpdateInputWithPlants(updatedInput);
-        return isUpdated ? Ok(updatedInput) : BadRequest("Failed to update input.");
+        updatedPlan.PlanID = id;
+        bool isUpdated = clsPlans_BLL.UpdatePlanWithDetails(updatedPlan, id);
+        return isUpdated ? Ok(updatedPlan) : BadRequest("Failed to update plan.");
     }
 
-    [HttpDelete("Input/{id}", Name = "DeleteInputWithPlants")]
+    // Delete a Plan and its related data
+    [HttpDelete("Plan/PlanID/{id}", Name = "DeletePlanWithDetails")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult DeleteInputWithPlants(int id)
+    public ActionResult DeletePlanWithDetails(int id)
     {
-        bool isDeleted = clsInputs_BLL.DeleteInputWithPlants(id);
+        bool isDeleted = clsPlans_BLL.DeletePlanWithDetails(id);
         return isDeleted
-            ? Ok($"Input with ID {id} deleted successfully.")
-            : NotFound($"Input with ID {id} not found.");
+            ? Ok($"Plan with ID {id} deleted successfully.")
+            : NotFound($"Plan with ID {id} not found.");
+    }
+
+    // GET: api/Plans/ByClient/{clientId}
+    [HttpGet("Plan/ClientID/{clientId}")]
+    public ActionResult<List<PlanResponseDTO>> GetPlansWithDetailsByClientId(int clientId)
+    {
+        var plans = clsPlans_BLL.GetPlansWithDetailsByClientId(clientId);
+
+        if (plans == null || plans.Count == 0)
+        {
+            return NotFound($"No plans found for ClientID: {clientId}");
+        }
+
+        return Ok(plans);
     }
 }

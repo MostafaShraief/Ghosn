@@ -107,14 +107,14 @@ namespace Ghosn_DAL
             }
         }
 
-        public static bool DeleteChoosePlants(int choosePlantsId)
+        public static bool DeleteChoosePlantsByPlantingStepsID(int PlantingStepsID)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "DELETE FROM ChoosePlants WHERE ChoosePlantsID = @ChoosePlantsID";
+                string query = "DELETE FROM ChoosePlants WHERE PlantingStepsID = @PlantingStepsID";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@ChoosePlantsID", choosePlantsId);
+                    cmd.Parameters.AddWithValue("@PlantingStepsID", PlantingStepsID);
                     conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
                     return rowsAffected > 0;
