@@ -132,15 +132,31 @@ namespace Ghosn_DAL
                 }
             }
         }
+        //PK
 
-        public static bool DeleteFirstWeek(int firstWeekId)
+        public static bool DeleteFirstWeekFirstWeekIDByFirstWeekIDPK(int FirstWeekID)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 string query = "DELETE FROM FirstWeeks WHERE FirstWeekID = @FirstWeekID";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@FirstWeekID", firstWeekId);
+                    cmd.Parameters.AddWithValue("@FirstWeekID", FirstWeekID);
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+        }
+        //FK
+        public static bool DeleteFirstWeekBySuggestedTimelineIDFK(int SuggestedTimelineID)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM FirstWeeks WHERE SuggestedTimelineID = @SuggestedTimelineID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@SuggestedTimelineID", SuggestedTimelineID);
                     conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
                     return rowsAffected > 0;

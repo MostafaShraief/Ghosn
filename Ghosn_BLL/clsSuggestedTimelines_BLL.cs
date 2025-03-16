@@ -152,10 +152,10 @@ namespace Ghosn_BLL
         // Helper method to delete related steps
         private static void DeleteRelatedSteps(int suggestedTimelineID)
         {
-            clsFirstWeeks_BLL.DeleteFirstWeek(suggestedTimelineID);
-            clsSecondWeeks_BLL.DeleteSecondWeek(suggestedTimelineID);
-            clsFirstMonths_BLL.DeleteFirstMonth(suggestedTimelineID);
-            clsThirdMonths_BLL.DeleteThirdMonth(suggestedTimelineID);
+            clsFirstWeeks_BLL.DeleteFirstWeekBySuggestedTimelineIDFK(suggestedTimelineID);
+            clsSecondWeeks_BLL.DeleteSecondWeekBySuggestedTimelineIDFK(suggestedTimelineID);
+            clsFirstMonths_BLL.DeleteFirstMonthBySuggestedTimelineIDFK(suggestedTimelineID);
+            clsThirdMonths_BLL.DeleteThirdMonthBysuggestedTimelineIDPK(suggestedTimelineID);
         }
 
         // Conversion methods

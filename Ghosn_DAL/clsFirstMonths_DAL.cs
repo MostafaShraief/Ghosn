@@ -106,15 +106,30 @@ namespace Ghosn_DAL
                 }
             }
         }
+        public static bool DeleteFirstMonthBySuggestedTimelineIDFK(int SuggestedTimelineID)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM FirstMonths WHERE SuggestedTimelineID = @SuggestedTimelineID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@SuggestedTimelineID", SuggestedTimelineID);
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+        }
 
-        public static bool DeleteFirstMonth(int firstMonthId)
+
+        public static bool DeleteFirstMonthByFirstMonthIDPK(int FirstMonthID)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 string query = "DELETE FROM FirstMonths WHERE FirstMonthID = @FirstMonthID";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@FirstMonthID", firstMonthId);
+                    cmd.Parameters.AddWithValue("@FirstMonthID", FirstMonthID);
                     conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
                     return rowsAffected > 0;

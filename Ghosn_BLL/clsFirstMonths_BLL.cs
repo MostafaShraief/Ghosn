@@ -33,21 +33,28 @@ namespace Ghosn_BLL
             return firstMonthObject != null ? ConvertToDTO(firstMonthObject) : null;
         }
 
+
         public static int AddFirstMonth(FirstMonthDTO dto)
         {
             var firstMonthObject = ConvertToDALObject(dto);
             return clsFirstMonths_DAL.AddFirstMonth(firstMonthObject);
         }
+          
 
         public static bool UpdateFirstMonth(FirstMonthDTO dto)
         {
             var firstMonthObject = ConvertToDALObject(dto);
             return clsFirstMonths_DAL.UpdateFirstMonth(firstMonthObject);
         }
-
-        public static bool DeleteFirstMonth(int id)
+        // PK
+        public static bool DeleteFirstMonthByFirstMonthIDPK(int id)
         {
-            return clsFirstMonths_DAL.DeleteFirstMonth(id);
+            return clsFirstMonths_DAL.DeleteFirstMonthByFirstMonthIDPK(id);
+        }
+        //FK
+        public static bool DeleteFirstMonthBySuggestedTimelineIDFK(int id)
+        {
+            return clsFirstMonths_DAL.DeleteFirstMonthBySuggestedTimelineIDFK(id);
         }
 
         // Function to retrieve all FirstMonths by SuggestedTimelineID

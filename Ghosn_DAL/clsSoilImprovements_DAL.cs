@@ -107,14 +107,31 @@ namespace Ghosn_DAL
             }
         }
 
-        public static bool DeleteSoilImprovement(int soilImprovementId)
+
+
+        public static bool DeleteSoilImprovementBySoilImprovementIDPK(int OutputID)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM SoilImprovements WHERE OutputID = @OutputID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@OutputID", OutputID);
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+        }
+
+        public static bool DeleteSoilImprovementByOutputIDFK(int SoilImprovementID)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 string query = "DELETE FROM SoilImprovements WHERE SoilImprovementID = @SoilImprovementID";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@SoilImprovementID", soilImprovementId);
+                    cmd.Parameters.AddWithValue("@SoilImprovementID", SoilImprovementID);
                     conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
                     return rowsAffected > 0;

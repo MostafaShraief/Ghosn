@@ -51,9 +51,13 @@ namespace Ghosn_BLL
             return clsFirstWeeks_DAL.UpdateFirstWeek(firstWeekObject);
         }
 
-        public static bool DeleteFirstWeek(int id)
+        public static bool DeleteFirstWeekByFirstWeekIDPK(int id)
         {
-            return clsFirstWeeks_DAL.DeleteFirstWeek(id);
+            return clsFirstWeeks_DAL.DeleteFirstWeekFirstWeekIDByFirstWeekIDPK(id);
+        }
+        public static bool DeleteFirstWeekBySuggestedTimelineIDFK(int id)
+        {
+            return clsFirstWeeks_DAL.DeleteFirstWeekBySuggestedTimelineIDFK(id);
         }
 
         // Conversion methods

@@ -45,10 +45,19 @@ namespace Ghosn_BLL
             return clsThirdMonths_DAL.UpdateThirdMonth(thirdMonthObject);
         }
 
-        public static bool DeleteThirdMonth(int id)
+
+
+        // FK
+        public static bool DeleteThirdMonthBysuggestedTimelineIDFK(int id)
         {
-            return clsThirdMonths_DAL.DeleteThirdMonth(id);
+            return clsThirdMonths_DAL.DeleteThirdMonthBySuggestedTimelineIDFK(id);
         }
+        // PK
+        public static bool DeleteThirdMonthByThirdMonthIDPK(int id)
+        {
+            return clsThirdMonths_DAL.DeleteThirdMonthByThirdMonthIDPK(id);
+        }
+
 
         // Function to retrieve all ThirdMonths by SuggestedTimelineID
         public static List<ThirdMonthDTO> GetThirdMonthsBySuggestedTimelineID(int suggestedTimelineID)

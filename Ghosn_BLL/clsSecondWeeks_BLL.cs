@@ -45,9 +45,16 @@ namespace Ghosn_BLL
             return clsSecondWeeks_DAL.UpdateSecondWeek(secondWeekObject);
         }
 
-        public static bool DeleteSecondWeek(int id)
+
+        //FK
+        public static bool DeleteSecondWeekBySuggestedTimelineIDFK(int id)
         {
-            return clsSecondWeeks_DAL.DeleteSecondWeek(id);
+            return clsSecondWeeks_DAL.DeleteSecondWeekBySuggestedTimelineIDFK(id);
+        }
+        //PK
+        public static bool DeleteSecondWeekBySecondWeekIDPK(int id)
+        {
+            return clsSecondWeeks_DAL.DeleteSecondWeekBySecondWeekIDPK(id);
         }
 
         // Function to retrieve all SecondWeeks by SuggestedTimelineID

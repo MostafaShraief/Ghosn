@@ -107,20 +107,38 @@ namespace Ghosn_DAL
             }
         }
 
-        public static bool DeleteSecondWeek(int secondWeekId)
+        public static bool DeleteSecondWeekBySuggestedTimelineIDFK(int SuggestedTimelineID)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "DELETE FROM SecondWeeks WHERE SecondWeekID = @SecondWeekID";
+                string query = "DELETE FROM SecondWeeks WHERE SuggestedTimelineID = @SuggestedTimelineID";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@SecondWeekID", secondWeekId);
+                    cmd.Parameters.AddWithValue("@SuggestedTimelineID", SuggestedTimelineID);
                     conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
                     return rowsAffected > 0;
                 }
             }
         }
+
+        public static bool DeleteSecondWeekBySecondWeekIDPK(int SecondWeekID)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM SecondWeeks WHERE SecondWeekID = @SecondWeekID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@SecondWeekID", SecondWeekID);
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+        }
+
+
+
 
         // Function to retrieve all SecondWeeks by SuggestedTimelineID
         public static List<SecondWeekObject> GetSecondWeeksBySuggestedTimelineID(int suggestedTimelineID)
