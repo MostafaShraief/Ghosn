@@ -132,6 +132,85 @@ namespace Ghosn_BLL
         //    return true;
         //}
 
+        public static List<PlanResponseDTO> GetPlansWithDetailsByClientId(int clientId)
+        {
+            var plans = new List<PlanResponseDTO>();
+
+            // Retrieve plans by ClientID from DAL
+            var planObjects = clsPlans_DAL.GetPlansByClientId(clientId);
+            foreach (var planObject in planObjects)
+            {
+                var planResponseDTO = new PlanResponseDTO
+                {
+                    PlanID = planObject.PlanID,
+                    ClientID = planObject.ClientID,
+                    Output = clsOutputs_BLL.GetOutputWithDetailsById(planObject.OutputID),
+                    Input = clsInputs_BLL.GetInputWithPlantsById(planObject.InputID)
+                };
+
+                plans.Add(planResponseDTO);
+            }
+
+            return plans;
+        }
+
+        //public static bool UpdatePlanWithDetailsByClientId(int clientId, PlanRequestDTO dto)
+        //{
+        //    if (dto == null || dto.Output == null || dto.Input == null) return false;
+
+        //    // Retrieve the existing plans for the client
+        //    var planObjects = clsPlans_DAL.GetPlansByClientId(clientId);
+        //    if (planObjects == null || !planObjects.Any()) return false;
+
+        //    // Update each plan for the client
+        //    foreach (var planObject in planObjects)
+        //    {
+        //        // Update the Output
+        //        bool isOutputUpdated = clsOutputs_BLL.UpdateOutputWithDetails(dto.Output);
+
+        //        // Update the Input
+        //        bool isInputUpdated = clsInputs_BLL.UpdateInputWithPlants(dto.Input);
+
+        //        // Update the Plan
+        //        var updatedPlanObject = new PlanObject(planObject.PlanID, clientId, planObject.OutputID, planObject.InputID);
+        //        bool isPlanUpdated = clsPlans_DAL.UpdatePlan(updatedPlanObject);
+
+        //        if (!isOutputUpdated || !isInputUpdated || !isPlanUpdated)
+        //        {
+        //            return false;
+        //        }
+        //    }
+
+        //    return true;
+        //}
+
+        //public static bool DeletePlansWithDetailsByClientId(int clientId)
+        //{
+        //    // Retrieve the plans for the client
+        //    var planObjects = clsPlans_DAL.GetPlansByClientId(clientId);
+        //    if (planObjects == null || !planObjects.Any()) return false;
+
+        //    // Delete each plan and its related data
+        //    foreach (var planObject in planObjects)
+        //    {
+        //        // Delete the Output and its related data
+        //        bool isOutputDeleted = clsOutputs_BLL.DeleteOutputWithDetails(planObject.OutputID);
+
+        //        // Delete the Input and its related data
+        //        bool isInputDeleted = clsInputs_BLL.DeleteInputWithPlants(planObject.InputID);
+
+        //        // Delete the Plan
+        //        bool isPlanDeleted = clsPlans_DAL.DeletePlan(planObject.PlanID);
+
+        //        if (!isOutputDeleted || !isInputDeleted || !isPlanDeleted)
+        //        {
+        //            return false;
+        //        }
+        //    }
+
+        //    return true;
+        //}
+
         // Conversion method: DAL Object to DTO
         private static PlanDTO ConvertToDTO(PlanObject obj)
         {

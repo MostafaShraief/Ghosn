@@ -127,5 +127,64 @@ namespace Ghosn_DAL
                 }
             }
         }
+
+        public static List<PlanObject> GetPlansByClientId(int clientId)
+        {
+            var plans = new List<PlanObject>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT * FROM Plans WHERE ClientID = @ClientID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ClientID", clientId);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            plans.Add(new PlanObject(
+                                reader.GetInt32(reader.GetOrdinal("PlanID")),
+                                reader.GetInt32(reader.GetOrdinal("ClientID")),
+                                reader.GetInt32(reader.GetOrdinal("InputID")),
+                                reader.GetInt32(reader.GetOrdinal("OutputID"))
+                            ));
+                        }
+                    }
+                }
+            }
+            return plans;
+        }
+
+        public static bool UpdatePlanByClientId(int clientId, PlanObject plan)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "UPDATE Plans SET InputID = @InputID, OutputID = @OutputID WHERE ClientID = @ClientID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ClientID", clientId);
+                    cmd.Parameters.AddWithValue("@InputID", plan.InputID);
+                    cmd.Parameters.AddWithValue("@OutputID", plan.OutputID);
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+        }
+
+        public static bool DeletePlansByClientId(int clientId)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM Plans WHERE ClientID = @ClientID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ClientID", clientId);
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+        }
     }
 }
