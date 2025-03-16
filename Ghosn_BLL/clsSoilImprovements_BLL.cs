@@ -14,6 +14,11 @@ namespace Ghosn_BLL
         public string Step { get; set; }
     }
 
+    public class SoilImprovementStepDTO
+    {
+        public string Step { get; set; }
+    }
+
     public class clsSoilImprovements_BLL
     {
         public static List<SoilImprovementDTO> GetAllSoilImprovements()
@@ -66,6 +71,36 @@ namespace Ghosn_BLL
         private static SoilImprovementObject ConvertToDALObject(SoilImprovementDTO dto)
         {
             return new SoilImprovementObject(dto.SoilImprovementID, dto.OutputID, dto.Step);
+        }
+
+        // New function to retrieve all Steps
+        public static List<SoilImprovementStepDTO> GetAllSoilImprovementSteps()
+        {
+            var soilImprovementObjects = clsSoilImprovements_DAL.GetAllSoilImprovements();
+            return soilImprovementObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        // New function to retrieve Step by SoilImprovementID
+        public static SoilImprovementStepDTO? GetSoilImprovementStepById(int id)
+        {
+            var soilImprovementObject = clsSoilImprovements_DAL.GetSoilImprovementById(id);
+            return soilImprovementObject != null ? ConvertToStepDTO(soilImprovementObject) : null;
+        }
+
+        // New function to retrieve Steps by OutputID
+        public static List<SoilImprovementStepDTO> GetSoilImprovementStepsByOutputID(int outputID)
+        {
+            var soilImprovementObjects = clsSoilImprovements_DAL.GetSoilImprovementsByOutputID(outputID);
+            return soilImprovementObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        // Conversion method for Step-only DTO
+        private static SoilImprovementStepDTO ConvertToStepDTO(SoilImprovementObject obj)
+        {
+            return new SoilImprovementStepDTO
+            {
+                Step = obj.Step
+            };
         }
     }
 }

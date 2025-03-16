@@ -14,6 +14,11 @@ namespace Ghosn_BLL
         public string Step { get; set; }
     }
 
+    public class PestPreventionStepDTO
+    {
+        public string Step { get; set; }
+    }
+
     public class clsPestPreventions_BLL
     {
         public static List<PestPreventionDTO> GetAllPestPreventions()
@@ -66,6 +71,36 @@ namespace Ghosn_BLL
         private static PestPreventionObject ConvertToDALObject(PestPreventionDTO dto)
         {
             return new PestPreventionObject(dto.PestPreventionID, dto.OutputID, dto.Step);
+        }
+
+        // New function to retrieve all Steps
+        public static List<PestPreventionStepDTO> GetAllPestPreventionSteps()
+        {
+            var pestPreventionObjects = clsPestPreventions_DAL.GetAllPestPreventions();
+            return pestPreventionObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        // New function to retrieve Step by PestPreventionID
+        public static PestPreventionStepDTO? GetPestPreventionStepById(int id)
+        {
+            var pestPreventionObject = clsPestPreventions_DAL.GetPestPreventionById(id);
+            return pestPreventionObject != null ? ConvertToStepDTO(pestPreventionObject) : null;
+        }
+
+        // New function to retrieve Steps by OutputID
+        public static List<PestPreventionStepDTO> GetPestPreventionStepsByOutputID(int outputID)
+        {
+            var pestPreventionObjects = clsPestPreventions_DAL.GetPestPreventionsByOutputID(outputID);
+            return pestPreventionObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        // Conversion method for Step-only DTO
+        private static PestPreventionStepDTO ConvertToStepDTO(PestPreventionObject obj)
+        {
+            return new PestPreventionStepDTO
+            {
+                Step = obj.Step
+            };
         }
     }
 }

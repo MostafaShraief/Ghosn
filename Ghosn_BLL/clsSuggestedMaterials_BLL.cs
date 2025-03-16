@@ -15,6 +15,11 @@ namespace Ghosn_BLL
         public string MaterialName { get; set; } // Added
     }
 
+    public class SuggestedMaterialNameDTO
+    {
+        public string MaterialName { get; set; }
+    }
+
     public class clsSuggestedMaterials_BLL
     {
         public static List<SuggestedMaterialDTO> GetAllSuggestedMaterials()
@@ -68,6 +73,36 @@ namespace Ghosn_BLL
         private static SuggestedMaterialObject ConvertToDALObject(SuggestedMaterialDTO dto)
         {
             return new SuggestedMaterialObject(dto.SuggestedMaterialID, dto.OutputID, dto.MaterialID, dto.MaterialName);
+        }
+
+        // New function to retrieve all MaterialNames
+        public static List<SuggestedMaterialNameDTO> GetAllSuggestedMaterialNames()
+        {
+            var suggestedMaterialObjects = clsSuggestedMaterials_DAL.GetAllSuggestedMaterials();
+            return suggestedMaterialObjects.Select(ConvertToNameDTO).ToList();
+        }
+
+        // New function to retrieve MaterialName by SuggestedMaterialID
+        public static SuggestedMaterialNameDTO? GetSuggestedMaterialNameById(int id)
+        {
+            var suggestedMaterialObject = clsSuggestedMaterials_DAL.GetSuggestedMaterialById(id);
+            return suggestedMaterialObject != null ? ConvertToNameDTO(suggestedMaterialObject) : null;
+        }
+
+        // New function to retrieve MaterialNames by OutputID
+        public static List<SuggestedMaterialNameDTO> GetSuggestedMaterialNamesByOutputID(int outputID)
+        {
+            var suggestedMaterialObjects = clsSuggestedMaterials_DAL.GetSuggestedMaterialsByOutputID(outputID);
+            return suggestedMaterialObjects.Select(ConvertToNameDTO).ToList();
+        }
+
+        // Conversion method for Name-only DTO
+        private static SuggestedMaterialNameDTO ConvertToNameDTO(SuggestedMaterialObject obj)
+        {
+            return new SuggestedMaterialNameDTO
+            {
+                MaterialName = obj.MaterialName
+            };
         }
     }
 }

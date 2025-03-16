@@ -15,6 +15,11 @@ namespace Ghosn_BLL
         public string FarmingToolName { get; set; } // Added
     }
 
+    public class SuggestedFarmingToolNameDTO
+    {
+        public string FarmingToolName { get; set; }
+    }
+
     public class clsSuggestedFarmingTools_BLL
     {
         public static List<SuggestedFarmingToolDTO> GetAllSuggestedFarmingTools()
@@ -68,6 +73,36 @@ namespace Ghosn_BLL
         private static SuggestedFarmingToolObject ConvertToDALObject(SuggestedFarmingToolDTO dto)
         {
             return new SuggestedFarmingToolObject(dto.SuggestedFarmingToolID, dto.OutputID, dto.FarmingToolID, dto.FarmingToolName);
+        }
+
+        // New function to retrieve all FarmingToolNames
+        public static List<SuggestedFarmingToolNameDTO> GetAllSuggestedFarmingToolNames()
+        {
+            var suggestedFarmingToolObjects = clsSuggestedFarmingTools_DAL.GetAllSuggestedFarmingTools();
+            return suggestedFarmingToolObjects.Select(ConvertToNameDTO).ToList();
+        }
+
+        // New function to retrieve FarmingToolName by SuggestedFarmingToolID
+        public static SuggestedFarmingToolNameDTO? GetSuggestedFarmingToolNameById(int id)
+        {
+            var suggestedFarmingToolObject = clsSuggestedFarmingTools_DAL.GetSuggestedFarmingToolById(id);
+            return suggestedFarmingToolObject != null ? ConvertToNameDTO(suggestedFarmingToolObject) : null;
+        }
+
+        // New function to retrieve FarmingToolNames by OutputID
+        public static List<SuggestedFarmingToolNameDTO> GetSuggestedFarmingToolNamesByOutputID(int outputID)
+        {
+            var suggestedFarmingToolObjects = clsSuggestedFarmingTools_DAL.GetSuggestedFarmingToolsByOutputID(outputID);
+            return suggestedFarmingToolObjects.Select(ConvertToNameDTO).ToList();
+        }
+
+        // Conversion method for Name-only DTO
+        private static SuggestedFarmingToolNameDTO ConvertToNameDTO(SuggestedFarmingToolObject obj)
+        {
+            return new SuggestedFarmingToolNameDTO
+            {
+                FarmingToolName = obj.FarmingToolName
+            };
         }
     }
 }

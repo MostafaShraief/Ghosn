@@ -8,7 +8,7 @@ namespace Ghosn.Controllers;
 [Route("api/[controller]")]
 public class ClientsController : ControllerBase
 {
-    [HttpGet("All", Name = "GetAllClients")]
+    [HttpGet("AllClients", Name = "GetAllClients")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<IEnumerable<ClientDTO>> GetAllClients()
@@ -17,7 +17,7 @@ public class ClientsController : ControllerBase
         return clients.Count > 0 ? Ok(clients) : NotFound("No clients found.");
     }
 
-    [HttpGet("{id}", Name = "GetClientById")]
+    [HttpGet("Client/{id}", Name = "GetClientById")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<ClientDTO> GetClientById(int id)
@@ -39,7 +39,7 @@ public class ClientsController : ControllerBase
         return CreatedAtRoute("GetClientById", new { id = newId }, newClient);
     }
 
-    [HttpPut("{id}", Name = "UpdateClient")]
+    [HttpPut("Client/{id}", Name = "UpdateClient")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -57,7 +57,7 @@ public class ClientsController : ControllerBase
         return Ok(updatedClient);
     }
 
-    [HttpDelete("{id}", Name = "DeleteClient")]
+    [HttpDelete("Client/{id}", Name = "DeleteClient")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult DeleteClient(int id)
@@ -66,5 +66,65 @@ public class ClientsController : ControllerBase
         return isDeleted
             ? Ok($"Client with ID {id} deleted successfully.")
             : NotFound($"Client with ID {id} not found.");
+    }
+
+    [HttpGet("AllInputs", Name = "GetAllInputsWithPlants")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<IEnumerable<AllInputResponseDTO>> GetAllInputsWithPlants()
+    {
+        var inputs = clsInputs_BLL.GetAllInputsWithPlants();
+        return inputs.Count > 0 ? Ok(inputs) : NotFound("No inputs found.");
+    }
+
+    [HttpGet("Input/{id}", Name = "GetInputWithPlantsById")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<AllInputResponseDTO> GetInputWithPlantsById(int id)
+    {
+        var input = clsInputs_BLL.GetInputWithPlantsById(id);
+        return input != null ? Ok(input) : NotFound($"Input with ID {id} not found.");
+    }
+
+    [HttpPost("Input", Name = "AddInputWithPlants")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public ActionResult<AllInputResponseDTO> AddInputWithPlants([FromBody] AllInputRequestDTO newInput)
+    {
+        if (newInput == null)
+            return BadRequest("Input data is required.");
+
+        int newId = clsInputs_BLL.AddInputWithPlants(newInput);
+        newInput.InputID = newId;
+        return CreatedAtRoute("GetInputWithPlantsById", new { id = newId }, newInput);
+    }
+
+    [HttpPut("Input/{id}", Name = "UpdateInputWithPlants")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<AllInputResponseDTO> UpdateInputWithPlants(int id, [FromBody] AllInputRequestDTO updatedInput)
+    {
+        if (updatedInput == null)
+            return BadRequest("Input data is required.");
+
+        var existingInput = clsInputs_BLL.GetInputWithPlantsById(id);
+        if (existingInput == null)
+            return NotFound($"Input with ID {id} not found.");
+
+        updatedInput.InputID = id;
+        bool isUpdated = clsInputs_BLL.UpdateInputWithPlants(updatedInput);
+        return isUpdated ? Ok(updatedInput) : BadRequest("Failed to update input.");
+    }
+
+    [HttpDelete("Input/{id}", Name = "DeleteInputWithPlants")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult DeleteInputWithPlants(int id)
+    {
+        bool isDeleted = clsInputs_BLL.DeleteInputWithPlants(id);
+        return isDeleted
+            ? Ok($"Input with ID {id} deleted successfully.")
+            : NotFound($"Input with ID {id} not found.");
     }
 }

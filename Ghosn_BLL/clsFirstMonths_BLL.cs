@@ -14,6 +14,11 @@ namespace Ghosn_BLL
         public string Step { get; set; }
     }
 
+    public class FirstMonthStepDTO
+    {
+        public string Step { get; set; }
+    }
+
     public class clsFirstMonths_BLL
     {
         public static List<FirstMonthDTO> GetAllFirstMonths()
@@ -66,6 +71,34 @@ namespace Ghosn_BLL
         private static FirstMonthObject ConvertToDALObject(FirstMonthDTO dto)
         {
             return new FirstMonthObject(dto.FirstMonthID, dto.SuggestedTimelineID, dto.Step);
+        }
+
+        // New function to retrieve only the Step property
+        public static List<FirstMonthStepDTO> GetAllFirstMonthSteps()
+        {
+            var firstMonthObjects = clsFirstMonths_DAL.GetAllFirstMonths();
+            return firstMonthObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        public static FirstMonthStepDTO? GetFirstMonthStepById(int id)
+        {
+            var firstMonthObject = clsFirstMonths_DAL.GetFirstMonthById(id);
+            return firstMonthObject != null ? ConvertToStepDTO(firstMonthObject) : null;
+        }
+
+        public static List<FirstMonthStepDTO> GetFirstMonthStepsBySuggestedTimelineID(int suggestedTimelineID)
+        {
+            var firstMonthObjects = clsFirstMonths_DAL.GetFirstMonthsBySuggestedTimelineID(suggestedTimelineID);
+            return firstMonthObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        // Conversion method for Step-only DTO
+        private static FirstMonthStepDTO ConvertToStepDTO(FirstMonthObject obj)
+        {
+            return new FirstMonthStepDTO
+            {
+                Step = obj.Step
+            };
         }
     }
 }

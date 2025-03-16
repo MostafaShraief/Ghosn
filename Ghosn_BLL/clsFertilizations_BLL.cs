@@ -14,6 +14,11 @@ namespace Ghosn_BLL
         public string Step { get; set; }
     }
 
+    public class FertilizationStepDTO
+    {
+        public string Step { get; set; }
+    }
+
     public class clsFertilizations_BLL
     {
         public static List<FertilizationDTO> GetAllFertilizations()
@@ -66,6 +71,34 @@ namespace Ghosn_BLL
         private static FertilizationObject ConvertToDALObject(FertilizationDTO dto)
         {
             return new FertilizationObject(dto.FertilizationID, dto.PlantingStepsID, dto.Step);
+        }
+
+        // New function to retrieve only the Step property
+        public static List<FertilizationStepDTO> GetAllFertilizationSteps()
+        {
+            var fertilizationObjects = clsFertilizations_DAL.GetAllFertilizations();
+            return fertilizationObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        public static FertilizationStepDTO? GetFertilizationStepById(int id)
+        {
+            var fertilizationObject = clsFertilizations_DAL.GetFertilizationById(id);
+            return fertilizationObject != null ? ConvertToStepDTO(fertilizationObject) : null;
+        }
+
+        public static List<FertilizationStepDTO> GetFertilizationStepsByPlantingStepsID(int plantingStepsID)
+        {
+            var fertilizationObjects = clsFertilizations_DAL.GetFertilizationsByPlantingStepsID(plantingStepsID);
+            return fertilizationObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        // Conversion method for Step-only DTO
+        private static FertilizationStepDTO ConvertToStepDTO(FertilizationObject obj)
+        {
+            return new FertilizationStepDTO
+            {
+                Step = obj.Step
+            };
         }
     }
 }

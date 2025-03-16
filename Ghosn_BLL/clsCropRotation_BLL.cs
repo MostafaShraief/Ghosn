@@ -14,6 +14,11 @@ namespace Ghosn_BLL
         public string Step { get; set; }
     }
 
+    public class CropRotationStepDTO
+    {
+        public string Step { get; set; }
+    }
+
     public class clsCropRotation_BLL
     {
         public static List<CropRotationDTO> GetAllCropRotations()
@@ -66,6 +71,34 @@ namespace Ghosn_BLL
         private static CropRotationObject ConvertToDALObject(CropRotationDTO dto)
         {
             return new CropRotationObject(dto.CropRotationID, dto.OutputID, dto.Step);
+        }
+
+        // New function to retrieve only the Step property
+        public static List<CropRotationStepDTO> GetAllCropRotationSteps()
+        {
+            var cropRotationObjects = clsCropRotation_DAL.GetAllCropRotations();
+            return cropRotationObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        public static CropRotationStepDTO? GetCropRotationStepById(int id)
+        {
+            var cropRotationObject = clsCropRotation_DAL.GetCropRotationById(id);
+            return cropRotationObject != null ? ConvertToStepDTO(cropRotationObject) : null;
+        }
+
+        public static List<CropRotationStepDTO> GetCropRotationStepsByOutputID(int outputID)
+        {
+            var cropRotationObjects = clsCropRotation_DAL.GetCropRotationsByOutputID(outputID);
+            return cropRotationObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        // Conversion method for Step-only DTO
+        private static CropRotationStepDTO ConvertToStepDTO(CropRotationObject obj)
+        {
+            return new CropRotationStepDTO
+            {
+                Step = obj.Step
+            };
         }
     }
 }

@@ -15,6 +15,11 @@ namespace Ghosn_BLL
         public string IrrigationSystemName { get; set; } // Added
     }
 
+    public class SuggestedIrrigationSystemNameDTO
+    {
+        public string IrrigationSystemName { get; set; }
+    }
+
     public class clsSuggestedIrrigationSystems_BLL
     {
         public static List<SuggestedIrrigationSystemDTO> GetAllSuggestedIrrigationSystems()
@@ -68,6 +73,36 @@ namespace Ghosn_BLL
         private static SuggestedIrrigationSystemObject ConvertToDALObject(SuggestedIrrigationSystemDTO dto)
         {
             return new SuggestedIrrigationSystemObject(dto.SuggestedIrrigationSystemID, dto.OutputID, dto.IrrigationSystemID, dto.IrrigationSystemName);
+        }
+
+        // New function to retrieve all IrrigationSystemNames
+        public static List<SuggestedIrrigationSystemNameDTO> GetAllSuggestedIrrigationSystemNames()
+        {
+            var suggestedIrrigationSystemObjects = clsSuggestedIrrigationSystems_DAL.GetAllSuggestedIrrigationSystems();
+            return suggestedIrrigationSystemObjects.Select(ConvertToNameDTO).ToList();
+        }
+
+        // New function to retrieve IrrigationSystemName by SuggestedIrrigationSystemID
+        public static SuggestedIrrigationSystemNameDTO? GetSuggestedIrrigationSystemNameById(int id)
+        {
+            var suggestedIrrigationSystemObject = clsSuggestedIrrigationSystems_DAL.GetSuggestedIrrigationSystemById(id);
+            return suggestedIrrigationSystemObject != null ? ConvertToNameDTO(suggestedIrrigationSystemObject) : null;
+        }
+
+        // New function to retrieve IrrigationSystemNames by OutputID
+        public static List<SuggestedIrrigationSystemNameDTO> GetSuggestedIrrigationSystemNamesByOutputID(int outputID)
+        {
+            var suggestedIrrigationSystemObjects = clsSuggestedIrrigationSystems_DAL.GetSuggestedIrrigationSystemsByOutputID(outputID);
+            return suggestedIrrigationSystemObjects.Select(ConvertToNameDTO).ToList();
+        }
+
+        // Conversion method for Name-only DTO
+        private static SuggestedIrrigationSystemNameDTO ConvertToNameDTO(SuggestedIrrigationSystemObject obj)
+        {
+            return new SuggestedIrrigationSystemNameDTO
+            {
+                IrrigationSystemName = obj.IrrigationSystemName
+            };
         }
     }
 }

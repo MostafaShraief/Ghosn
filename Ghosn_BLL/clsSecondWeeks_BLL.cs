@@ -13,6 +13,12 @@ namespace Ghosn_BLL
         public int SuggestedTimelineID { get; set; }
         public string Step { get; set; }
     }
+
+    public class SecondWeekStepDTO
+    {
+        public string Step { get; set; }
+    }
+
     public class clsSecondWeeks_BLL
     {
         public static List<SecondWeekDTO> GetAllSecondWeeks()
@@ -65,6 +71,34 @@ namespace Ghosn_BLL
         private static SecondWeekObject ConvertToDALObject(SecondWeekDTO dto)
         {
             return new SecondWeekObject(dto.SecondWeekID, dto.SuggestedTimelineID, dto.Step);
+        }
+
+        // New function to retrieve only the Step property
+        public static List<SecondWeekStepDTO> GetAllSecondWeekSteps()
+        {
+            var secondWeekObjects = clsSecondWeeks_DAL.GetAllSecondWeeks();
+            return secondWeekObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        public static SecondWeekStepDTO? GetSecondWeekStepById(int id)
+        {
+            var secondWeekObject = clsSecondWeeks_DAL.GetSecondWeekById(id);
+            return secondWeekObject != null ? ConvertToStepDTO(secondWeekObject) : null;
+        }
+
+        public static List<SecondWeekStepDTO> GetSecondWeekStepsBySuggestedTimelineID(int suggestedTimelineID)
+        {
+            var secondWeekObjects = clsSecondWeeks_DAL.GetSecondWeeksBySuggestedTimelineID(suggestedTimelineID);
+            return secondWeekObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        // Conversion method for Step-only DTO
+        private static SecondWeekStepDTO ConvertToStepDTO(SecondWeekObject obj)
+        {
+            return new SecondWeekStepDTO
+            {
+                Step = obj.Step
+            };
         }
     }
 }

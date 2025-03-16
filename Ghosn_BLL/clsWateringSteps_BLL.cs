@@ -14,6 +14,11 @@ namespace Ghosn_BLL
         public string Step { get; set; }
     }
 
+    public class WateringStepNameDTO
+    {
+        public string Step { get; set; }
+    }
+
     public class clsWateringSteps_BLL
     {
         public static List<WateringStepDTO> GetAllWateringSteps()
@@ -66,6 +71,36 @@ namespace Ghosn_BLL
         private static WateringStepObject ConvertToDALObject(WateringStepDTO dto)
         {
             return new WateringStepObject(dto.WateringStepsID, dto.PlantingStepsID, dto.Step);
+        }
+
+        // New function to retrieve all Steps
+        public static List<WateringStepNameDTO> GetAllWateringStepNames()
+        {
+            var wateringStepObjects = clsWateringSteps_DAL.GetAllWateringSteps();
+            return wateringStepObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        // New function to retrieve Step by WateringStepsID
+        public static WateringStepNameDTO? GetWateringStepNameById(int id)
+        {
+            var wateringStepObject = clsWateringSteps_DAL.GetWateringStepById(id);
+            return wateringStepObject != null ? ConvertToStepDTO(wateringStepObject) : null;
+        }
+
+        // New function to retrieve Steps by PlantingStepsID
+        public static List<WateringStepNameDTO> GetWateringStepNamesByPlantingStepsID(int plantingStepsID)
+        {
+            var wateringStepObjects = clsWateringSteps_DAL.GetWateringStepsByPlantingStepsID(plantingStepsID);
+            return wateringStepObjects.Select(ConvertToStepDTO).ToList();
+        }
+
+        // Conversion method for Step-only DTO
+        private static WateringStepNameDTO ConvertToStepDTO(WateringStepObject obj)
+        {
+            return new WateringStepNameDTO
+            {
+                Step = obj.Step
+            };
         }
     }
 }
