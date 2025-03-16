@@ -58,7 +58,7 @@ namespace Ghosn_DAL
                                 reader.GetInt32(reader.GetOrdinal("AreaSize")),
                                 reader.GetByte(reader.GetOrdinal("AreaShape")),
                                 reader.GetByte(reader.GetOrdinal("Climate")),
-                                reader.IsDBNull(reader.GetOrdinal("AverageTemperature")) ? (byte?)null : reader.GetByte(reader.GetOrdinal("AverageTemperature")),
+                                reader.GetByte(reader.GetOrdinal("Temperature")),
                                 reader.IsDBNull(reader.GetOrdinal("SoilType")) ? (byte?)null : reader.GetByte(reader.GetOrdinal("SoilType")),
                                 reader.GetByte(reader.GetOrdinal("SoilFertilityLevel")),
                                 reader.GetByte(reader.GetOrdinal("PlantsStatus")),
@@ -90,7 +90,7 @@ namespace Ghosn_DAL
                                 reader.GetInt32(reader.GetOrdinal("AreaSize")),
                                 reader.GetByte(reader.GetOrdinal("AreaShape")),
                                 reader.GetByte(reader.GetOrdinal("Climate")),
-                                reader.IsDBNull(reader.GetOrdinal("AverageTemperature")) ? (byte?)null : reader.GetByte(reader.GetOrdinal("AverageTemperature")),
+                                reader.GetByte(reader.GetOrdinal("Temperature")),
                                 reader.IsDBNull(reader.GetOrdinal("SoilType")) ? (byte?)null : reader.GetByte(reader.GetOrdinal("SoilType")),
                                 reader.GetByte(reader.GetOrdinal("SoilFertilityLevel")),
                                 reader.GetByte(reader.GetOrdinal("PlantsStatus")),
@@ -108,8 +108,8 @@ namespace Ghosn_DAL
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 string query = @"
-            INSERT INTO Inputs (LocationType, AreaSize, AreaShape, Climate, AverageTemperature, SoilType, SoilFertilityLevel, PlantsStatus, MedicationsUsed)
-            VALUES (@LocationType, @AreaSize, @AreaShape, @Climate, @AverageTemperature, @SoilType, @SoilFertilityLevel, @PlantsStatus, @MedicationsUsed);
+            INSERT INTO Inputs (LocationType, AreaSize, AreaShape, Climate, Temperature, SoilType, SoilFertilityLevel, PlantsStatus, MedicationsUsed)
+            VALUES (@LocationType, @AreaSize, @AreaShape, @Climate, @Temperature, @SoilType, @SoilFertilityLevel, @PlantsStatus, @MedicationsUsed);
             SELECT SCOPE_IDENTITY();";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -141,7 +141,7 @@ namespace Ghosn_DAL
                 AreaSize = @AreaSize,
                 AreaShape = @AreaShape,
                 Climate = @Climate,
-                AverageTemperature = @AverageTemperature,
+                Temperature = @Temperature,
                 SoilType = @SoilType,
                 SoilFertilityLevel = @SoilFertilityLevel,
                 PlantsStatus = @PlantsStatus,

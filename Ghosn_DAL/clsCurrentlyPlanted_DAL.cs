@@ -8,14 +8,14 @@ namespace Ghosn_DAL
     {
         public int CurrentlyPlantedID { get; set; }
         public int PlantID { get; set; }
-        public int OutputID { get; set; }
+        public int InputID { get; set; }
         public string PlantName { get; set; } // Added
 
-        public CurrentlyPlantedObject(int currentlyPlantedID, int plantID, int outputID, string plantName)
+        public CurrentlyPlantedObject(int currentlyPlantedID, int plantID, int InputID, string plantName)
         {
             CurrentlyPlantedID = currentlyPlantedID;
             PlantID = plantID;
-            OutputID = outputID;
+            this.InputID = InputID;
             PlantName = plantName; // Added
         }
     }
@@ -43,7 +43,7 @@ namespace Ghosn_DAL
                             currentlyPlantedList.Add(new CurrentlyPlantedObject(
                                 reader.GetInt32(reader.GetOrdinal("CurrentlyPlantedID")),
                                 reader.GetInt32(reader.GetOrdinal("PlantID")),
-                                reader.GetInt32(reader.GetOrdinal("OutputID")),
+                                reader.GetInt32(reader.GetOrdinal("InputID")),
                                 reader.GetString(reader.GetOrdinal("PlantName")) // Added
                             ));
                         }
@@ -73,7 +73,7 @@ namespace Ghosn_DAL
                             return new CurrentlyPlantedObject(
                                 reader.GetInt32(reader.GetOrdinal("CurrentlyPlantedID")),
                                 reader.GetInt32(reader.GetOrdinal("PlantID")),
-                                reader.GetInt32(reader.GetOrdinal("OutputID")),
+                                reader.GetInt32(reader.GetOrdinal("InputID")),
                                 reader.GetString(reader.GetOrdinal("PlantName")) // Added
                             );
                         }
@@ -87,11 +87,11 @@ namespace Ghosn_DAL
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "INSERT INTO CurrentlyPlanted (PlantID, OutputID) VALUES (@PlantID, @OutputID); SELECT SCOPE_IDENTITY();";
+                string query = "INSERT INTO CurrentlyPlanted (PlantID, InputID) VALUES (@PlantID, @InputID); SELECT SCOPE_IDENTITY();";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@PlantID", currentlyPlanted.PlantID);
-                    cmd.Parameters.AddWithValue("@OutputID", currentlyPlanted.OutputID);
+                    cmd.Parameters.AddWithValue("@InputID", currentlyPlanted.InputID);
                     conn.Open();
                     return Convert.ToInt32(cmd.ExecuteScalar());
                 }
@@ -102,12 +102,12 @@ namespace Ghosn_DAL
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "UPDATE CurrentlyPlanted SET PlantID = @PlantID, OutputID = @OutputID WHERE CurrentlyPlantedID = @CurrentlyPlantedID";
+                string query = "UPDATE CurrentlyPlanted SET PlantID = @PlantID, InputID = @InputID WHERE CurrentlyPlantedID = @CurrentlyPlantedID";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@CurrentlyPlantedID", currentlyPlanted.CurrentlyPlantedID);
                     cmd.Parameters.AddWithValue("@PlantID", currentlyPlanted.PlantID);
-                    cmd.Parameters.AddWithValue("@OutputID", currentlyPlanted.OutputID);
+                    cmd.Parameters.AddWithValue("@InputID", currentlyPlanted.InputID);
                     conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
                     return rowsAffected > 0;
@@ -130,8 +130,8 @@ namespace Ghosn_DAL
             }
         }
 
-        // Function to retrieve all CurrentlyPlanted by OutputID
-        public static List<CurrentlyPlantedObject> GetCurrentlyPlantedByOutputID(int outputID)
+        // Function to retrieve all CurrentlyPlanted by InputID
+        public static List<CurrentlyPlantedObject> GetCurrentlyPlantedByInputID(int InputID)
         {
             var currentlyPlantedList = new List<CurrentlyPlantedObject>();
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -140,10 +140,10 @@ namespace Ghosn_DAL
                     SELECT CurrentlyPlanted.*, Plants.PlantName
                     FROM CurrentlyPlanted
                     INNER JOIN Plants ON CurrentlyPlanted.PlantID = Plants.PlantID
-                    WHERE CurrentlyPlanted.OutputID = @OutputID";
+                    WHERE CurrentlyPlanted.InputID = @InputID";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@OutputID", outputID);
+                    cmd.Parameters.AddWithValue("@InputID", InputID);
                     conn.Open();
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -152,7 +152,7 @@ namespace Ghosn_DAL
                             currentlyPlantedList.Add(new CurrentlyPlantedObject(
                                 reader.GetInt32(reader.GetOrdinal("CurrentlyPlantedID")),
                                 reader.GetInt32(reader.GetOrdinal("PlantID")),
-                                reader.GetInt32(reader.GetOrdinal("OutputID")),
+                                reader.GetInt32(reader.GetOrdinal("InputID")),
                                 reader.GetString(reader.GetOrdinal("PlantName")) // Added
                             ));
                         }

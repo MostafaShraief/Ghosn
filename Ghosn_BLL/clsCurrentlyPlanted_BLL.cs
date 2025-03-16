@@ -9,8 +9,18 @@ namespace Ghosn_BLL
     {
         public int CurrentlyPlantedID { get; set; }
         public int PlantID { get; set; }
-        public int OutputID { get; set; }
+        public int InputID { get; set; }
         public string PlantName { get; set; } // Added
+    }
+
+    public class CurrentlyPlantedRequestDTO
+    {
+        public int PlantID { get; set; } // Frontend sends PlantID
+    }
+
+    public class CurrentlyPlantedResponseDTO
+    {
+        public string PlantName { get; set; }
     }
 
     public class clsCurrentlyPlanted_BLL
@@ -45,9 +55,9 @@ namespace Ghosn_BLL
         }
 
         // Function to retrieve all CurrentlyPlanted by OutputID
-        public static List<CurrentlyPlantedDTO> GetCurrentlyPlantedByOutputID(int outputID)
+        public static List<CurrentlyPlantedDTO> GetCurrentlyPlantedByInputID(int outputID)
         {
-            var currentlyPlantedObjects = clsCurrentlyPlanted_DAL.GetCurrentlyPlantedByOutputID(outputID);
+            var currentlyPlantedObjects = clsCurrentlyPlanted_DAL.GetCurrentlyPlantedByInputID(outputID);
             return currentlyPlantedObjects.Select(ConvertToDTO).ToList();
         }
 
@@ -58,14 +68,42 @@ namespace Ghosn_BLL
             {
                 CurrentlyPlantedID = obj.CurrentlyPlantedID,
                 PlantID = obj.PlantID,
-                OutputID = obj.OutputID,
+                InputID = obj.InputID,
                 PlantName = obj.PlantName // Added
             };
         }
 
         private static CurrentlyPlantedObject ConvertToDALObject(CurrentlyPlantedDTO dto)
         {
-            return new CurrentlyPlantedObject(dto.CurrentlyPlantedID, dto.PlantID, dto.OutputID, dto.PlantName);
+            return new CurrentlyPlantedObject(dto.CurrentlyPlantedID, dto.PlantID, dto.InputID, dto.PlantName);
+        }
+
+        // New function to retrieve only the PlantName property
+        public static List<CurrentlyPlantedResponseDTO> GetAllCurrentlyPlantedPlantNames()
+        {
+            var currentlyPlantedObjects = clsCurrentlyPlanted_DAL.GetAllCurrentlyPlanted();
+            return currentlyPlantedObjects.Select(ConvertToPlantNameDTO).ToList();
+        }
+
+        public static CurrentlyPlantedResponseDTO? GetCurrentlyPlantedPlantNameById(int id)
+        {
+            var currentlyPlantedObject = clsCurrentlyPlanted_DAL.GetCurrentlyPlantedById(id);
+            return currentlyPlantedObject != null ? ConvertToPlantNameDTO(currentlyPlantedObject) : null;
+        }
+
+        public static List<CurrentlyPlantedResponseDTO> GetCurrentlyPlantedPlantNamesByInputID(int inputID)
+        {
+            var currentlyPlantedObjects = clsCurrentlyPlanted_DAL.GetCurrentlyPlantedByInputID(inputID);
+            return currentlyPlantedObjects.Select(ConvertToPlantNameDTO).ToList();
+        }
+
+        // Conversion method for PlantName-only DTO
+        private static CurrentlyPlantedResponseDTO ConvertToPlantNameDTO(CurrentlyPlantedObject obj)
+        {
+            return new CurrentlyPlantedResponseDTO
+            {
+                PlantName = obj.PlantName
+            };
         }
     }
 }
