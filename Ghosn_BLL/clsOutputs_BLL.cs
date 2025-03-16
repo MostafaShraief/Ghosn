@@ -1,106 +1,263 @@
-﻿using System.Collections.Generic;
-using Ghosn_DAL;
+﻿using Ghosn_DAL;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Ghosn_BLL
 {
+    public class OutputDTO
+    {
+        public int OutputID { get; set; }
+        public int PlantTypeID { get; set; }
+
+        public List<SoilImprovementStepDTO> SoilImprovements { get; set; } = new();
+        public List<PestPreventionStepDTO> PestPreventions { get; set; } = new();
+        public AllPlantingStepDTO? PlantingSteps { get; set; } = new();
+        public List<CropRotationStepDTO> CropRotations { get; set; } = new();
+        public AllSuggestedTimelineDTO? SuggestedTimelines { get; set; } = new();
+    }
+
+    public class OutputRequestDTO : OutputDTO
+    {
+        public List<SuggestedMaterialRequestDTO> SuggestedMaterials { get; set; } = new();
+        public List<SuggestedFarmingToolRequestDTO> SuggestedFarmingTools { get; set; } = new();
+        public List<SuggestedIrrigationSystemRequestDTO> SuggestedIrrigationSystems { get; set; } = new();
+        public List<SuggestedPlantRequestDTO> SuggestedPlants { get; set; } = new();
+    }
+
+    public class OutputResponseDTO : OutputDTO
+    {
+        public List<SuggestedMaterialResponseDTO> SuggestedMaterials { get; set; } = new();
+        public List<SuggestedFarmingToolResponseDTO> SuggestedFarmingTools { get; set; } = new();
+        public List<SuggestedIrrigationSystemResponseDTO> SuggestedIrrigationSystems { get; set; } = new();
+        public List<SuggestedPlantResponseDTO> SuggestedPlants { get; set; } = new();
+    }
+
     public class clsOutputs_BLL
     {
-        public class CropRotationDTO
+        // Retrieve all Outputs with related data
+        public static List<OutputResponseDTO> GetAllOutputsWithDetails()
         {
-            public int CropRotationID { get; set; }
-            public string Name { get; set; } = string.Empty; 
-        }
+            var outputs = new List<OutputResponseDTO>();
 
-        public class SuggestedFarmingToolDTO
-        {
-            public int SuggestedFarmingToolID { get; set; }
-            public string Name { get; set; } = string.Empty;
-        }
-
-        public class SuggestedMaterialDTO
-        {
-            public int SuggestedMaterialID { get; set; }
-            public string Name { get; set; } = string.Empty;
-        }
-
-        public class PlantingStepDTO
-        {
-            public int PlantingStepID { get; set; }
-            public string Description { get; set; } = string.Empty;
-        }
-
-        public class PestPreventionDTO
-        {
-            public int PestPreventionID { get; set; }
-            public string Description { get; set; } = string.Empty;
-        }
-
-        public class SuggestedPlantDTO
-        {
-            public int SuggestedPlantID { get; set; }
-            public string Name { get; set; } = string.Empty;
-        }
-
-        public class SoilImprovementDTO
-        {
-            public int SoilImprovementID { get; set; }
-            public string Name { get; set; } = string.Empty;
-        }
-
-        public class SuggestedTimelineDTO
-        {
-            public int SuggestedTimelineID { get; set; }
-            public string Name { get; set; } = string.Empty;
-        }
-
-        public class SuggestedIrrigationSystemDTO
-        {
-            public int SuggestedIrrigationSystemID { get; set; }
-            public string Name { get; set; } = string.Empty;
-        }
-
-        public class OutputDTO
-        {
-            public int OutputID { get; set; }
-            public int PlantTypeID { get; set; }
-
-            public List<SoilImprovementDTO> SoilImprovements { get; set; } = new();
-            public List<SuggestedPlantDTO> SuggestedPlants { get; set; } = new();
-            public List<PestPreventionDTO> PestPreventions { get; set; } = new();
-            public List<PlantingStepDTO> PlantingSteps { get; set; } = new();
-            public List<SuggestedMaterialDTO> SuggestedMaterials { get; set; } = new();
-            public List<SuggestedFarmingToolDTO> SuggestedFarmingTools { get; set; } = new();
-            public List<CropRotationDTO> CropRotations { get; set; } = new();
-            public List<SuggestedIrrigationSystemDTO> SuggestedIrrigationSystems { get; set; } = new();
-            public List<SuggestedTimelineDTO> SuggestedTimelines { get; set; } = new();
-        }
-
-      
-        private static OutputDTO MapToBLL(Ghosn_DAL.clsOutputs_DAL.OutputDTO dalOutput)
-        {
-            return new OutputDTO
+            // Retrieve all Outputs from DAL
+            var outputObjects = clsOutputs_DAL.GetAllOutputs();
+            foreach (var outputObject in outputObjects)
             {
-                OutputID = dalOutput.OutputID,
-                PlantTypeID = dalOutput.PlantTypeID,
+                var outputResponseDTO = new OutputResponseDTO
+                {
+                    OutputID = outputObject.OutputID,
+                    PlantTypeID = outputObject.PlantTypeID,
+                    SoilImprovements = clsSoilImprovements_BLL.GetSoilImprovementStepsByOutputID(outputObject.OutputID),
+                    PestPreventions = clsPestPreventions_BLL.GetPestPreventionStepsByOutputID(outputObject.OutputID),
+                    PlantingSteps = clsPlantingSteps_BLL.GetPlantingStepWithDetailsByOutputId(outputObject.OutputID),
+                    CropRotations = clsCropRotation_BLL.GetCropRotationStepsByOutputID(outputObject.OutputID),
+                    SuggestedTimelines = clsSuggestedTimelines_BLL.GetSuggestedTimelineWithDetailsById(outputObject.OutputID),
+                    SuggestedMaterials = clsSuggestedMaterials_BLL.GetSuggestedMaterialNamesByOutputID(outputObject.OutputID),
+                    SuggestedFarmingTools = clsSuggestedFarmingTools_BLL.GetSuggestedFarmingToolNamesByOutputID(outputObject.OutputID),
+                    SuggestedIrrigationSystems = clsSuggestedIrrigationSystems_BLL.GetSuggestedIrrigationSystemNamesByOutputID(outputObject.OutputID),
+                    SuggestedPlants = clsSuggestedPlants_BLL.GetSuggestedPlantNamesByOutputID(outputObject.OutputID)
+                };
 
-                SoilImprovements = dalOutput.SoilImprovements?.ConvertAll(si => new SoilImprovementDTO { SoilImprovementID = si.SoilImprovementID, Name = si.Name }) ?? new(),
-                SuggestedPlants = dalOutput.SuggestedPlants?.ConvertAll(sp => new SuggestedPlantDTO { SuggestedPlantID = sp.SuggestedPlantID, Name = sp.Name }) ?? new(),
-                PestPreventions = dalOutput.PestPreventions?.ConvertAll(pp => new PestPreventionDTO { PestPreventionID = pp.PestPreventionID, Description = pp.Description }) ?? new(),
-                PlantingSteps = dalOutput.PlantingSteps?.ConvertAll(ps => new PlantingStepDTO { PlantingStepID = ps.PlantingStepID, Description = ps.Description }) ?? new(),
-                SuggestedMaterials = dalOutput.SuggestedMaterials?.ConvertAll(sm => new SuggestedMaterialDTO { SuggestedMaterialID = sm.SuggestedMaterialID, Name = sm.Name }) ?? new(),
-                SuggestedFarmingTools = dalOutput.SuggestedFarmingTools?.ConvertAll(sft => new SuggestedFarmingToolDTO { SuggestedFarmingToolID = sft.SuggestedFarmingToolID, Name = sft.Name }) ?? new(),
-                CropRotations = dalOutput.CropRotations?.ConvertAll(cr => new CropRotationDTO { CropRotationID = cr.CropRotationID, Name = cr.Name }) ?? new(),
-                SuggestedIrrigationSystems = dalOutput.SuggestedIrrigationSystems?.ConvertAll(sis => new SuggestedIrrigationSystemDTO { SuggestedIrrigationSystemID = sis.SuggestedIrrigationSystemID, Name = sis.Name }) ?? new(),
-                SuggestedTimelines = dalOutput.SuggestedTimelines?.ConvertAll(st => new SuggestedTimelineDTO { SuggestedTimelineID = st.SuggestedTimelineID, Name = st.Name }) ?? new(),
+                outputs.Add(outputResponseDTO);
+            }
+
+            return outputs;
+        }
+
+        // Retrieve an Output by ID with related data
+        public static OutputResponseDTO? GetOutputWithDetailsById(int outputID)
+        {
+            var outputObject = clsOutputs_DAL.GetOutputById(outputID);
+            if (outputObject == null) return null;
+
+            return new OutputResponseDTO
+            {
+                OutputID = outputObject.OutputID,
+                PlantTypeID = outputObject.PlantTypeID,
+                SoilImprovements = clsSoilImprovements_BLL.GetSoilImprovementStepsByOutputID(outputObject.OutputID),
+                PestPreventions = clsPestPreventions_BLL.GetPestPreventionStepsByOutputID(outputObject.OutputID),
+                PlantingSteps = clsPlantingSteps_BLL.GetPlantingStepWithDetailsByOutputId(outputObject.OutputID),
+                CropRotations = clsCropRotation_BLL.GetCropRotationStepsByOutputID(outputObject.OutputID),
+                SuggestedTimelines = clsSuggestedTimelines_BLL.GetSuggestedTimelineWithDetailsById(outputObject.OutputID),
+                SuggestedMaterials = clsSuggestedMaterials_BLL.GetSuggestedMaterialNamesByOutputID(outputObject.OutputID),
+                SuggestedFarmingTools = clsSuggestedFarmingTools_BLL.GetSuggestedFarmingToolNamesByOutputID(outputObject.OutputID),
+                SuggestedIrrigationSystems = clsSuggestedIrrigationSystems_BLL.GetSuggestedIrrigationSystemNamesByOutputID(outputObject.OutputID),
+                SuggestedPlants = clsSuggestedPlants_BLL.GetSuggestedPlantNamesByOutputID(outputObject.OutputID)
             };
         }
 
-        public static OutputDTO GetOutputById(int outputID)
+        // Add a new Output with related data
+        public static int AddOutputWithDetails(OutputRequestDTO dto)
         {
-            var dalOutput = clsOutputs_DAL.GetOutputById(outputID);
-            if (dalOutput == null) return null; 
+            // Add the Output
+            var outputObject = new OutputObject(0, dto.PlantTypeID);
+            int outputID = clsOutputs_DAL.AddOutput(outputObject);
 
-            return MapToBLL(dalOutput);
+            // Add related data
+            AddRelatedData(outputID, dto);
+
+            return outputID;
+        }
+
+        // Update an existing Output with related data
+        public static bool UpdateOutputWithDetails(OutputRequestDTO dto)
+        {
+            // Update the Output
+            var outputObject = new OutputObject(dto.OutputID, dto.PlantTypeID);
+            bool isUpdated = clsOutputs_DAL.UpdateOutput(outputObject);
+
+            if (isUpdated)
+            {
+                // Delete existing related data
+                DeleteRelatedData(dto.OutputID);
+
+                // Add updated related data
+                AddRelatedData(dto.OutputID, dto);
+            }
+
+            return isUpdated;
+        }
+
+        // Delete an Output and its related data
+        public static bool DeleteOutputWithDetails(int outputID)
+        {
+            // Delete related data
+            DeleteRelatedData(outputID);
+
+            // Delete the Output
+            return clsOutputs_DAL.DeleteOutput(outputID);
+        }
+
+        // Delete all Outputs and their related data
+        //public static bool DeleteAllOutputs()
+        //{
+        //    // Retrieve all Outputs
+        //    var outputObjects = clsOutputs_DAL.GetAllOutputs();
+
+        //    // Delete each Output and its related data
+        //    foreach (var outputObject in outputObjects)
+        //    {
+        //        DeleteRelatedData(outputObject.OutputID);
+        //        clsOutputs_DAL.DeleteOutput(outputObject.OutputID);
+        //    }
+
+        //    return true;
+        //}
+
+        // Helper method to add related data
+        private static void AddRelatedData(int outputID, OutputRequestDTO dto)
+        {
+            // Add SoilImprovements
+            foreach (var soilImprovement in dto.SoilImprovements)
+            {
+                clsSoilImprovements_BLL.AddSoilImprovement(new SoilImprovementDTO
+                {
+                    OutputID = outputID,
+                    Step = soilImprovement.Step
+                });
+            }
+
+            // Add PestPreventions
+            foreach (var pestPrevention in dto.PestPreventions)
+            {
+                clsPestPreventions_BLL.AddPestPrevention(new PestPreventionDTO
+                {
+                    OutputID = outputID,
+                    Step = pestPrevention.Step
+                });
+            }
+
+            // Add PlantingSteps
+            if (dto.PlantingSteps != null)
+            {
+                clsPlantingSteps_BLL.AddAll(new AllPlantingStepDTO
+                {
+                    OutputID = outputID,
+                    CareSteps = dto.PlantingSteps.CareSteps,
+                    FertilizationSteps = dto.PlantingSteps.FertilizationSteps,
+                    WateringSteps = dto.PlantingSteps.WateringSteps,
+                    ChoosePlants = dto.PlantingSteps.ChoosePlants,
+                    PrepareSoilSteps = dto.PlantingSteps.PrepareSoilSteps
+                });
+            }
+
+            // Add CropRotations
+            foreach (var cropRotation in dto.CropRotations)
+            {
+                clsCropRotation_BLL.AddCropRotation(new CropRotationDTO
+                {
+                    OutputID = outputID,
+                    Step = cropRotation.Step
+                });
+            }
+
+            // Add SuggestedTimelines
+            if (dto.SuggestedTimelines != null)
+            {
+                clsSuggestedTimelines_BLL.AddAll(new AllSuggestedTimelineDTO
+                {
+                    OutputID = outputID,
+                    FirstWeeks = dto.SuggestedTimelines.FirstWeeks,
+                    SecondWeeks = dto.SuggestedTimelines.SecondWeeks,
+                    FirstMonths = dto.SuggestedTimelines.FirstMonths,
+                    ThirdMonths = dto.SuggestedTimelines.ThirdMonths
+                });
+            }
+
+            // Add SuggestedMaterials
+            foreach (var suggestedMaterial in dto.SuggestedMaterials)
+            {
+                clsSuggestedMaterials_BLL.AddSuggestedMaterial(new SuggestedMaterialDTO
+                {
+                    OutputID = outputID,
+                    MaterialID = suggestedMaterial.MaterialID
+                });
+            }
+
+            // Add SuggestedFarmingTools
+            foreach (var suggestedFarmingTool in dto.SuggestedFarmingTools)
+            {
+                clsSuggestedFarmingTools_BLL.AddSuggestedFarmingTool(new SuggestedFarmingToolDTO
+                {
+                    OutputID = outputID,
+                    FarmingToolID = suggestedFarmingTool.FarmingToolID
+                });
+            }
+
+            // Add SuggestedIrrigationSystems
+            foreach (var suggestedIrrigationSystem in dto.SuggestedIrrigationSystems)
+            {
+                clsSuggestedIrrigationSystems_BLL.AddSuggestedIrrigationSystem(new SuggestedIrrigationSystemDTO
+                {
+                    OutputID = outputID,
+                    IrrigationSystemID = suggestedIrrigationSystem.IrrigationSystemID
+                });
+            }
+
+            // Add SuggestedPlants
+            foreach (var suggestedPlant in dto.SuggestedPlants)
+            {
+                clsSuggestedPlants_BLL.AddSuggestedPlant(new SuggestedPlantDTO
+                {
+                    OutputID = outputID,
+                    PlantID = suggestedPlant.PlantID
+                });
+            }
+        }
+
+        // Helper method to delete related data
+        private static void DeleteRelatedData(int outputID)
+        {
+            clsSoilImprovements_BLL.DeleteSoilImprovement(outputID);
+            clsPestPreventions_BLL.DeletePestPrevention(outputID);
+            clsPlantingSteps_BLL.DeleteAll(outputID);
+            clsCropRotation_BLL.DeleteCropRotation(outputID);
+            clsSuggestedTimelines_BLL.DeleteAll(outputID);
+            clsSuggestedMaterials_BLL.DeleteSuggestedMaterialByOutputID(outputID);
+            clsSuggestedFarmingTools_BLL.DeleteSuggestedFarmingToolByOutputID(outputID);
+            clsSuggestedIrrigationSystems_BLL.DeleteSuggestedIrrigationSystemByOutputID(outputID);
+            clsSuggestedPlants_BLL.DeleteSuggestedPlantByOutputID(outputID);
         }
     }
 }

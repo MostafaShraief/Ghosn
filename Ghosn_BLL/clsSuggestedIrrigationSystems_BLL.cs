@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ghosn_BLL
 {
@@ -15,50 +13,60 @@ namespace Ghosn_BLL
         public string IrrigationSystemName { get; set; } // Added
     }
 
-    public class SuggestedIrrigationSystemNameDTO
+    public class SuggestedIrrigationSystemRequestDTO
+    {
+        public int IrrigationSystemID { get; set; } // Frontend sends IrrigationSystemID
+    }
+
+    public class SuggestedIrrigationSystemResponseDTO
     {
         public string IrrigationSystemName { get; set; }
     }
 
     public class clsSuggestedIrrigationSystems_BLL
     {
+        // Retrieve all SuggestedIrrigationSystems
         public static List<SuggestedIrrigationSystemDTO> GetAllSuggestedIrrigationSystems()
         {
             var suggestedIrrigationSystemObjects = clsSuggestedIrrigationSystems_DAL.GetAllSuggestedIrrigationSystems();
             return suggestedIrrigationSystemObjects.Select(ConvertToDTO).ToList();
         }
 
+        // Retrieve a SuggestedIrrigationSystem by ID
         public static SuggestedIrrigationSystemDTO? GetSuggestedIrrigationSystemById(int id)
         {
             var suggestedIrrigationSystemObject = clsSuggestedIrrigationSystems_DAL.GetSuggestedIrrigationSystemById(id);
             return suggestedIrrigationSystemObject != null ? ConvertToDTO(suggestedIrrigationSystemObject) : null;
         }
 
+        // Add a new SuggestedIrrigationSystem
         public static int AddSuggestedIrrigationSystem(SuggestedIrrigationSystemDTO dto)
         {
             var suggestedIrrigationSystemObject = ConvertToDALObject(dto);
             return clsSuggestedIrrigationSystems_DAL.AddSuggestedIrrigationSystem(suggestedIrrigationSystemObject);
         }
 
+        // Update an existing SuggestedIrrigationSystem
         public static bool UpdateSuggestedIrrigationSystem(SuggestedIrrigationSystemDTO dto)
         {
             var suggestedIrrigationSystemObject = ConvertToDALObject(dto);
             return clsSuggestedIrrigationSystems_DAL.UpdateSuggestedIrrigationSystem(suggestedIrrigationSystemObject);
         }
 
-        public static bool DeleteSuggestedIrrigationSystem(int id)
+        // Delete a SuggestedIrrigationSystem by ID
+        public static bool DeleteSuggestedIrrigationSystemByOutputID(int id)
         {
             return clsSuggestedIrrigationSystems_DAL.DeleteSuggestedIrrigationSystem(id);
         }
 
-        // Function to retrieve all SuggestedIrrigationSystems by OutputID
+        // Retrieve all SuggestedIrrigationSystems by OutputID
         public static List<SuggestedIrrigationSystemDTO> GetSuggestedIrrigationSystemsByOutputID(int outputID)
         {
             var suggestedIrrigationSystemObjects = clsSuggestedIrrigationSystems_DAL.GetSuggestedIrrigationSystemsByOutputID(outputID);
             return suggestedIrrigationSystemObjects.Select(ConvertToDTO).ToList();
         }
 
-        // Conversion methods
+        // Conversion method: DAL Object to DTO
         private static SuggestedIrrigationSystemDTO ConvertToDTO(SuggestedIrrigationSystemObject obj)
         {
             return new SuggestedIrrigationSystemDTO
@@ -70,36 +78,37 @@ namespace Ghosn_BLL
             };
         }
 
+        // Conversion method: DTO to DAL Object
         private static SuggestedIrrigationSystemObject ConvertToDALObject(SuggestedIrrigationSystemDTO dto)
         {
             return new SuggestedIrrigationSystemObject(dto.SuggestedIrrigationSystemID, dto.OutputID, dto.IrrigationSystemID, dto.IrrigationSystemName);
         }
 
-        // New function to retrieve all IrrigationSystemNames
-        public static List<SuggestedIrrigationSystemNameDTO> GetAllSuggestedIrrigationSystemNames()
+        // Retrieve all IrrigationSystemNames
+        public static List<SuggestedIrrigationSystemResponseDTO> GetAllSuggestedIrrigationSystemNames()
         {
             var suggestedIrrigationSystemObjects = clsSuggestedIrrigationSystems_DAL.GetAllSuggestedIrrigationSystems();
             return suggestedIrrigationSystemObjects.Select(ConvertToNameDTO).ToList();
         }
 
-        // New function to retrieve IrrigationSystemName by SuggestedIrrigationSystemID
-        public static SuggestedIrrigationSystemNameDTO? GetSuggestedIrrigationSystemNameById(int id)
+        // Retrieve IrrigationSystemName by SuggestedIrrigationSystemID
+        public static SuggestedIrrigationSystemResponseDTO? GetSuggestedIrrigationSystemNameById(int id)
         {
             var suggestedIrrigationSystemObject = clsSuggestedIrrigationSystems_DAL.GetSuggestedIrrigationSystemById(id);
             return suggestedIrrigationSystemObject != null ? ConvertToNameDTO(suggestedIrrigationSystemObject) : null;
         }
 
-        // New function to retrieve IrrigationSystemNames by OutputID
-        public static List<SuggestedIrrigationSystemNameDTO> GetSuggestedIrrigationSystemNamesByOutputID(int outputID)
+        // Retrieve IrrigationSystemNames by OutputID
+        public static List<SuggestedIrrigationSystemResponseDTO> GetSuggestedIrrigationSystemNamesByOutputID(int outputID)
         {
             var suggestedIrrigationSystemObjects = clsSuggestedIrrigationSystems_DAL.GetSuggestedIrrigationSystemsByOutputID(outputID);
             return suggestedIrrigationSystemObjects.Select(ConvertToNameDTO).ToList();
         }
 
         // Conversion method for Name-only DTO
-        private static SuggestedIrrigationSystemNameDTO ConvertToNameDTO(SuggestedIrrigationSystemObject obj)
+        private static SuggestedIrrigationSystemResponseDTO ConvertToNameDTO(SuggestedIrrigationSystemObject obj)
         {
-            return new SuggestedIrrigationSystemNameDTO
+            return new SuggestedIrrigationSystemResponseDTO
             {
                 IrrigationSystemName = obj.IrrigationSystemName
             };

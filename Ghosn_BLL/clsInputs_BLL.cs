@@ -21,12 +21,12 @@ namespace Ghosn_BLL
         public byte? MedicationsUsed { get; set; }
     }
 
-    public class AllInputRequestDTO : InputDTO
+    public class InputRequestDTO : InputDTO
     {
         public List<CurrentlyPlantedRequestDTO>? CurrentlyPlantedPlants { get; set; }
     }
 
-    public class AllInputResponseDTO : InputDTO
+    public class InputResponseDTO : InputDTO
     {
         public List<CurrentlyPlantedResponseDTO>? CurrentlyPlantedPlants { get; set; }
     }
@@ -39,16 +39,16 @@ namespace Ghosn_BLL
         //    return inputObjects.Select(ConvertToDTO).ToList();
         //}
 
-        public static List<AllInputResponseDTO> GetAllInputsWithPlants()
+        public static List<InputResponseDTO> GetAllInputsWithPlants()
         {
-            var allInputs = new List<AllInputResponseDTO>();
+            var allInputs = new List<InputResponseDTO>();
 
             // Retrieve all inputs
             var inputObjects = clsInputs_DAL.GetAllInputs();
             foreach (var inputObject in inputObjects)
             {
                 // Convert InputObject to AllInputResponseDTO
-                var allInputDTO = new AllInputResponseDTO
+                var allInputDTO = new InputResponseDTO
                 {
                     InputID = inputObject.InputID,
                     LocationType = inputObject.LocationType,
@@ -76,7 +76,7 @@ namespace Ghosn_BLL
         //    return inputObject != null ? ConvertToDTO(inputObject) : null;
         //}
 
-        public static AllInputResponseDTO? GetInputWithPlantsById(int id)
+        public static InputResponseDTO? GetInputWithPlantsById(int id)
         {
             // Retrieve the input by ID
             var inputObject = clsInputs_DAL.GetInputById(id);
@@ -86,7 +86,7 @@ namespace Ghosn_BLL
             }
 
             // Convert InputObject to AllInputResponseDTO
-            var allInputDTO = new AllInputResponseDTO
+            var allInputDTO = new InputResponseDTO
             {
                 InputID = inputObject.InputID,
                 LocationType = inputObject.LocationType,
@@ -111,7 +111,7 @@ namespace Ghosn_BLL
         //    return clsInputs_DAL.AddInput(inputObject);
         //}
 
-        public static int AddInputWithPlants(AllInputRequestDTO dto)
+        public static int AddInputWithPlants(InputRequestDTO dto)
         {
             // Add the input
             var inputObject = ConvertToDALObject(dto);
@@ -140,7 +140,7 @@ namespace Ghosn_BLL
         //    return clsInputs_DAL.UpdateInput(inputObject);
         //}
 
-        public static bool UpdateInputWithPlants(AllInputRequestDTO dto)
+        public static bool UpdateInputWithPlants(InputRequestDTO dto)
         {
             // Update the input
             var inputObject = ConvertToDALObject(dto);
@@ -180,9 +180,9 @@ namespace Ghosn_BLL
             return clsInputs_DAL.DeleteInput(id);
         }
 
-        private static AllInputResponseDTO ConvertToResponseDTO(InputObject obj)
+        private static InputResponseDTO ConvertToResponseDTO(InputObject obj)
         {
-            return new AllInputResponseDTO
+            return new InputResponseDTO
             {
                 InputID = obj.InputID,
                 LocationType = obj.LocationType,
@@ -199,7 +199,7 @@ namespace Ghosn_BLL
             };
         }
 
-        private static InputObject ConvertToDALObject(AllInputRequestDTO dto)
+        private static InputObject ConvertToDALObject(InputRequestDTO dto)
         {
             return new InputObject(
                 dto.InputID,

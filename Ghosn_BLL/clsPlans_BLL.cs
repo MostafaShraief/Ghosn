@@ -1,11 +1,7 @@
 ﻿using Ghosn_DAL;
-using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ghosn_BLL
 {
@@ -13,56 +9,143 @@ namespace Ghosn_BLL
     {
         public int PlanID { get; set; }
         public int ClientID { get; set; }
-        public int InputID { get; set; }
-        public int OutputID { get; set; }
+    }
+
+    public class PlanRequestDTO : PlanDTO
+    {
+        public OutputRequestDTO? Output { get; set; }
+        public InputRequestDTO? Input { get; set; }
+    }
+
+    public class PlanResponseDTO : PlanDTO
+    {
+        public OutputResponseDTO? Output { get; set; }
+        public InputResponseDTO? Input { get; set; }
     }
 
     public class clsPlans_BLL
     {
-        public static List<PlanDTO> GetAllPlans()
+
+        // Retrieve all Plans with related data
+        public static List<PlanResponseDTO> GetAllPlansWithDetails()
         {
-            var plansObjects = clsPlans_DAL.GetAllPlans();
-            return plansObjects.Select(ConvertToDTO).ToList();
+            var plans = new List<PlanResponseDTO>();
+
+            // Retrieve all Plans from DAL
+            var planObjects = clsPlans_DAL.GetAllPlans();
+            foreach (var planObject in planObjects)
+            {
+                var planResponseDTO = new PlanResponseDTO
+                {
+                    Output = clsOutputs_BLL.GetOutputWithDetailsById(planObject.OutputID),
+                    Input = clsInputs_BLL.GetInputWithPlantsById(planObject.InputID)
+                };
+
+                plans.Add(planResponseDTO);
+            }
+
+            return plans;
         }
 
-        public static PlanDTO? GetPlanById(int id)
+        // Retrieve a Plan by ID with related data
+        public static PlanResponseDTO? GetPlanWithDetailsById(int planID)
         {
-            var planObject = clsPlans_DAL.GetPlanById(id);
-            return planObject != null ? ConvertToDTO(planObject) : null;
+            var planObject = clsPlans_DAL.GetPlanById(planID);
+            if (planObject == null) return null;
+
+            return new PlanResponseDTO
+            {
+                Output = clsOutputs_BLL.GetOutputWithDetailsById(planObject.OutputID),
+                Input = clsInputs_BLL.GetInputWithPlantsById(planObject.InputID)
+            };
         }
 
-        public static int AddPlan(PlanDTO dto)
+        // Add a new Plan with related data
+        public static int AddPlanWithDetails(PlanRequestDTO dto)
         {
-            var planObject = ConvertToDALObject(dto);
-            return clsPlans_DAL.AddPlan(planObject);
+            if (dto == null || dto.Output == null || dto.Input == null) return 0; // Return failed to add
+            
+            // Add the Output
+            int outputID = clsOutputs_BLL.AddOutputWithDetails(dto.Output);
+
+            // Add the Input
+            int inputID = clsInputs_BLL.AddInputWithPlants(dto.Input);
+
+            // Add the Plan
+            var planObject = new PlanObject(0, dto.ClientID, outputID, inputID);
+            int planID = clsPlans_DAL.AddPlan(planObject);
+
+            return planID;
         }
 
-        public static bool UpdatePlan(PlanDTO dto)
+        // Update an existing Plan with related data
+        public static bool UpdatePlanWithDetails(PlanRequestDTO dto, int planID)
         {
-            var planObject = ConvertToDALObject(dto);
-            return clsPlans_DAL.UpdatePlan(planObject);
+            // Retrieve the existing Plan
+            var planObject = clsPlans_DAL.GetPlanById(planID);
+            if (dto == null || dto.Output == null || dto.Input == null || planObject == null) return false; // Failed to add
+
+            // Update the Output
+            bool isOutputUpdated = clsOutputs_BLL.UpdateOutputWithDetails(dto.Output);
+
+            // Update the Input
+            bool isInputUpdated = clsInputs_BLL.UpdateInputWithPlants(dto.Input);
+
+            // Update the Plan
+            var updatedPlanObject = new PlanObject(planID, dto.ClientID, planObject.OutputID, planObject.InputID);
+            bool isPlanUpdated = clsPlans_DAL.UpdatePlan(updatedPlanObject);
+
+            return isOutputUpdated && isInputUpdated && isPlanUpdated;
         }
 
-        public static bool DeletePlan(int id)
+        // Delete a Plan and its related data
+        public static bool DeletePlanWithDetails(int planID)
         {
-            return clsPlans_DAL.DeletePlan(id);
+            // Retrieve the Plan
+            var planObject = clsPlans_DAL.GetPlanById(planID);
+            if (planObject == null) return false;
+
+            // Delete the Output and its related data
+            bool isOutputDeleted = clsOutputs_BLL.DeleteOutputWithDetails(planObject.OutputID);
+
+            // Delete the Input and its related data
+            bool isInputDeleted = clsInputs_BLL.DeleteInputWithPlants(planObject.InputID);
+
+            // Delete the Plan
+            bool isPlanDeleted = clsPlans_DAL.DeletePlan(planID);
+
+            return isOutputDeleted && isInputDeleted && isPlanDeleted;
         }
 
-        // Conversion methods
+        // Delete all Plans and their related data
+        //public static bool DeleteAllPlans()
+        //{
+        //    // Retrieve all Plans
+        //    var planObjects = clsPlans_DAL.GetAllPlans();
+
+        //    // Delete each Plan and its related data
+        //    foreach (var planObject in planObjects)
+        //    {
+        //        DeletePlanWithDetails(planObject.PlanID);
+        //    }
+
+        //    return true;
+        //}
+
+        // Conversion method: DAL Object to DTO
         private static PlanDTO ConvertToDTO(PlanObject obj)
         {
             return new PlanDTO
             {
                 PlanID = obj.PlanID,
-                ClientID = obj.ClientID,
-                InputID = obj.InputID,
-                OutputID = obj.OutputID
+                ClientID = obj.ClientID
             };
         }
 
+        // Conversion method: DTO to DAL Object
         private static PlanObject ConvertToDALObject(PlanDTO dto)
         {
-            return new PlanObject(dto.PlanID, dto.ClientID, dto.InputID, dto.OutputID);
+            return new PlanObject(dto.PlanID, dto.ClientID, 0, 0); // OutputID and InputID are set to 0 as they are managed separately
         }
     }
 }

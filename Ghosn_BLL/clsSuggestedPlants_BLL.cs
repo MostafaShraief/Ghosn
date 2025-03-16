@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ghosn_BLL
 {
@@ -16,50 +14,60 @@ namespace Ghosn_BLL
         public string PlantName { get; set; } // Added
     }
 
-    public class SuggestedPlantNameDTO
+    public class SuggestedPlantRequestDTO
+    {
+        public int PlantID { get; set; } // Frontend sends PlantID
+    }
+
+    public class SuggestedPlantResponseDTO
     {
         public string PlantName { get; set; }
     }
 
     public class clsSuggestedPlants_BLL
     {
+        // Retrieve all SuggestedPlants
         public static List<SuggestedPlantDTO> GetAllSuggestedPlants()
         {
             var suggestedPlantObjects = clsSuggestedPlants_DAL.GetAllSuggestedPlants();
             return suggestedPlantObjects.Select(ConvertToDTO).ToList();
         }
 
+        // Retrieve a SuggestedPlant by ID
         public static SuggestedPlantDTO? GetSuggestedPlantById(int id)
         {
             var suggestedPlantObject = clsSuggestedPlants_DAL.GetSuggestedPlantById(id);
             return suggestedPlantObject != null ? ConvertToDTO(suggestedPlantObject) : null;
         }
 
+        // Add a new SuggestedPlant
         public static int AddSuggestedPlant(SuggestedPlantDTO dto)
         {
             var suggestedPlantObject = ConvertToDALObject(dto);
             return clsSuggestedPlants_DAL.AddSuggestedPlant(suggestedPlantObject);
         }
 
+        // Update an existing SuggestedPlant
         public static bool UpdateSuggestedPlant(SuggestedPlantDTO dto)
         {
             var suggestedPlantObject = ConvertToDALObject(dto);
             return clsSuggestedPlants_DAL.UpdateSuggestedPlant(suggestedPlantObject);
         }
 
-        public static bool DeleteSuggestedPlant(int id)
+        // Delete a SuggestedPlant by ID
+        public static bool DeleteSuggestedPlantByOutputID(int id)
         {
             return clsSuggestedPlants_DAL.DeleteSuggestedPlant(id);
         }
 
-        // Function to retrieve all SuggestedPlants by OutputID
+        // Retrieve all SuggestedPlants by OutputID
         public static List<SuggestedPlantDTO> GetSuggestedPlantsByOutputID(int outputID)
         {
             var suggestedPlantObjects = clsSuggestedPlants_DAL.GetSuggestedPlantsByOutputID(outputID);
             return suggestedPlantObjects.Select(ConvertToDTO).ToList();
         }
 
-        // Conversion methods
+        // Conversion method: DAL Object to DTO
         private static SuggestedPlantDTO ConvertToDTO(SuggestedPlantObject obj)
         {
             return new SuggestedPlantDTO
@@ -72,36 +80,37 @@ namespace Ghosn_BLL
             };
         }
 
+        // Conversion method: DTO to DAL Object
         private static SuggestedPlantObject ConvertToDALObject(SuggestedPlantDTO dto)
         {
             return new SuggestedPlantObject(dto.SuggestedPlantID, dto.PlantID, dto.OutputID, dto.PlantTypeID, dto.PlantName);
         }
 
-        // New function to retrieve all PlantNames
-        public static List<SuggestedPlantNameDTO> GetAllSuggestedPlantNames()
+        // Retrieve all PlantNames
+        public static List<SuggestedPlantResponseDTO> GetAllSuggestedPlantNames()
         {
             var suggestedPlantObjects = clsSuggestedPlants_DAL.GetAllSuggestedPlants();
             return suggestedPlantObjects.Select(ConvertToNameDTO).ToList();
         }
 
-        // New function to retrieve PlantName by SuggestedPlantID
-        public static SuggestedPlantNameDTO? GetSuggestedPlantNameById(int id)
+        // Retrieve PlantName by SuggestedPlantID
+        public static SuggestedPlantResponseDTO? GetSuggestedPlantNameById(int id)
         {
             var suggestedPlantObject = clsSuggestedPlants_DAL.GetSuggestedPlantById(id);
             return suggestedPlantObject != null ? ConvertToNameDTO(suggestedPlantObject) : null;
         }
 
-        // New function to retrieve PlantNames by OutputID
-        public static List<SuggestedPlantNameDTO> GetSuggestedPlantNamesByOutputID(int outputID)
+        // Retrieve PlantNames by OutputID
+        public static List<SuggestedPlantResponseDTO> GetSuggestedPlantNamesByOutputID(int outputID)
         {
             var suggestedPlantObjects = clsSuggestedPlants_DAL.GetSuggestedPlantsByOutputID(outputID);
             return suggestedPlantObjects.Select(ConvertToNameDTO).ToList();
         }
 
         // Conversion method for Name-only DTO
-        private static SuggestedPlantNameDTO ConvertToNameDTO(SuggestedPlantObject obj)
+        private static SuggestedPlantResponseDTO ConvertToNameDTO(SuggestedPlantObject obj)
         {
-            return new SuggestedPlantNameDTO
+            return new SuggestedPlantResponseDTO
             {
                 PlantName = obj.PlantName
             };
