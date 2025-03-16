@@ -1,17 +1,9 @@
-import { useState, useEffect } from "react";
-import {
-  Container,
-  Typography,
-  Box,
-  Alert,
-  CircularProgress,
-  Fade,
-} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Container, Box, Alert, CircularProgress } from "@mui/material";
 import { testBackendConnection } from "@/services/api";
 import AIPrompt from "@/components/AIPrompt";
-import PlantingForm from "@/components/PlantingForm";
 
-function App() {
+const AIPromptPage = () => {
   const [backendConnected, setBackendConnected] = useState(false);
   const [connectionError, setConnectionError] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -39,41 +31,38 @@ function App() {
           <CircularProgress size={48} thickness={4} />
         </Box>
       ) : (
-        <Fade in={true} timeout={800}>
-          <Box>
-            {connectionError ? (
+        <Box>
+          {connectionError ? (
+            <Alert
+              severity="error"
+              sx={{
+                mb: 4,
+                borderRadius: 2,
+                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+              }}
+            >
+              Could not connect to the backend. Please check your server
+              connection.
+            </Alert>
+          ) : (
+            backendConnected && (
               <Alert
-                severity="error"
+                severity="success"
                 sx={{
                   mb: 4,
                   borderRadius: 2,
                   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
                 }}
               >
-                Could not connect to the backend. Please check your server
-                connection.
+                Successfully connected to backend!
               </Alert>
-            ) : (
-              backendConnected && (
-                <Alert
-                  severity="success"
-                  sx={{
-                    mb: 4,
-                    borderRadius: 2,
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                  }}
-                >
-                  Successfully connected to backend!
-                </Alert>
-              )
-            )}
-          </Box>
-        </Fade>
+            )
+          )}
+        </Box>
       )}
       <AIPrompt />
-      <PlantingForm />
     </Container>
   );
-}
+};
 
-export default App;
+export default AIPromptPage;

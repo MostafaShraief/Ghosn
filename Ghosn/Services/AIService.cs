@@ -17,20 +17,21 @@ public class AIService
     {
         try
         {
-            var client = _httpClientFactory.CreateClient("DeepSeekAPI");
+            // var client = _httpClientFactory.CreateClient("DeepSeekAPI");
 
-            // Replace with actual DeepSeek API request structure
-            var request = new
-            {
-                prompt = prompt,
-                max_tokens = 500
-            };
+            // // Replace with actual DeepSeek API request structure
+            // var request = new
+            // {
+            //     prompt = prompt,
+            //     max_tokens = 500
+            // };
 
-            var response = await client.PostAsJsonAsync("/v1/completions", request);
-            response.EnsureSuccessStatusCode();
+            // var response = await client.PostAsJsonAsync("/v1/completions", request);
+            // response.EnsureSuccessStatusCode();
 
-            var result = await response.Content.ReadFromJsonAsync<AIResponse>();
-            return result ?? new AIResponse { Text = "No response from AI service" };
+            // var result = await response.Content.ReadFromJsonAsync<AIResponse>();
+            // return result ?? new AIResponse { Text = "No response from AI service" };
+            return new AIResponse { Text = "This is a test response from AI service" };
         }
         catch (Exception ex)
         {

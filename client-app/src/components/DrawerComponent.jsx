@@ -48,7 +48,9 @@ function DrawerComponent({ drawerWidth }) {
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <List sx={{ px: 1 }}>
           {[
-            { text: "AI Prompt", to: "/" },
+            { text: "Home", to: "/" },
+            { text: "AI Prompt", to: "/ai-prompt" },
+            { text: "Add a planting plan", to: "/planting-form" },
             { text: "New Chat", to: "/chat", icon: <AddIcon /> },
           ].map((item) => (
             <ListItem key={item.text} disablePadding>
