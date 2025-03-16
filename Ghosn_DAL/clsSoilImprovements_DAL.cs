@@ -107,9 +107,7 @@ namespace Ghosn_DAL
             }
         }
 
-
-
-        public static bool DeleteSoilImprovementBySoilImprovementIDPK(int OutputID)
+        public static bool DeleteSoilImprovementBySoilImprovementIDFK(int OutputID)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -124,7 +122,7 @@ namespace Ghosn_DAL
             }
         }
 
-        public static bool DeleteSoilImprovementByOutputIDFK(int SoilImprovementID)
+        public static bool DeleteSoilImprovementByOutputIDPK(int SoilImprovementID)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {

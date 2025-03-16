@@ -155,7 +155,7 @@ namespace Ghosn_BLL
             clsFirstWeeks_BLL.DeleteFirstWeekBySuggestedTimelineIDFK(suggestedTimelineID);
             clsSecondWeeks_BLL.DeleteSecondWeekBySuggestedTimelineIDFK(suggestedTimelineID);
             clsFirstMonths_BLL.DeleteFirstMonthBySuggestedTimelineIDFK(suggestedTimelineID);
-            clsThirdMonths_BLL.DeleteThirdMonthBysuggestedTimelineIDPK(suggestedTimelineID);
+            clsThirdMonths_BLL.DeleteThirdMonthBysuggestedTimelineIDFK(suggestedTimelineID);
         }
 
         // Conversion methods

@@ -10,7 +10,6 @@ namespace Ghosn_BLL
     public class NotificationDTO
     {
         public int NotificationID { get; set; }
-        public int PersonID { get; set; }
         public string Title { get; set; }
         public DateTime DateAndTime { get; set; }
         public string Body { get; set; }
@@ -47,20 +46,12 @@ namespace Ghosn_BLL
             return clsNotifications_DAL.DeleteNotification(id);
         }
 
-        // Function to retrieve all Notifications by PersonID
-        public static List<NotificationDTO> GetNotificationsByPersonID(int personID)
-        {
-            var notificationObjects = clsNotifications_DAL.GetNotificationsByPersonID(personID);
-            return notificationObjects.Select(ConvertToDTO).ToList();
-        }
-
         // Conversion methods
         private static NotificationDTO ConvertToDTO(NotificationObject obj)
         {
             return new NotificationDTO
             {
                 NotificationID = obj.NotificationID,
-                PersonID = obj.PersonID,
                 Title = obj.Title,
                 DateAndTime = obj.DateAndTime,
                 Body = obj.Body
@@ -69,7 +60,7 @@ namespace Ghosn_BLL
 
         private static NotificationObject ConvertToDALObject(NotificationDTO dto)
         {
-            return new NotificationObject(dto.NotificationID, dto.PersonID, dto.Title, dto.DateAndTime, dto.Body);
+            return new NotificationObject(dto.NotificationID, dto.Title, dto.DateAndTime, dto.Body);
         }
     }
 }

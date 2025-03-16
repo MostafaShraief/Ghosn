@@ -249,7 +249,7 @@ namespace Ghosn_BLL
         // Helper method to delete related data
         private static void DeleteRelatedData(int outputID)
         {
-            clsSoilImprovements_BLL.DeleteSoilImprovement(outputID);
+            clsSoilImprovements_BLL.DeleteSoilImprovementByOutputIDFK(outputID);
             clsPestPreventions_BLL.DeletePestPrevention(outputID);
             clsPlantingSteps_BLL.DeleteAll(outputID);
             clsCropRotation_BLL.DeleteCropRotation(outputID);
