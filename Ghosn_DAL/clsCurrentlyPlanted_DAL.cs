@@ -130,6 +130,21 @@ namespace Ghosn_DAL
             }
         }
 
+        public static bool DeleteCurrentlyPlantedByInputID(int InputID)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM CurrentlyPlanted WHERE InputID = @InputID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@InputID", InputID);
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+        }
+
         // Function to retrieve all CurrentlyPlanted by InputID
         public static List<CurrentlyPlantedObject> GetCurrentlyPlantedByInputID(int InputID)
         {

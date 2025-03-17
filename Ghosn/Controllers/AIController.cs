@@ -64,18 +64,20 @@ public class GhosnController : ControllerBase
 
     // PUT: api/Clients/5
     [HttpPut("Client/{ClientID}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult UpdateClient(int ClientID, [FromBody] ClientDTO dto)
     {
-        if (dto == null || ClientID != dto.ClientID)
+        if (dto == null || ClientID < 1)
         {
             return BadRequest("Invalid client data or ID mismatch.");
         }
 
         try
         {
+            dto.ClientID = ClientID;
+
             bool isUpdated = clsClients_BAL.UpdateClient(dto);
 
             if (!isUpdated)
@@ -83,7 +85,7 @@ public class GhosnController : ControllerBase
                 return NotFound($"Client with ID {ClientID} not found.");
             }
 
-            return NoContent(); // 204 No Content
+            return Ok(dto);
         }
         catch (ArgumentException ex)
         {
@@ -93,7 +95,7 @@ public class GhosnController : ControllerBase
 
     // DELETE: api/Clients/5
     [HttpDelete("Client/{ClientID}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult DeleteClient(int ClientID)
@@ -112,7 +114,7 @@ public class GhosnController : ControllerBase
                 return NotFound($"Client with ID {ClientID} not found.");
             }
 
-            return NoContent(); // 204 No Content
+            return Ok($"Client with ID {ClientID} has been deleted.");
         }
         catch (ArgumentException ex)
         {
@@ -144,14 +146,15 @@ public class GhosnController : ControllerBase
     }
 
     // Add a new Plan with related data
-    [HttpPost("Plan", Name = "AddPlanWithDetails")]
+    [HttpPost("Plan/{ClientID}", Name = "AddPlanWithDetails")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public ActionResult<PlanResponseDTO> AddPlanWithDetails([FromBody] PlanResponseDTO newPlan)
+    public ActionResult<PlanResponseDTO> AddPlanWithDetails(int ClientID, [FromBody] PlanResponseDTO newPlan)
     {
         if (newPlan == null || newPlan.Output == null || newPlan.Input == null)
             return BadRequest("Plan data, Output, and Input are required.");
 
+        newPlan.ClientID = ClientID;
         int newId = clsPlans_BLL.AddPlanWithDetails(newPlan);
         newPlan.PlanID = newId;
         return CreatedAtRoute("GetPlanWithDetailsById", new { PlanID = newId }, newPlan);
@@ -443,6 +446,7 @@ public class GhosnController : ControllerBase
 
     [HttpPost("GeneratePlan")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<OutputDTO>> GeneratePlan([FromBody] InputResponseDTO inputResponse)
     {
         GeminiService _geminiService = new GeminiService();
@@ -453,7 +457,10 @@ public class GhosnController : ControllerBase
             // Send input to AI
             var aiResponse = await _geminiService.GeneratePlanAsync(inputAIDTO);
 
-            return Ok(aiResponse);
+            if (aiResponse != null)
+                return Ok(aiResponse);
+            else
+                return BadRequest("Try again later");
         }
         catch (Exception ex)
         {

@@ -47,7 +47,7 @@ namespace Ghosn_BLL
 
         public static bool DeleteCropRotation(int id)
         {
-            return clsCropRotation_DAL.DeleteCropRotation(id);
+            return clsCropRotation_DAL.DeleteCropRotationByOutputID(id);
         }
 
         // Function to retrieve all CropRotations by OutputID

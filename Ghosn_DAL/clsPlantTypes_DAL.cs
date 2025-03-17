@@ -70,7 +70,30 @@ namespace Ghosn_DAL
             }
         }
 
-      
+        public static PlantTypeObject? GetPlantTypeByName(string PlantName)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT * FROM PlantTypes WHERE PlantName = @PlantName";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@PlantName", PlantName);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new PlantTypeObject(
+                                reader.GetInt32(reader.GetOrdinal("PlantTypeID")),
+                                reader.GetString(reader.GetOrdinal("PlantTypeName"))
+                            );
+                        }
+                        return null;
+                    }
+                }
+            }
+        }
+
         public static int AddPlantType(PlantTypeObject plantType)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

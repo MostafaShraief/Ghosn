@@ -49,6 +49,11 @@ namespace Ghosn_BLL
             return clsCurrentlyPlanted_DAL.DeleteCurrentlyPlanted(id);
         }
 
+        public static bool DeleteCurrentlyPlantedByInputID(int InputID)
+        {
+            return clsCurrentlyPlanted_DAL.DeleteCurrentlyPlantedByInputID(InputID);
+        }
+
         // Function to retrieve all CurrentlyPlanted by OutputID
         public static List<CurrentlyPlantedDTO> GetCurrentlyPlantedByInputID(int outputID)
         {

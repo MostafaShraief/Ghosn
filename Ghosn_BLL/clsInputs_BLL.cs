@@ -226,7 +226,7 @@ public class clsInputs_BLL
             if (isUpdated && dto.CurrentlyPlantedPlants != null)
             {
                 // Delete existing plants for this input
-                clsCurrentlyPlanted_BLL.DeleteCurrentlyPlanted(dto.InputID);
+                clsCurrentlyPlanted_BLL.DeleteCurrentlyPlantedByInputID(dto.InputID);
 
                 // Add the updated plants
                 foreach (var plantDTO in dto.CurrentlyPlantedPlants)
@@ -254,12 +254,11 @@ public class clsInputs_BLL
         //    return clsInputs_DAL.DeleteInput(id);
         //}
 
-        public static bool DeleteInputWithPlants(int id)
+        public static bool DeleteInputWithPlants(int InputID)
         {
             // Delete the currently planted plants for this input
-            clsCurrentlyPlanted_BLL.DeleteCurrentlyPlanted(id);
+            clsCurrentlyPlanted_BLL.DeleteCurrentlyPlantedByInputID(InputID);
 
-            // Delete the input
             return true;
         }
 

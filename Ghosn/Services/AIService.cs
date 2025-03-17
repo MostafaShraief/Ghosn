@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Ghosn_BLL;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Newtonsoft.Json;
 
 public class GeminiService
@@ -49,7 +50,7 @@ public class GeminiService
         return result?.candidates[0]?.content?.parts[0]?.text ?? "No response from Gemini";
     }
 
-    public async Task<OutputDTO> GeneratePlanAsync(InputAIDTO input)
+    public async Task<OutputDTO?> GeneratePlanAsync(InputAIDTO input)
     {
         var requestBody = new
         {
@@ -71,7 +72,8 @@ public class GeminiService
                         "9. One Line: You should write the JSON in one line only (no spaces or next lines 'escaped characters' needed).\r\n" +
                         "10. SuggestedPlants: You will get list of plants name and you should suggest plant from it and should not use external plants name (name is strict).\r\n" +
                         "11. SuggestedFarmingTools + SuggestedMaterials + SuggestedIrrigationSystems: Same as SuggestedPlants (name is strict).\r\n" +
-                        "12. Strict JSON: Ensure the JSON is valid and properly formatted. Do not add any extra characters or symbols outside the JSON structure.\r\n\r\n" +
+                        "12. Plant Type: You will get list of plant type names and their numeric values, and you have to choose number from 1 to 3 depending on the output plan.\r\n" +
+                        "13. Strict JSON: Ensure the JSON is valid and properly formatted. Do not add any extra characters or symbols outside the JSON structure.\r\n\r\n" +
                         "Here is the required JSON output structure:\r\n" +
                         "{\"Output\": {\"OutputID\": 0, \"PlantTypeID\": 0, \"SoilImprovements\": [{\"Step\": \"string\"}], \"PestPreventions\": [{\"Step\": \"string\"}], \"PlantingSteps\": {\"CareSteps\": [{\"Step\": \"string\"}], \"FertilizationSteps\": [{\"Step\": \"string\"}], \"WateringSteps\": [{\"Step\": \"string\"}], \"ChoosePlants\": [{\"Step\": \"string\"}], \"PrepareSoilSteps\": [{\"Step\": \"string\"}]}, \"CropRotations\": [{\"Step\": \"string\"}], \"SuggestedTimelines\": {\"FirstWeeks\": [{\"Step\": \"string\"}], \"SecondWeeks\": [{\"Step\": \"string\"}], \"FirstMonths\": [{\"Step\": \"string\"}], \"ThirdMonths\": [{\"Step\": \"string\"}]}, \"SuggestedMaterials\": [{\"MaterialName\": \"string\"}], \"SuggestedFarmingTools\": [{\"FarmingToolName\": \"string\"}], \"SuggestedIrrigationSystems\": [{\"IrrigationSystemName\": \"string\"}], \"SuggestedPlants\": [{\"PlantName\": \"string\"}]}}\r\n\r\n" +
                         "Here is the input JSON to help you generate the output:\r\n" +
@@ -83,7 +85,9 @@ public class GeminiService
                         "\r\nHere is Materials names list:\r\n" +
                         string.Join(", ", clsMaterials_BLL.GetAllMaterials().Select(m => m.MaterialName)) +
                         "\r\nHere is Irrigation Systems names list:\r\n" +
-                        string.Join(", ", clsIrrigationSystems_BLL.GetAllIrrigationSystems().Select(ir => ir.IrrigationSystemName))
+                        string.Join(", ", clsIrrigationSystems_BLL.GetAllIrrigationSystems().Select(ir => ir.IrrigationSystemName)) +
+                        "\r\nHere is the Plant type names and their numeric values:\r\n" +
+                        "OrnamentalPlants = 1, FoodPlants = 2, AromaticPlants = 3"
                         }
 
                     }
@@ -94,53 +98,73 @@ public class GeminiService
         var jsonRequest = JsonConvert.SerializeObject(requestBody);
         var requestContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
 
-        var response = await _httpClient.PostAsync($"{BASE_URL}?key={_apiKey}", requestContent);
+        int Times = 6;
+        dynamic result = null;
 
-        if (!response.IsSuccessStatusCode)
+        while (Times > 0)
         {
-            string errorMessage = await response.Content.ReadAsStringAsync();
-            throw new Exception($"API Error: {response.StatusCode} - {errorMessage}");
+            try
+            {
+                var response = await _httpClient.PostAsync($"{BASE_URL}?key={_apiKey}", requestContent);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorMessage = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"API Error: {response.StatusCode} - {errorMessage}");
+                }
+
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                dynamic Resp = JsonConvert.DeserializeObject(jsonResponse);
+                string aiGeneratedJson = Resp?.candidates?[0]?.content?.parts?[0]?.text ?? "{}";
+                string cleanedJson = Regex.Unescape(aiGeneratedJson);
+                cleanedJson = cleanedJson.Replace("```", "");
+                cleanedJson = cleanedJson.Replace("JSON", "");
+                cleanedJson = cleanedJson.Replace("json", "");
+                cleanedJson = cleanedJson.Trim();
+                result = JsonConvert.DeserializeObject(cleanedJson);
+                break;
+            }
+            catch (Exception ex)
+            {
+                --Times;
+            }
         }
 
-        var jsonResponse = await response.Content.ReadAsStringAsync();
-        dynamic Resp = JsonConvert.DeserializeObject(jsonResponse);
-        string aiGeneratedJson = Resp?.candidates?[0]?.content?.parts?[0]?.text ?? "{}";
-        string cleanedJson = Regex.Unescape(aiGeneratedJson);
-        cleanedJson = cleanedJson.Replace("```", "");
-        cleanedJson = cleanedJson.Replace("JSON", "");
-        cleanedJson = cleanedJson.Replace("json", "");
-        cleanedJson = cleanedJson.Trim();
-        dynamic result = JsonConvert.DeserializeObject(cleanedJson);
-
         // If you only need OutputDTO, you can cast or map it
-        var outputDTO = new OutputResponseDTO
+        if (result != null)
         {
-            OutputID = result?.Output?.OutputID ?? 0,
-            PlantTypeID = result?.Output?.PlantTypeID ?? 0,
-            SoilImprovements = ((IEnumerable<dynamic>)result?.Output?.SoilImprovements)?.Select(s => new SoilImprovementStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<SoilImprovementStepDTO>(),
-            PestPreventions = ((IEnumerable<dynamic>)result?.Output?.PestPreventions)?.Select(s => new PestPreventionStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<PestPreventionStepDTO>(),
-            PlantingSteps = new AllPlantingStepDTO
+            int PlantTypeId = result?.Output?.PlantTypeID ?? 0;
+            var outputDTO = new OutputResponseDTO
             {
-                CareSteps = ((IEnumerable<dynamic>)result?.Output?.PlantingSteps?.CareSteps)?.Select(s => new CareStepStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<CareStepStepDTO>(),
-                FertilizationSteps = ((IEnumerable<dynamic>)result?.Output?.PlantingSteps?.FertilizationSteps)?.Select(s => new FertilizationStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<FertilizationStepDTO>(),
-                WateringSteps = ((IEnumerable<dynamic>)result?.Output?.PlantingSteps?.WateringSteps)?.Select(s => new WateringStepStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<WateringStepStepDTO>(),
-                ChoosePlants = ((IEnumerable<dynamic>)result?.Output?.PlantingSteps?.ChoosePlants)?.Select(s => new ChoosePlantsStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<ChoosePlantsStepDTO>(),
-                PrepareSoilSteps = ((IEnumerable<dynamic>)result?.Output?.PlantingSteps?.PrepareSoilSteps)?.Select(s => new PrepareSoilStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<PrepareSoilStepDTO>()
-            },
-            CropRotations = ((IEnumerable<dynamic>)result?.Output?.CropRotations)?.Select(s => new CropRotationStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<CropRotationStepDTO>(),
-            SuggestedTimelines = new AllSuggestedTimelineDTO
-            {
-                FirstWeeks = ((IEnumerable<dynamic>)result?.Output?.SuggestedTimelines?.FirstWeeks)?.Select(s => new FirstWeekStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<FirstWeekStepDTO>(),
-                SecondWeeks = ((IEnumerable<dynamic>)result?.Output?.SuggestedTimelines?.SecondWeeks)?.Select(s => new SecondWeekStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<SecondWeekStepDTO>(),
-                FirstMonths = ((IEnumerable<dynamic>)result?.Output?.SuggestedTimelines?.FirstMonths)?.Select(s => new FirstMonthStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<FirstMonthStepDTO>(),
-                ThirdMonths = ((IEnumerable<dynamic>)result?.Output?.SuggestedTimelines?.ThirdMonths)?.Select(s => new ThirdMonthStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<ThirdMonthStepDTO>()
-            },
-            SuggestedMaterials = ((IEnumerable<dynamic>)result?.Output?.SuggestedMaterials)?.Select(s => new SuggestedMaterialResponseDTO { MaterialName = s?.MaterialName?.ToString() }).ToList() ?? new List<SuggestedMaterialResponseDTO>(),
-            SuggestedFarmingTools = ((IEnumerable<dynamic>)result?.Output?.SuggestedFarmingTools)?.Select(s => new SuggestedFarmingToolResponseDTO { FarmingToolName = s?.FarmingToolName?.ToString() }).ToList() ?? new List<SuggestedFarmingToolResponseDTO>(),
-            SuggestedIrrigationSystems = ((IEnumerable<dynamic>)result?.Output?.SuggestedIrrigationSystems)?.Select(s => new SuggestedIrrigationSystemResponseDTO { IrrigationSystemName = s?.IrrigationSystemName?.ToString() }).ToList() ?? new List<SuggestedIrrigationSystemResponseDTO>(),
-            SuggestedPlants = ((IEnumerable<dynamic>)result?.Output?.SuggestedPlants)?.Select(s => new SuggestedPlantResponseDTO { PlantName = s?.PlantName?.ToString() }).ToList() ?? new List<SuggestedPlantResponseDTO>()
-        };
+                OutputID = result?.Output?.OutputID ?? 0,
+                PlantTypeID = (PlantTypeId <= 3 && PlantTypeId >= 1) ? PlantTypeId : 2  ,
+                SoilImprovements = ((IEnumerable<dynamic>)result?.Output?.SoilImprovements)?.Select(s => new SoilImprovementStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<SoilImprovementStepDTO>(),
+                PestPreventions = ((IEnumerable<dynamic>)result?.Output?.PestPreventions)?.Select(s => new PestPreventionStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<PestPreventionStepDTO>(),
+                PlantingSteps = new AllPlantingStepDTO
+                {
+                    CareSteps = ((IEnumerable<dynamic>)result?.Output?.PlantingSteps?.CareSteps)?.Select(s => new CareStepStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<CareStepStepDTO>(),
+                    FertilizationSteps = ((IEnumerable<dynamic>)result?.Output?.PlantingSteps?.FertilizationSteps)?.Select(s => new FertilizationStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<FertilizationStepDTO>(),
+                    WateringSteps = ((IEnumerable<dynamic>)result?.Output?.PlantingSteps?.WateringSteps)?.Select(s => new WateringStepStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<WateringStepStepDTO>(),
+                    ChoosePlants = ((IEnumerable<dynamic>)result?.Output?.PlantingSteps?.ChoosePlants)?.Select(s => new ChoosePlantsStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<ChoosePlantsStepDTO>(),
+                    PrepareSoilSteps = ((IEnumerable<dynamic>)result?.Output?.PlantingSteps?.PrepareSoilSteps)?.Select(s => new PrepareSoilStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<PrepareSoilStepDTO>()
+                },
+                CropRotations = ((IEnumerable<dynamic>)result?.Output?.CropRotations)?.Select(s => new CropRotationStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<CropRotationStepDTO>(),
+                SuggestedTimelines = new AllSuggestedTimelineDTO
+                {
+                    FirstWeeks = ((IEnumerable<dynamic>)result?.Output?.SuggestedTimelines?.FirstWeeks)?.Select(s => new FirstWeekStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<FirstWeekStepDTO>(),
+                    SecondWeeks = ((IEnumerable<dynamic>)result?.Output?.SuggestedTimelines?.SecondWeeks)?.Select(s => new SecondWeekStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<SecondWeekStepDTO>(),
+                    FirstMonths = ((IEnumerable<dynamic>)result?.Output?.SuggestedTimelines?.FirstMonths)?.Select(s => new FirstMonthStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<FirstMonthStepDTO>(),
+                    ThirdMonths = ((IEnumerable<dynamic>)result?.Output?.SuggestedTimelines?.ThirdMonths)?.Select(s => new ThirdMonthStepDTO { Step = s?.Step?.ToString() }).ToList() ?? new List<ThirdMonthStepDTO>()
+                },
+                SuggestedMaterials = ((IEnumerable<dynamic>)result?.Output?.SuggestedMaterials)?.Select(s => new SuggestedMaterialResponseDTO { MaterialName = s?.MaterialName?.ToString() }).ToList() ?? new List<SuggestedMaterialResponseDTO>(),
+                SuggestedFarmingTools = ((IEnumerable<dynamic>)result?.Output?.SuggestedFarmingTools)?.Select(s => new SuggestedFarmingToolResponseDTO { FarmingToolName = s?.FarmingToolName?.ToString() }).ToList() ?? new List<SuggestedFarmingToolResponseDTO>(),
+                SuggestedIrrigationSystems = ((IEnumerable<dynamic>)result?.Output?.SuggestedIrrigationSystems)?.Select(s => new SuggestedIrrigationSystemResponseDTO { IrrigationSystemName = s?.IrrigationSystemName?.ToString() }).ToList() ?? new List<SuggestedIrrigationSystemResponseDTO>(),
+                SuggestedPlants = ((IEnumerable<dynamic>)result?.Output?.SuggestedPlants)?.Select(s => new SuggestedPlantResponseDTO { PlantName = s?.PlantName?.ToString() }).ToList() ?? new List<SuggestedPlantResponseDTO>()
+            };
 
-        return outputDTO;
+            return outputDTO;
+        }
+
+        return null;
     }
 }

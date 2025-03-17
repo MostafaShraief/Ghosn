@@ -81,6 +81,10 @@ namespace Ghosn_BLL
             var planObject = clsPlans_DAL.GetPlanById(planID);
             if (dto == null || dto.Output == null || dto.Input == null || planObject == null) return false; // Failed to add
 
+            dto.Output.OutputID = planObject.OutputID;
+            dto.Input.InputID = planObject.InputID;
+            dto.ClientID = planObject.ClientID;
+
             // Update the Output
             bool isOutputUpdated = clsOutputs_BLL.UpdateOutputWithDetails(dto.Output);
 
@@ -110,7 +114,8 @@ namespace Ghosn_BLL
             // Delete the Plan
             bool isPlanDeleted = clsPlans_DAL.DeletePlan(planID);
 
-            return isOutputDeleted && isInputDeleted && clsOutputs_DAL.DeleteOutput(planObject.OutputID) && clsInputs_DAL.DeleteInput(planObject.InputID) && isPlanDeleted;
+            return isOutputDeleted && isInputDeleted && clsOutputs_DAL.DeleteOutput(planObject.OutputID) && 
+                clsInputs_DAL.DeleteInput(planObject.InputID) && isPlanDeleted;
         }
 
         // Delete all Plans and their related data

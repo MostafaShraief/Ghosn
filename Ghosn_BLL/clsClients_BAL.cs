@@ -113,10 +113,13 @@ namespace Ghosn_BLL
         // Update an existing client
         public static bool UpdateClient(ClientDTO dto)
         {
-            if (dto == null || dto.ClientID <= 0 || dto.PersonID <= 0)
-            {
-                throw new ArgumentException("Invalid client data.");
-            }
+            var clientObj = GetClientById(dto.ClientID); 
+
+            if (dto == null || clientObj == null)
+                return false;
+
+            dto.ClientID = clientObj.ClientID;
+            dto.PersonID = clientObj.PersonID;
 
             // Update the PersonDTO
             var personDto = new PersonDTO

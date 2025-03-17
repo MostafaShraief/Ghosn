@@ -1,6 +1,7 @@
 ﻿using Ghosn_DAL;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 
 namespace Ghosn_BLL
@@ -23,6 +24,13 @@ namespace Ghosn_BLL
         {
             var plantTypeObjects = clsPlantTypes_DAL.GetAllPlantTypes();
             return plantTypeObjects.Select(ConvertToDTO).ToList();
+        }
+
+        // Retrieve all PlantTypes
+        public static List<string> GetAllPlantTypeNames()
+        {
+            var plantTypeObjects = clsPlantTypes_DAL.GetAllPlantTypes();
+            return plantTypeObjects.Select(obj => obj.PlantTypeName).ToList();
         }
 
         // Retrieve a PlantType by ID
@@ -53,7 +61,7 @@ namespace Ghosn_BLL
         }
 
         // Retrieve all PlantTypeNames
-        public static List<PlantTypeNameDTO> GetAllPlantTypeNames()
+        public static List<PlantTypeNameDTO> GetAllPlantTypeNamesAsDto()
         {
             var plantTypeObjects = clsPlantTypes_DAL.GetAllPlantTypes();
             return plantTypeObjects.Select(ConvertToNameDTO).ToList();
