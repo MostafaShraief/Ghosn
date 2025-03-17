@@ -40,28 +40,23 @@ function HomePage() {
   const [recentActivity, setRecentActivity] = useState([]);
 
   useEffect(() => {
-    // Simulate fetching data
     const timer = setTimeout(() => {
-      // Mock data
       setNotifications([
         { id: 1, text: "تذكير: سقاية المحصول الذي لديك.", icon: <WaterDrop /> },
         { id: 2, text: "تذكير: قم بري النباتات اليوم.", icon: <EventIcon /> },
       ]);
-
       setSuggestions([
         "تحقق من رطوبة التربة اليوم.",
         "قم بتسميد النباتات المغذية.",
         "تفقد النباتات بحثًا عن أي آفات.",
       ]);
-
       setRecentActivity([
         { time: "اليوم", event: "تم إنشاء تقرير جديد" },
         { time: "أمس", event: "تمت إضافة خطة زراعة" },
         { time: "منذ يومين", event: "تم تسجيل الدخول" },
       ]);
-
       setLoading(false);
-    }, 500); // Simulate a delay
+    }, 500); 
 
     return () => clearTimeout(timer);
   }, []);
@@ -85,7 +80,7 @@ function HomePage() {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box
         sx={{
-          background: "linear-gradient(to right, #43a047, #00c853)", // Example gradient
+          background: "linear-gradient(to right, #43a047, #00c853)",
           color: "white",
           p: 4,
           mb: 4,
@@ -94,7 +89,7 @@ function HomePage() {
         }}
       >
         <Typography variant="h4" component="h1" gutterBottom>
-          مرحبا بك في صفحة الرئيسية!
+          مرحبا بك في الصفحة الرئيسية!
         </Typography>
         <Typography variant="subtitle1">
           إدارة زراعتك بسهولة وفعالية.
@@ -153,7 +148,7 @@ function HomePage() {
                 <Button
                   variant="contained"
                   color="primary"
-                  startIcon={<AddCircleIcon />}
+                  startIcon={<AddCircleIcon sx={{ ml: 1 }} />}
                   href="/planting-form"
                 >
                   إضافة خطة زراعة
@@ -164,7 +159,7 @@ function HomePage() {
                 <Button
                   variant="outlined"
                   color="primary"
-                  startIcon={<ChatBubbleIcon />}
+                  startIcon={<ChatBubbleIcon sx={{ ml: 1 }} />} 
                   href="/chat"
                 >
                   الدردشة
@@ -174,7 +169,7 @@ function HomePage() {
                 <Button
                   variant="outlined"
                   color="primary"
-                  startIcon={<AssessmentIcon />}
+                  startIcon={<AssessmentIcon sx={{ ml: 1 }} />} 
                   href="/reports"
                 >
                   عرض التقارير

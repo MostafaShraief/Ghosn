@@ -24,6 +24,8 @@ function DrawerComponent({ drawerWidth }) {
   return (
     <Drawer
       variant="permanent"
+      dir="rtl"
+      anchor="right"
       sx={{
         width: drawerWidth,
         flexShrink: 0,
@@ -31,7 +33,7 @@ function DrawerComponent({ drawerWidth }) {
           width: drawerWidth,
           boxSizing: "border-box",
           background: "linear-gradient(180deg, #ffffff, #f8f9fc)",
-          borderRight: "none",
+          borderLeft: "none",
           boxShadow: "2px 0 8px rgba(0,0,0,0.08)",
         },
       }}
@@ -47,11 +49,11 @@ function DrawerComponent({ drawerWidth }) {
       <Divider />
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <List sx={{ px: 1 }}>
-          {[
-            { text: "Home", to: "/" },
-            { text: "AI Prompt", to: "/ai-prompt" },
-            { text: "Add a planting plan", to: "/planting-form" },
-            { text: "New Chat", to: "/chat", icon: <AddIcon /> },
+          {[ 
+            { text: "الصفحة الرئيسية", to: "/" },
+            { text: "الموجه الذكي", to: "/ai-prompt" },
+            { text: "إضافة خطة زراعة", to: "/planting-form" },
+            { text: "محادثة جديدة", to: "/chat", icon: <AddIcon /> },
           ].map((item) => (
             <ListItem key={item.text} disablePadding>
               <ListItemButton
@@ -66,6 +68,7 @@ function DrawerComponent({ drawerWidth }) {
                 <ListItemText
                   primary={item.text}
                   primaryTypographyProps={{ fontWeight: 500 }}
+                  sx={{ textAlign: "right" }}
                 />
                 {item.icon}
               </ListItemButton>
@@ -78,8 +81,9 @@ function DrawerComponent({ drawerWidth }) {
               sx={{ borderRadius: 2 }}
             >
               <ListItemText
-                primary="Recent Chats"
+                primary="الدردشات الأخيرة"
                 primaryTypographyProps={{ fontWeight: 500 }}
+                sx={{ textAlign: "right" }}
               />
               {recentChatsOpen ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
@@ -99,8 +103,9 @@ function DrawerComponent({ drawerWidth }) {
                     }}
                   >
                     <ListItemText
-                      primary={`Chat ${num}`}
+                      primary={`الدردشة ${num}`}
                       primaryTypographyProps={{ color: "text.secondary" }}
+                      sx={{ textAlign: "right" }}
                     />
                   </ListItemButton>
                 </ListItem>
@@ -121,13 +126,14 @@ function DrawerComponent({ drawerWidth }) {
             }}
           >
             <Avatar
-              sx={{ bgcolor: deepOrange[500], mr: 1.5, width: 32, height: 32 }}
+              sx={{ bgcolor: deepOrange[500], width: 32, height: 32 }} 
             >
               U
             </Avatar>
             <ListItemText
-              primary="Username"
+              primary="اسم المستخدم"
               primaryTypographyProps={{ fontWeight: 500 }}
+              sx={{ textAlign: "right" ,pr:2}}
             />
           </ListItemButton>
         </Box>
