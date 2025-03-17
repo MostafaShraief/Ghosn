@@ -68,6 +68,29 @@ namespace Ghosn_DAL
             }
         }
 
+        public static int? GetMaterialIdByName(string MaterialName)
+        {
+            using (SqlConnection conn = new SqlConnection(clsSettings.connectionString))
+            {
+                string query = "SELECT Top 1 MaterialID FROM Materials WHERE MaterialName = @MaterialName";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@MaterialName", MaterialName);
+                    conn.Open();
+
+                    int Result;
+                    object scalarValue = cmd.ExecuteScalar();
+
+                    if (scalarValue != null && int.TryParse(scalarValue.ToString(), out Result))
+                    {
+                        return Result;
+                    }
+                    return null;
+
+                }
+            }
+        }
+
         public static int AddMaterial(MaterialObject material)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

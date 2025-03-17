@@ -107,6 +107,21 @@ namespace Ghosn_DAL
             }
         }
 
+        public static bool DeleteCropRotationByOutputID(int OutputID)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM CropRotation WHERE OutputID = @OutputID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@OutputID", OutputID);
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+        }
+
         public static bool DeleteCropRotation(int cropRotationId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

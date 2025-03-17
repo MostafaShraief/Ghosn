@@ -48,6 +48,18 @@ namespace Ghosn_BLL
             return plantObject != null ? PlantMapper.ConvertObjectToDto(plantObject) : null;
         }
 
+        public static int? GetPlantIdByName(string PlantName)
+        {
+            return clsPlants_DAL.GetPlantIdByName(PlantName);
+        }
+
+        // New function to retrieve only Plant names
+        public static List<string> GetAllPlantNames()
+        {
+            var materialObjects = clsPlants_DAL.GetAllPlants();
+            return materialObjects.Select(obj => obj.PlantName).ToList();
+        }
+
         public static int AddPlant(PlantDTO dto)
         {
             if (string.IsNullOrWhiteSpace(dto.PlantName))
@@ -75,7 +87,7 @@ namespace Ghosn_BLL
         }
 
         // New function to retrieve all PlantNames
-        public static List<PlantNameDTO> GetAllPlantNames()
+        public static List<PlantNameDTO> GetAllPlantNamesDTO()
         {
             var plantObjects = clsPlants_DAL.GetAllPlants();
             return plantObjects.Select(ConvertToNameDTO).ToList();

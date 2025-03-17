@@ -17,14 +17,6 @@ namespace Ghosn_BLL
         public AllSuggestedTimelineDTO? SuggestedTimelines { get; set; } = new();
     }
 
-    public class OutputRequestDTO : OutputDTO
-    {
-        public List<SuggestedMaterialRequestDTO> SuggestedMaterials { get; set; } = new();
-        public List<SuggestedFarmingToolRequestDTO> SuggestedFarmingTools { get; set; } = new();
-        public List<SuggestedIrrigationSystemRequestDTO> SuggestedIrrigationSystems { get; set; } = new();
-        public List<SuggestedPlantRequestDTO> SuggestedPlants { get; set; } = new();
-    }
-
     public class OutputResponseDTO : OutputDTO
     {
         public List<SuggestedMaterialResponseDTO> SuggestedMaterials { get; set; } = new();
@@ -88,7 +80,7 @@ namespace Ghosn_BLL
         }
 
         // Add a new Output with related data
-        public static int AddOutputWithDetails(OutputRequestDTO dto)
+        public static int AddOutputWithDetails(OutputResponseDTO dto)
         {
             // Add the Output
             var outputObject = new OutputObject(0, dto.PlantTypeID);
@@ -101,7 +93,7 @@ namespace Ghosn_BLL
         }
 
         // Update an existing Output with related data
-        public static bool UpdateOutputWithDetails(OutputRequestDTO dto)
+        public static bool UpdateOutputWithDetails(OutputResponseDTO dto)
         {
             // Update the Output
             var outputObject = new OutputObject(dto.OutputID, dto.PlantTypeID);
@@ -126,7 +118,7 @@ namespace Ghosn_BLL
             DeleteRelatedData(outputID);
 
             // Delete the Output
-            return clsOutputs_DAL.DeleteOutput(outputID);
+            return true;
         }
 
         // Delete all Outputs and their related data
@@ -146,7 +138,7 @@ namespace Ghosn_BLL
         //}
 
         // Helper method to add related data
-        private static void AddRelatedData(int outputID, OutputRequestDTO dto)
+        private static void AddRelatedData(int outputID, OutputResponseDTO dto)
         {
             // Add SoilImprovements
             foreach (var soilImprovement in dto.SoilImprovements)
@@ -171,9 +163,8 @@ namespace Ghosn_BLL
             // Add PlantingSteps
             if (dto.PlantingSteps != null)
             {
-                clsPlantingSteps_BLL.AddAll(new AllPlantingStepDTO
+                clsPlantingSteps_BLL.AddAll(outputID, new AllPlantingStepDTO
                 {
-                    OutputID = outputID,
                     CareSteps = dto.PlantingSteps.CareSteps,
                     FertilizationSteps = dto.PlantingSteps.FertilizationSteps,
                     WateringSteps = dto.PlantingSteps.WateringSteps,
@@ -195,9 +186,8 @@ namespace Ghosn_BLL
             // Add SuggestedTimelines
             if (dto.SuggestedTimelines != null)
             {
-                clsSuggestedTimelines_BLL.AddAll(new AllSuggestedTimelineDTO
+                clsSuggestedTimelines_BLL.AddAll(outputID, new AllSuggestedTimelineDTO
                 {
-                    OutputID = outputID,
                     FirstWeeks = dto.SuggestedTimelines.FirstWeeks,
                     SecondWeeks = dto.SuggestedTimelines.SecondWeeks,
                     FirstMonths = dto.SuggestedTimelines.FirstMonths,
@@ -208,30 +198,46 @@ namespace Ghosn_BLL
             // Add SuggestedMaterials
             foreach (var suggestedMaterial in dto.SuggestedMaterials)
             {
+
+                int? MaterialID = clsPlants_BLL.GetPlantIdByName(suggestedMaterial.MaterialName);
+
+                if (MaterialID == null)
+                    continue;
+
                 clsSuggestedMaterials_BLL.AddSuggestedMaterial(new SuggestedMaterialDTO
                 {
                     OutputID = outputID,
-                    MaterialID = suggestedMaterial.MaterialID
+                    MaterialID = (int)MaterialID
                 });
             }
 
             // Add SuggestedFarmingTools
             foreach (var suggestedFarmingTool in dto.SuggestedFarmingTools)
             {
+                int? FarmingToolID = clsPlants_BLL.GetPlantIdByName(suggestedFarmingTool.FarmingToolName);
+
+                if (FarmingToolID == null)
+                    continue;
+
                 clsSuggestedFarmingTools_BLL.AddSuggestedFarmingTool(new SuggestedFarmingToolDTO
                 {
                     OutputID = outputID,
-                    FarmingToolID = suggestedFarmingTool.FarmingToolID
+                    FarmingToolID = (int)FarmingToolID
                 });
             }
 
             // Add SuggestedIrrigationSystems
             foreach (var suggestedIrrigationSystem in dto.SuggestedIrrigationSystems)
             {
+                int? IrrigationSystemID = clsPlants_BLL.GetPlantIdByName(suggestedIrrigationSystem.IrrigationSystemName);
+
+                if (IrrigationSystemID == null)
+                    continue;
+
                 clsSuggestedIrrigationSystems_BLL.AddSuggestedIrrigationSystem(new SuggestedIrrigationSystemDTO
                 {
                     OutputID = outputID,
-                    IrrigationSystemID = suggestedIrrigationSystem.IrrigationSystemID
+                    IrrigationSystemID = (int)IrrigationSystemID
                 });
             }
 
@@ -241,7 +247,7 @@ namespace Ghosn_BLL
                 clsSuggestedPlants_BLL.AddSuggestedPlant(new SuggestedPlantDTO
                 {
                     OutputID = outputID,
-                    PlantID = suggestedPlant.PlantID
+                    PlantName = suggestedPlant.PlantName
                 });
             }
         }

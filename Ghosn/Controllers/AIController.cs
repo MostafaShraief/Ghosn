@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Ghosn_BLL.Services;
 using Ghosn_BLL;
 
 namespace Ghosn.Controllers;
@@ -148,7 +147,7 @@ public class GhosnController : ControllerBase
     [HttpPost("Plan", Name = "AddPlanWithDetails")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public ActionResult<PlanResponseDTO> AddPlanWithDetails([FromBody] PlanRequestDTO newPlan)
+    public ActionResult<PlanResponseDTO> AddPlanWithDetails([FromBody] PlanResponseDTO newPlan)
     {
         if (newPlan == null || newPlan.Output == null || newPlan.Input == null)
             return BadRequest("Plan data, Output, and Input are required.");
@@ -163,7 +162,7 @@ public class GhosnController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<PlanResponseDTO> UpdatePlanWithDetails(int PlanID, [FromBody] PlanRequestDTO updatedPlan)
+    public ActionResult<PlanResponseDTO> UpdatePlanWithDetails(int PlanID, [FromBody] PlanResponseDTO updatedPlan)
     {
         if (updatedPlan == null || updatedPlan.Output == null || updatedPlan.Input == null)
             return BadRequest("Plan data, Output, and Input are required.");
@@ -207,11 +206,11 @@ public class GhosnController : ControllerBase
 
     // GET: api/Plants
     [HttpGet("AllPlants", Name = "GetAllPlantsWithDetails")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<PlantDTO>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<string>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<List<PlantDTO>> GetAllPlants()
+    public ActionResult<List<string>> GetAllPlants()
     {
-        var plants = clsPlants_BLL.GetAllPlants();
+        var plants = clsPlants_BLL.GetAllPlantNames();
 
         if (plants == null || plants.Count == 0)
         {
@@ -222,28 +221,28 @@ public class GhosnController : ControllerBase
     }
 
     // GET: api/Plants/5
-    [HttpGet("Plant/{PlantID}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PlantDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<PlantDTO> GetPlantById(int PlantID)
-    {
-        var plant = clsPlants_BLL.GetPlantById(PlantID);
+    //[HttpGet("Plant/{PlantID}")]
+    //[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PlantDTO))]
+    //[ProducesResponseType(StatusCodes.Status404NotFound)]
+    //public ActionResult<PlantDTO> GetPlantById(int PlantID)
+    //{
+    //    var plant = clsPlants_BLL.GetPlantById(PlantID);
 
-        if (plant == null)
-        {
-            return NotFound($"Plant with ID {PlantID} not found.");
-        }
+    //    if (plant == null)
+    //    {
+    //        return NotFound($"Plant with ID {PlantID} not found.");
+    //    }
 
-        return Ok(plant);
-    }
+    //    return Ok(plant);
+    //}
 
     // GET: api/Materials
     [HttpGet("AllMaterials")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<MaterialDTO>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<string>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<List<MaterialDTO>> GetAllMaterials()
+    public ActionResult<List<string>> GetAllMaterials()
     {
-        var materials = clsMaterials_BLL.GetAllMaterials();
+        var materials = clsMaterials_BLL.GetAllMaterialNames();
 
         if (materials == null || materials.Count == 0)
         {
@@ -253,29 +252,29 @@ public class GhosnController : ControllerBase
         return Ok(materials);
     }
 
-    // GET: api/Materials/5
-    [HttpGet("Material/{MaterialsID}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(MaterialDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<MaterialDTO> GetMaterialById(int MaterialsID)
-    {
-        var material = clsMaterials_BLL.GetMaterialById(MaterialsID);
+    //// GET: api/Materials/5
+    //[HttpGet("Material/{MaterialsID}")]
+    //[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(MaterialDTO))]
+    //[ProducesResponseType(StatusCodes.Status404NotFound)]
+    //public ActionResult<SuggestedMaterialResponseDTO> GetMaterialById(int MaterialsID)
+    //{
+    //    var material = clsSuggestedMaterials_BLL.GetSuggestedMaterialNameById(MaterialsID);
 
-        if (material == null)
-        {
-            return NotFound($"Material with ID {MaterialsID} not found.");
-        }
+    //    if (material == null)
+    //    {
+    //        return NotFound($"Material with ID {MaterialsID} not found.");
+    //    }
 
-        return Ok(material);
-    }
+    //    return Ok(material);
+    //}
 
     // GET: api/FarmingTools
     [HttpGet("AllFarmingTools")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<FarmingToolDTO>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<string>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<List<FarmingToolDTO>> GetAllFarmingTools()
+    public ActionResult<List<string>> GetAllFarmingTools()
     {
-        var farmingTools = clsFarmingTools_BLL.GetAllFarmingTools();
+        var farmingTools = clsFarmingTools_BLL.GetAllFarmingToolNames();
 
         if (farmingTools == null || farmingTools.Count == 0)
         {
@@ -286,28 +285,28 @@ public class GhosnController : ControllerBase
     }
 
     // GET: api/FarmingTools/5
-    [HttpGet("FarmingTool/{FarmingToolID}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FarmingToolDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<FarmingToolDTO> GetFarmingToolById(int FarmingToolID)
-    {
-        var farmingTool = clsFarmingTools_BLL.GetFarmingToolById(FarmingToolID);
+    //[HttpGet("FarmingTool/{FarmingToolID}")]
+    //[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FarmingToolDTO))]
+    //[ProducesResponseType(StatusCodes.Status404NotFound)]
+    //public ActionResult<FarmingToolDTO> GetFarmingToolById(int FarmingToolID)
+    //{
+    //    var farmingTool = clsFarmingTools_BLL.GetFarmingToolById(FarmingToolID);
 
-        if (farmingTool == null)
-        {
-            return NotFound($"Farming tool with ID {FarmingToolID} not found.");
-        }
+    //    if (farmingTool == null)
+    //    {
+    //        return NotFound($"Farming tool with ID {FarmingToolID} not found.");
+    //    }
 
-        return Ok(farmingTool);
-    }
+    //    return Ok(farmingTool);
+    //}
 
     // GET: api/IrrigationSystems
     [HttpGet("AllIrrigationSystems")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<IrrigationSystemDTO>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<string>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<List<IrrigationSystemDTO>> GetAllIrrigationSystems()
+    public ActionResult<List<string>> GetAllIrrigationSystems()
     {
-        var irrigationSystems = clsIrrigationSystems_BLL.GetAllIrrigationSystems();
+        var irrigationSystems = clsIrrigationSystems_BLL.GetAllIrrigationSystemNames();
 
         if (irrigationSystems == null || irrigationSystems.Count == 0)
         {
@@ -318,20 +317,21 @@ public class GhosnController : ControllerBase
     }
 
     // GET: api/IrrigationSystems/5
-    [HttpGet("IrrigationSystem/{IrrigationSystemID}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IrrigationSystemDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<IrrigationSystemDTO> GetIrrigationSystemById(int IrrigationSystemID)
-    {
-        var irrigationSystem = clsIrrigationSystems_BLL.GetIrrigationSystemById(IrrigationSystemID);
+    //[HttpGet("IrrigationSystem/{IrrigationSystemID}")]
+    //[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IrrigationSystemDTO))]
+    //[ProducesResponseType(StatusCodes.Status404NotFound)]
+    //public ActionResult<IrrigationSystemDTO> GetIrrigationSystemById(int IrrigationSystemID)
+    //{
+    //    var irrigationSystem = clsIrrigationSystems_BLL.GetIrrigationSystemById(IrrigationSystemID);
 
-        if (irrigationSystem == null)
-        {
-            return NotFound($"Irrigation system with ID {IrrigationSystemID} not found.");
-        }
+    //    if (irrigationSystem == null)
+    //    {
+    //        return NotFound($"Irrigation system with ID {IrrigationSystemID} not found.");
+    //    }
 
-        return Ok(irrigationSystem);
-    }
+    //    return Ok(irrigationSystem);
+    //}
+
     // GET: api/Notifications/AllClientNotifications
     [HttpGet("Notifications/AllClientNotifications")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<NotificationDTO>))]
@@ -380,6 +380,22 @@ public class GhosnController : ControllerBase
         return Ok(notification);
     }
 
+    // GET: api/Notifications/5
+    [HttpGet("Notification/ClientID={ClientID}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(NotificationDTO))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<NotificationDTO> GetNotificationByClientId(int ClientID)
+    {
+        var notification = clsClientNotifications_BLL.GetClientNotificationByClientId(ClientID);
+
+        if (notification == null)
+        {
+            return NotFound($"Notification with ID {ClientID} not found.");
+        }
+
+        return Ok(notification);
+    }
+
     // DELETE: api/Notifications/5
     [HttpDelete("Notification/{NotificationID}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -406,6 +422,42 @@ public class GhosnController : ControllerBase
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("Ai/{Prompt}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<string>> AskAi(string Prompt)
+    {
+        GeminiService geminiService = new GeminiService();
+        try
+        {
+            var response = await geminiService.GenerateTextAsync(Prompt);
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Error: {ex.Message}");
+        }
+    }
+
+    [HttpPost("GeneratePlan")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<OutputDTO>> GeneratePlan([FromBody] InputResponseDTO inputResponse)
+    {
+        GeminiService _geminiService = new GeminiService();
+
+        try
+        {
+            InputAIDTO inputAIDTO = clsInputs_BLL.ConvertToInputAiDto(inputResponse);
+            // Send input to AI
+            var aiResponse = await _geminiService.GeneratePlanAsync(inputAIDTO);
+
+            return Ok(aiResponse);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Error: {ex.Message}");
         }
     }
 }

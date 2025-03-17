@@ -47,7 +47,7 @@ namespace Ghosn_BLL
 
         public static bool DeletePestPrevention(int id)
         {
-            return clsPestPreventions_DAL.DeletePestPrevention(id);
+            return clsPestPreventions_DAL.DeletePestPreventionByFK(id);
         }
 
         // Function to retrieve all PestPreventions by OutputID

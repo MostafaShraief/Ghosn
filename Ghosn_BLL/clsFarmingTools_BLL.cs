@@ -32,6 +32,13 @@ namespace Ghosn_BLL
             return farmingToolObject != null ? ConvertToDTO(farmingToolObject) : null;
         }
 
+        // New function to retrieve only material names
+        public static List<string> GetAllFarmingToolNames()
+        {
+            var materialObjects = clsFarmingTools_DAL.GetAllFarmingTools();
+            return materialObjects.Select(obj => obj.FarmingToolName).ToList();
+        }
+
         public static int AddFarmingTool(FarmingToolDTO dto)
         {
             var farmingToolObject = ConvertToDALObject(dto);
@@ -65,7 +72,7 @@ namespace Ghosn_BLL
         }
 
         // New function to retrieve only the FarmingToolName property
-        public static List<FarmingToolNameDTO> GetAllFarmingToolNames()
+        public static List<FarmingToolNameDTO> GetAllFarmingToolNamesDTO()
         {
             var farmingToolObjects = clsFarmingTools_DAL.GetAllFarmingTools();
             return farmingToolObjects.Select(ConvertToNameDTO).ToList();

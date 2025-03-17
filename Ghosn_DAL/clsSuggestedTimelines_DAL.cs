@@ -43,6 +43,30 @@ namespace Ghosn_DAL
             return suggestedTimelines;
         }
 
+        public static SuggestedTimelineObject? GetSuggestedTimelineByOutputId(int OutputID)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT * FROM SuggestedTimelines WHERE OutputID = @OutputID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@OutputID", OutputID);
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new SuggestedTimelineObject(
+                                reader.GetInt32(reader.GetOrdinal("SuggestedTimelineID")),
+                                reader.GetInt32(reader.GetOrdinal("OutputID"))
+                            );
+                        }
+                        return null;
+                    }
+                }
+            }
+        }
+
         public static SuggestedTimelineObject? GetSuggestedTimelineById(int suggestedTimelineId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -105,6 +129,21 @@ namespace Ghosn_DAL
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@SuggestedTimelineID", suggestedTimelineId);
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+        }
+
+        public static bool DeleteSuggestedTimelineByOutputID(int OutputID)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM SuggestedTimelines WHERE OutputID = @OutputID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@OutputID", OutputID);
                     conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
                     return rowsAffected > 0;

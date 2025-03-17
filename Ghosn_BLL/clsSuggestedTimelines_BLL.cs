@@ -10,7 +10,7 @@ namespace Ghosn_BLL
         public int OutputID { get; set; }
     }
 
-    public class AllSuggestedTimelineDTO : SuggestedTimelineDTO
+    public class AllSuggestedTimelineDTO
     {
         public List<FirstWeekStepDTO> FirstWeeks { get; set; } = new List<FirstWeekStepDTO>();
         public List<SecondWeekStepDTO> SecondWeeks { get; set; } = new List<SecondWeekStepDTO>();
@@ -31,8 +31,6 @@ namespace Ghosn_BLL
             {
                 var allSuggestedTimelineDTO = new AllSuggestedTimelineDTO
                 {
-                    SuggestedTimelineID = suggestedTimelineObject.SuggestedTimelineID,
-                    OutputID = suggestedTimelineObject.OutputID,
                     FirstWeeks = clsFirstWeeks_BLL.GetFirstWeekStepsBySuggestedTimelineID(suggestedTimelineObject.SuggestedTimelineID),
                     SecondWeeks = clsSecondWeeks_BLL.GetSecondWeekStepsBySuggestedTimelineID(suggestedTimelineObject.SuggestedTimelineID),
                     FirstMonths = clsFirstMonths_BLL.GetFirstMonthStepsBySuggestedTimelineID(suggestedTimelineObject.SuggestedTimelineID),
@@ -56,8 +54,6 @@ namespace Ghosn_BLL
 
             var allSuggestedTimelineDTO = new AllSuggestedTimelineDTO
             {
-                SuggestedTimelineID = suggestedTimelineObject.SuggestedTimelineID,
-                OutputID = suggestedTimelineObject.OutputID,
                 FirstWeeks = clsFirstWeeks_BLL.GetFirstWeekStepsBySuggestedTimelineID(suggestedTimelineObject.SuggestedTimelineID),
                 SecondWeeks = clsSecondWeeks_BLL.GetSecondWeekStepsBySuggestedTimelineID(suggestedTimelineObject.SuggestedTimelineID),
                 FirstMonths = clsFirstMonths_BLL.GetFirstMonthStepsBySuggestedTimelineID(suggestedTimelineObject.SuggestedTimelineID),
@@ -68,10 +64,10 @@ namespace Ghosn_BLL
         }
 
         // Add a new SuggestedTimeline with related steps
-        public static int AddAll(AllSuggestedTimelineDTO dto)
+        public static int AddAll(int OutputID, AllSuggestedTimelineDTO dto)
         {
             // Add the SuggestedTimeline
-            var suggestedTimelineObject = new SuggestedTimelineObject(0, dto.OutputID);
+            var suggestedTimelineObject = new SuggestedTimelineObject(0, OutputID);
             int suggestedTimelineID = clsSuggestedTimelines_DAL.AddSuggestedTimeline(suggestedTimelineObject);
 
             // Add related steps
@@ -81,32 +77,35 @@ namespace Ghosn_BLL
         }
 
         // Update an existing SuggestedTimeline with related steps
-        public static bool EditAll(AllSuggestedTimelineDTO dto)
+        public static bool EditAll(int SuggestedTimelineID, AllSuggestedTimelineDTO dto)
         {
             // Update the SuggestedTimeline
-            var suggestedTimelineObject = new SuggestedTimelineObject(dto.SuggestedTimelineID, dto.OutputID);
-            bool isUpdated = clsSuggestedTimelines_DAL.UpdateSuggestedTimeline(suggestedTimelineObject);
 
-            if (isUpdated)
-            {
-                // Delete existing related steps
-                DeleteRelatedSteps(dto.SuggestedTimelineID);
+            // Delete existing related steps
+            DeleteRelatedSteps(SuggestedTimelineID);
 
-                // Add updated related steps
-                AddRelatedSteps(dto.SuggestedTimelineID, dto);
-            }
+            // Add updated related steps
+            AddRelatedSteps(SuggestedTimelineID, dto);
 
-            return isUpdated;
+            return true;
         }
 
         // Delete a SuggestedTimeline and its related steps
         public static bool DeleteAll(int OutputID)
         {
-            // Delete related steps
-            DeleteRelatedSteps(OutputID);
+            var obj = clsSuggestedTimelines_DAL.GetSuggestedTimelineByOutputId(OutputID);
+            if (obj != null)
+            {
+                int SuggestedTimelineID = obj.SuggestedTimelineID;
 
-            // Delete the SuggestedTimeline
-            return clsSuggestedTimelines_DAL.DeleteSuggestedTimeline(OutputID);
+                // Delete related steps
+                DeleteRelatedSteps(SuggestedTimelineID);
+
+                // Delete the SuggestedTimeline
+                return clsSuggestedTimelines_DAL.DeleteSuggestedTimelineByOutputID(OutputID);
+            }
+            else
+                return false;
         }
 
         // Delete all SuggestedTimelines and their related steps

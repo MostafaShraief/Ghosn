@@ -34,9 +34,6 @@ builder.Services.AddCors(options =>
             .AllowCredentials());
 });
 
-// Register the AIService
-builder.Services.AddScoped<Ghosn_BLL.Services.AIService>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline

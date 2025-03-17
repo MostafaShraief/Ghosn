@@ -32,6 +32,13 @@ namespace Ghosn_BLL
             return irrigationSystemObject != null ? ConvertToDTO(irrigationSystemObject) : null;
         }
 
+        // New function to retrieve only material names
+        public static List<string> GetAllIrrigationSystemNames()
+        {
+            var materialObjects = clsIrrigationSystems_DAL.GetAllIrrigationSystems();
+            return materialObjects.Select(obj => obj.IrrigationSystemName).ToList();
+        }
+
         public static int AddIrrigationSystem(IrrigationSystemDTO dto)
         {
             var irrigationSystemObject = ConvertToDALObject(dto);
@@ -65,7 +72,7 @@ namespace Ghosn_BLL
         }
 
         // New function to retrieve all IrrigationSystemNames
-        public static List<IrrigationSystemNameDTO> GetAllIrrigationSystemNames()
+        public static List<IrrigationSystemNameDTO> GetAllIrrigationSystemNamesDTO()
         {
             var irrigationSystemObjects = clsIrrigationSystems_DAL.GetAllIrrigationSystems();
             return irrigationSystemObjects.Select(ConvertToNameDTO).ToList();

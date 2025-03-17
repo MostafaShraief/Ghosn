@@ -13,11 +13,6 @@ namespace Ghosn_BLL
         public string FarmingToolName { get; set; } // Added
     }
 
-    public class SuggestedFarmingToolRequestDTO
-    {
-        public int FarmingToolID { get; set; } // Frontend sends FarmingToolID
-    }
-
     public class SuggestedFarmingToolResponseDTO
     {
         public string FarmingToolName { get; set; }

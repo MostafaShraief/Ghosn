@@ -13,11 +13,6 @@ namespace Ghosn_BLL
         public string IrrigationSystemName { get; set; } // Added
     }
 
-    public class SuggestedIrrigationSystemRequestDTO
-    {
-        public int IrrigationSystemID { get; set; } // Frontend sends IrrigationSystemID
-    }
-
     public class SuggestedIrrigationSystemResponseDTO
     {
         public string IrrigationSystemName { get; set; }

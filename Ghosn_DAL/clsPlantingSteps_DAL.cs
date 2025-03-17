@@ -140,6 +140,21 @@ namespace Ghosn_DAL
             }
         }
 
+        public static bool DeletePlantingStepByOutputID(int OutputID)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "DELETE FROM PlantingSteps WHERE OutputID = @OutputID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@OutputID", OutputID);
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+        }
+
         // Function to retrieve all PlantingSteps by OutputID
         public static List<PlantingStepObject> GetPlantingStepsByOutputID(int outputID)
         {

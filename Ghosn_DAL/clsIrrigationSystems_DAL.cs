@@ -71,6 +71,29 @@ namespace Ghosn_DAL
             }
         }
 
+        public static int? GetIrrigationSystemIdByName(string IrrigationSystemName)
+        {
+            using (SqlConnection conn = new SqlConnection(clsSettings.connectionString))
+            {
+                string query = "SELECT Top 1 IrrigationSystemID FROM IrrigationSystems WHERE IrrigationSystemName = @IrrigationSystemName";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@IrrigationSystemName", IrrigationSystemName);
+                    conn.Open();
+
+                    int Result;
+                    object scalarValue = cmd.ExecuteScalar();
+
+                    if (scalarValue != null && int.TryParse(scalarValue.ToString(), out Result))
+                    {
+                        return Result;
+                    }
+                    return null;
+
+                }
+            }
+        }
+
         public static int AddIrrigationSystem(IrrigationSystemObject irrigationSystem)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))

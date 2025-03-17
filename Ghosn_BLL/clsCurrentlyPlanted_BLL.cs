@@ -13,11 +13,6 @@ namespace Ghosn_BLL
         public string PlantName { get; set; } // Added
     }
 
-    public class CurrentlyPlantedRequestDTO
-    {
-        public int PlantID { get; set; } // Frontend sends PlantID
-    }
-
     public class CurrentlyPlantedResponseDTO
     {
         public string PlantName { get; set; }

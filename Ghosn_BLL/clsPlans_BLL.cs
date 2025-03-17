@@ -11,12 +11,6 @@ namespace Ghosn_BLL
         public int ClientID { get; set; }
     }
 
-    public class PlanRequestDTO : PlanDTO
-    {
-        public OutputRequestDTO? Output { get; set; }
-        public InputRequestDTO? Input { get; set; }
-    }
-
     public class PlanResponseDTO : PlanDTO
     {
         public OutputResponseDTO? Output { get; set; }
@@ -37,6 +31,8 @@ namespace Ghosn_BLL
             {
                 var planResponseDTO = new PlanResponseDTO
                 {
+                    PlanID = planObject.PlanID,
+                    ClientID = planObject.ClientID,
                     Output = clsOutputs_BLL.GetOutputWithDetailsById(planObject.OutputID),
                     Input = clsInputs_BLL.GetInputWithPlantsById(planObject.InputID)
                 };
@@ -61,7 +57,7 @@ namespace Ghosn_BLL
         }
 
         // Add a new Plan with related data
-        public static int AddPlanWithDetails(PlanRequestDTO dto)
+        public static int AddPlanWithDetails(PlanResponseDTO dto)
         {
             if (dto == null || dto.Output == null || dto.Input == null) return 0; // Return failed to add
             
@@ -72,14 +68,14 @@ namespace Ghosn_BLL
             int inputID = clsInputs_BLL.AddInputWithPlants(dto.Input);
 
             // Add the Plan
-            var planObject = new PlanObject(0, dto.ClientID, outputID, inputID);
+            var planObject = new PlanObject(0, dto.ClientID, inputID, outputID);
             int planID = clsPlans_DAL.AddPlan(planObject);
 
             return planID;
         }
 
         // Update an existing Plan with related data
-        public static bool UpdatePlanWithDetails(PlanRequestDTO dto, int planID)
+        public static bool UpdatePlanWithDetails(PlanResponseDTO dto, int planID)
         {
             // Retrieve the existing Plan
             var planObject = clsPlans_DAL.GetPlanById(planID);
@@ -92,7 +88,7 @@ namespace Ghosn_BLL
             bool isInputUpdated = clsInputs_BLL.UpdateInputWithPlants(dto.Input);
 
             // Update the Plan
-            var updatedPlanObject = new PlanObject(planID, dto.ClientID, planObject.OutputID, planObject.InputID);
+            var updatedPlanObject = new PlanObject(planID, dto.ClientID, planObject.InputID, planObject.OutputID);
             bool isPlanUpdated = clsPlans_DAL.UpdatePlan(updatedPlanObject);
 
             return isOutputUpdated && isInputUpdated && isPlanUpdated;
@@ -114,7 +110,7 @@ namespace Ghosn_BLL
             // Delete the Plan
             bool isPlanDeleted = clsPlans_DAL.DeletePlan(planID);
 
-            return isOutputDeleted && isInputDeleted && isPlanDeleted;
+            return isOutputDeleted && isInputDeleted && clsOutputs_DAL.DeleteOutput(planObject.OutputID) && clsInputs_DAL.DeleteInput(planObject.InputID) && isPlanDeleted;
         }
 
         // Delete all Plans and their related data

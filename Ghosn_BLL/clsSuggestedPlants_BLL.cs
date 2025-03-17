@@ -7,16 +7,11 @@ namespace Ghosn_BLL
 {
     public class SuggestedPlantDTO
     {
-        public int SuggestedPlantID { get; set; }
+        public int SuggestedPlantID { get; set; } = 0;
         public int PlantID { get; set; }
         public int OutputID { get; set; }
         public int PlantTypeID { get; set; } // Added
         public string PlantName { get; set; } // Added
-    }
-
-    public class SuggestedPlantRequestDTO
-    {
-        public int PlantID { get; set; } // Frontend sends PlantID
     }
 
     public class SuggestedPlantResponseDTO
@@ -44,6 +39,13 @@ namespace Ghosn_BLL
         public static int AddSuggestedPlant(SuggestedPlantDTO dto)
         {
             var suggestedPlantObject = ConvertToDALObject(dto);
+
+            if (suggestedPlantObject.PlantID == 0 && !String.IsNullOrEmpty(dto.PlantName))
+            {
+                int? ID = clsPlants_BLL.GetPlantIdByName(dto.PlantName);
+                suggestedPlantObject.PlantID = ID is not null ? (int)ID : 0;
+            }
+
             return clsSuggestedPlants_DAL.AddSuggestedPlant(suggestedPlantObject);
         }
 

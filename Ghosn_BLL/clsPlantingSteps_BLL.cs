@@ -11,11 +11,11 @@ namespace Ghosn_BLL
         public int OutputID { get; set; }
     }
 
-    public class AllPlantingStepDTO : PlantingStepDTO
+    public class AllPlantingStepDTO
     {
-        public List<CareStepDTO> CareSteps { get; set; } = new List<CareStepDTO>();
+        public List<CareStepStepDTO> CareSteps { get; set; } = new List<CareStepStepDTO>();
         public List<FertilizationStepDTO> FertilizationSteps { get; set; } = new List<FertilizationStepDTO>();
-        public List<WateringStepDTO> WateringSteps { get; set; } = new List<WateringStepDTO>();
+        public List<WateringStepStepDTO> WateringSteps { get; set; } = new List<WateringStepStepDTO>();
         public List<ChoosePlantsStepDTO> ChoosePlants { get; set; } = new List<ChoosePlantsStepDTO>();
         public List<PrepareSoilStepDTO> PrepareSoilSteps { get; set; } = new List<PrepareSoilStepDTO>();
     }
@@ -33,11 +33,9 @@ namespace Ghosn_BLL
             {
                 var allPlantingStepDTO = new AllPlantingStepDTO
                 {
-                    PlantingStepsID = plantingStepObject.PlantingStepsID,
-                    OutputID = plantingStepObject.OutputID,
-                    CareSteps = clsCareSteps_BLL.GetCareStepsByPlantingStepsID(plantingStepObject.PlantingStepsID),
+                    CareSteps = clsCareSteps_BLL.GetCareStepsStepsByPlantingStepsID(plantingStepObject.PlantingStepsID),
                     FertilizationSteps = clsFertilizations_BLL.GetFertilizationStepsByPlantingStepsID(plantingStepObject.PlantingStepsID),
-                    WateringSteps = clsWateringSteps_BLL.GetWateringStepsByPlantingStepsID(plantingStepObject.PlantingStepsID),
+                    WateringSteps = clsWateringSteps_BLL.GetWateringStepNamesByPlantingStepsID(plantingStepObject.PlantingStepsID),
                     ChoosePlants = clsChoosePlants_BLL.GetChoosePlantsStepsByPlantingStepsID(plantingStepObject.PlantingStepsID),
                     PrepareSoilSteps = clsPrepareSoils_BLL.GetPrepareSoilStepsByPlantingStepsID(plantingStepObject.PlantingStepsID)
                 };
@@ -46,6 +44,15 @@ namespace Ghosn_BLL
             }
 
             return allPlantingSteps;
+        }
+
+        public static int GetPlantingStepsIDByOutputID(int OutputID)
+        {
+            var Obj = clsPlantingSteps_DAL.GetPlantingStepByOutputId(OutputID);
+            if (Obj != null)
+                return Obj.PlantingStepsID;
+            else
+                return 0;
         }
 
         // Get a single PlantingStep with details by ID
@@ -59,11 +66,9 @@ namespace Ghosn_BLL
 
             var allPlantingStepDTO = new AllPlantingStepDTO
             {
-                PlantingStepsID = plantingStepObject.PlantingStepsID,
-                OutputID = plantingStepObject.OutputID,
-                CareSteps = clsCareSteps_BLL.GetCareStepsByPlantingStepsID(plantingStepObject.PlantingStepsID),
+                CareSteps = clsCareSteps_BLL.GetCareStepsStepsByPlantingStepsID(plantingStepObject.PlantingStepsID),
                 FertilizationSteps = clsFertilizations_BLL.GetFertilizationStepsByPlantingStepsID(plantingStepObject.PlantingStepsID),
-                WateringSteps = clsWateringSteps_BLL.GetWateringStepsByPlantingStepsID(plantingStepObject.PlantingStepsID),
+                WateringSteps = clsWateringSteps_BLL.GetWateringStepNamesByPlantingStepsID(plantingStepObject.PlantingStepsID),
                 ChoosePlants = clsChoosePlants_BLL.GetChoosePlantsStepsByPlantingStepsID(plantingStepObject.PlantingStepsID),
                 PrepareSoilSteps = clsPrepareSoils_BLL.GetPrepareSoilStepsByPlantingStepsID(plantingStepObject.PlantingStepsID)
             };
@@ -72,10 +77,10 @@ namespace Ghosn_BLL
         }
 
         // Add all PlantingSteps with related steps
-        public static int AddAll(AllPlantingStepDTO dto)
+        public static int AddAll(int OutputID, AllPlantingStepDTO dto)
         {
             // Add the PlantingStep
-            var plantingStepObject = new PlantingStepObject(0, dto.OutputID);
+            var plantingStepObject = new PlantingStepObject(0, OutputID);
             int plantingStepsID = clsPlantingSteps_DAL.AddPlantingStep(plantingStepObject);
 
             // Add related steps
@@ -85,32 +90,27 @@ namespace Ghosn_BLL
         }
 
         // Edit all PlantingSteps with related steps
-        public static bool EditAll(AllPlantingStepDTO dto)
+        public static bool EditAll(int PlantingStepsID, AllPlantingStepDTO dto)
         {
-            // Update the PlantingStep
-            var plantingStepObject = new PlantingStepObject(dto.PlantingStepsID, dto.OutputID);
-            bool isUpdated = clsPlantingSteps_DAL.UpdatePlantingStep(plantingStepObject);
+            // Delete existing related steps
+            DeleteRelatedStepsByPlantingStepIDFK(PlantingStepsID);
 
-            if (isUpdated)
-            {
-                // Delete existing related steps
-                DeleteRelatedStepsByPlantingStepIDFK(dto.PlantingStepsID);
+            // Add updated related steps
+            AddRelatedSteps(PlantingStepsID, dto);
 
-                // Add updated related steps
-                AddRelatedSteps(dto.PlantingStepsID, dto);
-            }
-
-            return isUpdated;
+            return true;
         }
 
         // Delete all PlantingSteps with related steps
-        public static bool DeleteAll(int plantingStepsID)
+        public static bool DeleteAll(int OutputID)
         {
+            int PlantingStepsID = GetPlantingStepsIDByOutputID(OutputID);
+
             // Delete related steps
-            DeleteRelatedStepsByPlantingStepIDFK(plantingStepsID);
+            DeleteRelatedStepsByPlantingStepIDFK(PlantingStepsID);
 
             // Delete the PlantingStep
-            return clsPlantingSteps_DAL.DeletePlantingStep(plantingStepsID);
+            return clsPlantingSteps_DAL.DeletePlantingStepByOutputID(OutputID);
         }
 
         // Helper method to add related steps

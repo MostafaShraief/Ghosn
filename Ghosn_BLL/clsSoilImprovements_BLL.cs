@@ -49,13 +49,13 @@ namespace Ghosn_BLL
         // FK
         public static bool DeleteSoilImprovementByOutputIDFK(int id)
         {
-            return clsSoilImprovements_DAL.DeleteSoilImprovementByOutputIDPK(id);
+            return clsSoilImprovements_DAL.DeleteSoilImprovementBySoilImprovementIDFK(id);
         }
 
         //PK
         public static bool DeleteSoilImprovementBySoilImprovementIDPK(int id)
         {
-            return clsSoilImprovements_DAL.DeleteSoilImprovementBySoilImprovementIDFK(id);
+            return clsSoilImprovements_DAL.DeleteSoilImprovementByOutputIDPK(id);
         }
 
         // Function to retrieve all SoilImprovements by OutputID

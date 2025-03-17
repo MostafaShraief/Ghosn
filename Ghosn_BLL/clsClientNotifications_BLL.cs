@@ -43,7 +43,7 @@ namespace Ghosn_BLL
 
         public static ClientNotificationDTO? GetClientNotificationByClientId(int id)
         {
-            var clientNotificationObject = clsClientNotifications_DAL.GetClientNotificationById(id);
+            var clientNotificationObject = clsClientNotifications_DAL.GetClientNotificationByClientId(id);
             return clientNotificationObject != null ? ConvertToDTO(clientNotificationObject) : null;
         }
 

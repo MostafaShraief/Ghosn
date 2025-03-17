@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using Ghosn_DAL;
+using System.Reflection.PortableExecutable;
 
 namespace Ghosn_DAL
 {
@@ -68,6 +69,29 @@ namespace Ghosn_DAL
                         }
                         return null;
                     }
+                }
+            }
+        }
+
+        public static int? GetPlantIdByName(string PlantName)
+        {
+            using (SqlConnection conn = new SqlConnection(clsSettings.connectionString))
+            {
+                string query = "SELECT Top 1 PlantID FROM Plants WHERE PlantName = @PlantName";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@PlantName", PlantName);
+                    conn.Open();
+
+                    int Result;
+                    object scalarValue = cmd.ExecuteScalar();
+
+                    if (scalarValue != null && int.TryParse(scalarValue.ToString(), out Result))
+                    {
+                        return Result;
+                    }
+
+                    return null;
                 }
             }
         }

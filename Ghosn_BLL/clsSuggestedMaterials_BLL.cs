@@ -13,11 +13,6 @@ namespace Ghosn_BLL
         public string MaterialName { get; set; } // Added
     }
 
-    public class SuggestedMaterialRequestDTO
-    {
-        public int MaterialID { get; set; } // Frontend sends MaterialID
-    }
-
     public class SuggestedMaterialResponseDTO
     {
         public string MaterialName { get; set; }

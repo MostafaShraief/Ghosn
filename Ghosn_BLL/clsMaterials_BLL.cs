@@ -19,6 +19,13 @@ namespace Ghosn_BLL
             return materialObjects.Select(ConvertToDTO).ToList();
         }
 
+        // New function to retrieve only material names
+        public static List<string> GetAllMaterialNames()
+        {
+            var materialObjects = clsMaterials_DAL.GetAllMaterials();
+            return materialObjects.Select(obj => obj.MaterialName).ToList();
+        }
+
         public static MaterialDTO? GetMaterialById(int id)
         {
             var materialObject = clsMaterials_DAL.GetMaterialById(id);
@@ -48,6 +55,14 @@ namespace Ghosn_BLL
             return new MaterialDTO
             {
                 MaterialID = obj.MaterialID,
+                MaterialName = obj.MaterialName
+            };
+        }
+
+        private static MaterialDTO ConvertToDTOName(MaterialObject obj)
+        {
+            return new MaterialDTO
+            {
                 MaterialName = obj.MaterialName
             };
         }
