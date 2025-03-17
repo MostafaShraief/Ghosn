@@ -22,9 +22,11 @@ function LoginForm() {
       sx={{
         display: "flex",
         justifyContent: "center",
-        alignItems: "flex-start", // رفع الصندوق لأعلى
-        height: "100vh",
-        paddingTop: 4, // إضافة مسافة من الأعلى (اختياري)
+        alignItems: "center",
+        height: "100vh", // لجعل النموذج في وسط الشاشة
+        backgroundImage: "url('https://via.placeholder.com/1920x1080')", // صورة خلفية للصفحة (اختياري)
+        backgroundSize: "cover",
+        backgroundPosition: "center",
       }}
     >
       <Paper
@@ -34,7 +36,11 @@ function LoginForm() {
           width: "100%",
           maxWidth: "600px",
           textAlign: "center",
-          marginTop: 8, // رفع الصندوق لأعلى
+          backgroundImage: "url('')", // صورة خلفية للصندوق
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundColor: "rgba(255, 255, 255, 0.8)", // شفافية الخلفية
+          backdropFilter: "blur(5px)", // تأثير ضبابي
         }}
       >
         <Typography variant="h4" component="h1" gutterBottom>
@@ -54,7 +60,7 @@ function LoginForm() {
             fullWidth
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            sx={{ mb: 4, fontSize: "1.2rem" }} // زيادة المسافة بين الحقول وتكبير الخط
+            sx={{ mb: 3, fontSize: "1.2rem" }} // زيادة المسافة بين الحقول
           />
 
           <TextField
@@ -64,7 +70,7 @@ function LoginForm() {
             fullWidth
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            sx={{ mb: 4, fontSize: "1.2rem" }} // زيادة المسافة بين الحقول وتكبير الخط
+            sx={{ mb: 3, fontSize: "1.2rem" }} // زيادة المسافة بين الحقول
           />
 
           <Button
@@ -72,7 +78,7 @@ function LoginForm() {
             variant="contained"
             color="primary"
             fullWidth
-            sx={{ mt: 4, py: 2, fontSize: "1.2rem" }} // زيادة حجم الزر وتكبير الخط
+            sx={{ mt: 3, py: 2, fontSize: "1.2rem" }} // زيادة المسافة فوق الزر
           >
             تسجيل الدخول
           </Button>
