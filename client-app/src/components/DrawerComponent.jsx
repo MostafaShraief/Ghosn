@@ -12,7 +12,7 @@ import Box from "@mui/material/Box";
 import { deepOrange } from "@mui/material/colors";
 import { Link } from "react-router-dom";
 import Divider from "@mui/material/Divider";
-import { Typography } from "@mui/material";
+import ghosnImage from "@/assets/ghosn.png";
 
 function DrawerComponent({ drawerWidth }) {
   const [recentChatsOpen, setRecentChatsOpen] = useState(false);
@@ -38,18 +38,20 @@ function DrawerComponent({ drawerWidth }) {
         },
       }}
     >
-      <Typography
-        variant="h4"
-        p={2}
-        sx={{ fontWeight: 600, color: "primary.main" }}
-        align="center"
-      >
-        Ghosn
-      </Typography>
-      <Divider />
+      <Box
+        component="img"
+        src={ghosnImage}
+        alt="Ghosn"
+        sx={{
+          maxWidth: "150px",
+          margin: "0 auto",
+          display: "block",
+          p: 1,
+        }}
+      />
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <List sx={{ px: 1 }}>
-          {[ 
+          {[
             { text: "الصفحة الرئيسية", to: "/" },
             { text: "الموجه الذكي", to: "/ai-prompt" },
             { text: "إضافة خطة زراعة", to: "/planting-form" },
@@ -125,15 +127,13 @@ function DrawerComponent({ drawerWidth }) {
               borderColor: "primary.main",
             }}
           >
-            <Avatar
-              sx={{ bgcolor: deepOrange[500], width: 32, height: 32 }} 
-            >
+            <Avatar sx={{ bgcolor: deepOrange[500], width: 32, height: 32 }}>
               U
             </Avatar>
             <ListItemText
               primary="اسم المستخدم"
               primaryTypographyProps={{ fontWeight: 500 }}
-              sx={{ textAlign: "right" ,pr:2}}
+              sx={{ textAlign: "right", pr: 2 }}
             />
           </ListItemButton>
         </Box>
