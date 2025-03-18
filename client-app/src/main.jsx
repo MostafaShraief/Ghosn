@@ -11,6 +11,8 @@ import AIPromptPage from "@/pages/AIPromptPage";
 import PlantingFormPage from "@/pages/PlantingFormPage";
 import PlantingOutputPage from "@/pages/PlantingOutputPage";
 import Login from "@/pages/Login";
+import NotificationsPage from "./pages/NotificationsPage";
+import PlansPage from "./pages/PlansPage";
 
 const drawerWidth = 260;
 
@@ -77,11 +79,13 @@ createRoot(document.getElementById("root")).render(
             <Route path="chat" element={<ChatView />} />
             <Route path="ai-prompt" element={<AIPromptPage />} />
             <Route path="planting-form" element={<PlantingFormPage />} />
+            <Route path="notifications" element={<NotificationsPage />} />
+            <Route path="plans" element={<PlansPage />} />
             <Route
               path="planting-output"
               element={<PlantingOutputPage />}
             />{" "}
-                    <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<Login />} />
           </Route>
         </Routes>
       </BrowserRouter>
