@@ -1,3 +1,4 @@
+// client-app/src/pages/PlantingOutputPage.jsx
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -8,6 +9,8 @@ import {
   Divider,
   Grid,
   CircularProgress,
+  useMediaQuery,
+  Avatar,
 } from "@mui/material";
 import {
   LocalFlorist as PlantIcon,
@@ -19,6 +22,79 @@ import {
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "@/services/api";
+import { styled } from "@mui/system";
+
+// --- Styled Components ---
+
+const Container = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(4),
+  minHeight: "100vh",
+  [theme.breakpoints.down("md")]: {
+    padding: theme.spacing(2),
+  },
+}));
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  borderRadius: theme.spacing(2.5),
+  boxShadow: "0 6px 12px rgba(0, 0, 0, 0.08)",
+  transition: "transform 0.2s ease-in-out",
+  "&:hover": {
+    transform: "translateY(-6px)",
+  },
+  overflow: "hidden",
+  width: "100%",
+  display: "flex",
+  flexDirection: "column",
+  border: `1px solid ${theme.palette.grey[200]}`,
+}));
+
+const CardHeader = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  padding: theme.spacing(2),
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.common.white,
+  borderRadius: `${theme.spacing(2.5)} ${theme.spacing(2.5)} 0 0`,
+}));
+
+const CardContentStyled = styled(CardContent)(({ theme }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(3),
+}));
+
+const SectionTitle = styled(Typography)(({ theme }) => ({
+  fontWeight: 600,
+  color: theme.palette.primary.dark,
+  marginBottom: theme.spacing(1.5),
+  marginTop: theme.spacing(2), // Add top margin for spacing between sections
+}));
+
+const StepText = styled(Typography)(({ theme }) => ({
+  marginBottom: theme.spacing(1),
+  marginLeft: theme.spacing(3),
+  color: theme.palette.text.secondary,
+  lineHeight: 1.7,
+  fontSize: "1rem",
+  "&::before": {
+    content: '"• "',
+    color: theme.palette.primary.main,
+    marginRight: theme.spacing(1),
+  },
+}));
+
+const NoDataText = styled(Typography)(({ theme }) => ({
+  fontStyle: "italic",
+  color: theme.palette.text.disabled,
+  marginLeft: theme.spacing(3), // Indent "No Data" text
+}));
+
+const HeaderIcon = styled(Avatar)(({ theme }) => ({
+  backgroundColor: theme.palette.common.white,
+  color: theme.palette.primary.main,
+  marginLeft: theme.spacing(2),
+}));
+
+// --- Main Component ---
 
 const PlantingOutputPage = () => {
   const navigate = useNavigate();
@@ -26,6 +102,7 @@ const PlantingOutputPage = () => {
   const [loading, setLoading] = useState(true);
   const [aiOutput, setAiOutput] = useState(null);
   const [userInputs, setUserInputs] = useState(null);
+  const isMdDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
 
   const handleChatClick = () => {
     navigate("/chat");
@@ -39,7 +116,6 @@ const PlantingOutputPage = () => {
       if (inputData) {
         try {
           const response = await api.post("/api/Ghosn/GeneratePlan", inputData);
-
           setAiOutput(response.data);
           setLoading(false);
         } catch (error) {
@@ -55,23 +131,23 @@ const PlantingOutputPage = () => {
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "50vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
+      <Container>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "50vh",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      </Container>
     );
   }
-
-  // Helper function to format user inputs.  Makes the code below cleaner.
   const formatUserInputs = () => {
     if (!userInputs) {
-      return <Typography>No user input data available.</Typography>;
+      return <NoDataText>No user input data available.</NoDataText>;
     }
 
     const mapToText = {
@@ -97,386 +173,210 @@ const PlantingOutputPage = () => {
       pesticide: { 0: "لا شيء", 1: "سماد", 2: "مبيد حشري" },
     };
 
-    const inputs = [];
-
-    inputs.push(
+    const inputs = [
       `نوع مكان الزراعة: ${
         mapToText.locationType[userInputs.locationType] || "غير محدد"
-      }`
-    );
-    inputs.push(
-      `شكل المنطقة: ${mapToText.areaShape[userInputs.areaShape] || "غير محدد"}`
-    );
-    inputs.push(
-      `المناخ: ${mapToText.climate[userInputs.climate] || "غير محدد"}`
-    );
-    inputs.push(
+      }`,
+      `شكل المنطقة: ${mapToText.areaShape[userInputs.areaShape] || "غير محدد"}`,
+      `المناخ: ${mapToText.climate[userInputs.climate] || "غير محدد"}`,
       `متوسط درجة الحرارة: ${
         mapToText.temperature[userInputs.temperature] || "غير محدد"
-      }`
-    );
-    inputs.push(
-      `نوع التربة: ${mapToText.soilType[userInputs.soilType] || "غير محدد"}`
-    );
-    inputs.push(
+      }`,
+      `نوع التربة: ${mapToText.soilType[userInputs.soilType] || "غير محدد"}`,
       `خصوبة التربة: ${
         mapToText.soilFertility[userInputs.soilFertility] || "غير محدد"
-      }`
-    );
-    inputs.push(
+      }`,
       `حالة النباتات: ${
         mapToText.plantHealth[userInputs.plantHealth] || "غير محدد"
-      }`
-    );
-    inputs.push(
+      }`,
       `الأدوية المستخدمة: ${
         mapToText.pesticide[userInputs.pesticide] || "غير محدد"
-      }`
-    );
-    inputs.push(`مساحة المنطقة: ${userInputs.areaSize || 0} متر مربع`);
-    inputs.push(
+      }`,
+      `مساحة المنطقة: ${userInputs.areaSize || 0} متر مربع`,
       `النباتات المزروعة: ${
         userInputs.currentlyPlantedPlants
           ?.map((plant) => plant.plantName)
           .join(", ") || "لا يوجد"
-      }`
-    );
+      }`,
+    ];
 
     return inputs.map((input, index) => (
-      <Typography key={index} variant="body1" sx={{ mb: 0.5 }}>
+      <StepText key={index} variant="body1">
         {input}
-      </Typography>
+      </StepText>
     ));
   };
 
+  // Helper function to render steps (now without Accordion)
+  const renderSteps = (title, steps) => (
+    <>
+      <SectionTitle variant="h6">{title}</SectionTitle>
+      {steps && steps.length > 0 ? (
+        steps.map((step, index) => (
+          <StepText key={`${title}-${index}`} variant="body2">
+            {step.step}
+          </StepText>
+        ))
+      ) : (
+        <NoDataText>لا توجد خطوات {title.toLowerCase()}.</NoDataText>
+      )}
+    </>
+  );
+
   return (
-    <Box sx={{ p: 3 }} dir="rtl">
-      <Typography variant="h4" gutterBottom color="primary">
+    <Container dir="rtl">
+      <Typography
+        variant="h4"
+        gutterBottom
+        color="primary"
+        align="center"
+        sx={{ fontWeight: "bold", mb: 4 }}
+      >
         خطة الزراعة المخصصة لك
       </Typography>
-      <Divider sx={{ mb: 4 }} />
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Card elevation={3} sx={{ borderRadius: 2 }}>
-            <CardContent>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <InfoIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6" gutterBottom>
-                  بيانات المستخدم:
-                </Typography>
-              </Box>
-              {formatUserInputs()}
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <Card elevation={3} sx={{ borderRadius: 2 }}>
-            <CardContent>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <PlantIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6" gutterBottom>
-                  النباتات المقترحة:
-                </Typography>
-              </Box>
-              {aiOutput?.suggestedPlants?.map((plant, index) => (
-                <Typography key={index} variant="body1" sx={{ mb: 0.5 }}>
-                  {plant.plantName}
-                </Typography>
-              )) || <Typography>لا توجد نباتات مقترحة.</Typography>}
-            </CardContent>
-          </Card>
-        </Grid>
-
+        {/* User Inputs */}
         <Grid item xs={12}>
-          <Card elevation={3} sx={{ borderRadius: 2 }}>
-            <CardContent>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <ChecklistIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6" gutterBottom>
-                  خطوات الزراعة:
-                </Typography>
-              </Box>
-              {/* Prepare Soil Steps */}
-              <Typography variant="body1" sx={{ mb: 0.5, fontWeight: "bold" }}>
-                تحضير التربة:
-              </Typography>
-              {aiOutput?.plantingSteps?.prepareSoilSteps?.map((step, index) => (
-                <Typography
-                  key={`prepareSoil-${index}`}
-                  variant="body2"
-                  sx={{ mb: 0.5, ml: 2 }}
-                >
-                  - {step.step}
-                </Typography>
-              )) || <Typography>لا توجد خطوات لتحضير التربة.</Typography>}
-
-              {/* Choose Plants Steps */}
-              <Typography
-                variant="body1"
-                sx={{ mb: 0.5, mt: 2, fontWeight: "bold" }}
-              >
-                اختيار النباتات:
-              </Typography>
-              {aiOutput?.plantingSteps?.choosePlants?.map((step, index) => (
-                <Typography
-                  key={`choosePlants-${index}`}
-                  variant="body2"
-                  sx={{ mb: 0.5, ml: 2 }}
-                >
-                  - {step.step}
-                </Typography>
-              )) || <Typography>لا توجد خطوات لاختيار النباتات.</Typography>}
-
-              {/* Watering Steps */}
-              <Typography
-                variant="body1"
-                sx={{ mb: 0.5, mt: 2, fontWeight: "bold" }}
-              >
-                الري:
-              </Typography>
-              {aiOutput?.plantingSteps?.wateringSteps?.map((step, index) => (
-                <Typography
-                  key={`watering-${index}`}
-                  variant="body2"
-                  sx={{ mb: 0.5, ml: 2 }}
-                >
-                  - {step.step}
-                </Typography>
-              )) || <Typography>لا توجد خطوات للري.</Typography>}
-
-              {/* Fertilization Steps */}
-              <Typography
-                variant="body1"
-                sx={{ mb: 0.5, mt: 2, fontWeight: "bold" }}
-              >
-                التسميد:
-              </Typography>
-              {aiOutput?.plantingSteps?.fertilizationSteps?.map(
-                (step, index) => (
-                  <Typography
-                    key={`fertilization-${index}`}
-                    variant="body2"
-                    sx={{ mb: 0.5, ml: 2 }}
-                  >
-                    - {step.step}
-                  </Typography>
-                )
-              ) || <Typography>لا توجد خطوات للتسميد.</Typography>}
-
-              {/* Care Steps */}
-              <Typography
-                variant="body1"
-                sx={{ mb: 0.5, mt: 2, fontWeight: "bold" }}
-              >
-                العناية:
-              </Typography>
-              {aiOutput?.plantingSteps?.careSteps?.map((step, index) => (
-                <Typography
-                  key={`care-${index}`}
-                  variant="body2"
-                  sx={{ mb: 0.5, ml: 2 }}
-                >
-                  - {step.step}
-                </Typography>
-              )) || <Typography>لا توجد خطوات للعناية.</Typography>}
-            </CardContent>
-          </Card>
+          <StyledCard>
+            <CardHeader>
+              <HeaderIcon>
+                <InfoIcon />
+              </HeaderIcon>
+              <Typography variant="h6">بيانات المستخدم</Typography>
+            </CardHeader>
+            <CardContentStyled>{formatUserInputs()}</CardContentStyled>
+          </StyledCard>
         </Grid>
 
-        <Grid item xs={12} md={6}>
-          <Card elevation={3} sx={{ borderRadius: 2 }}>
-            <CardContent>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <TipsIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6" gutterBottom>
-                  نصائح إضافية:
-                </Typography>
-              </Box>
-              {/* Soil Improvements */}
-              <Typography variant="body1" sx={{ mb: 0.5, fontWeight: "bold" }}>
-                تحسين التربة:
-              </Typography>
-              {aiOutput?.soilImprovements?.map((tip, index) => (
-                <Typography
-                  key={`soilImprovement-${index}`}
-                  variant="body2"
-                  sx={{ mb: 0.5, ml: 2 }}
-                >
-                  - {tip.step}
-                </Typography>
-              )) || <Typography>لا توجد نصائح لتحسين التربة.</Typography>}
-
-              {/* Pest Preventions */}
-              <Typography
-                variant="body1"
-                sx={{ mb: 0.5, mt: 2, fontWeight: "bold" }}
-              >
-                الوقاية من الآفات:
-              </Typography>
-              {aiOutput?.pestPreventions?.map((tip, index) => (
-                <Typography
-                  key={`pestPrevention-${index}`}
-                  variant="body2"
-                  sx={{ mb: 0.5, ml: 2 }}
-                >
-                  - {tip.step}
-                </Typography>
-              )) || <Typography>لا توجد نصائح للوقاية من الآفات.</Typography>}
-              {/* Crop Rotations */}
-              <Typography variant="body1" sx={{ mb: 0.5, fontWeight: "bold" }}>
-                تناوب المحاصيل:
-              </Typography>
-              {aiOutput?.cropRotations?.map((tip, index) => (
-                <Typography
-                  key={`cropRotations-${index}`}
-                  variant="body2"
-                  sx={{ mb: 0.5, ml: 2 }}
-                >
-                  - {tip.step}
-                </Typography>
-              )) || <Typography>لا توجد نصائح لتناوب المحاصيل.</Typography>}
-            </CardContent>
-          </Card>
+        {/* Suggested Plants */}
+        <Grid item xs={12}>
+          <StyledCard>
+            <CardHeader>
+              <HeaderIcon>
+                <PlantIcon />
+              </HeaderIcon>
+              <Typography variant="h6">النباتات المقترحة</Typography>
+            </CardHeader>
+            <CardContentStyled>
+              {aiOutput?.suggestedPlants?.length > 0 ? (
+                aiOutput.suggestedPlants.map((plant, index) => (
+                  <StepText key={index} variant="body1">
+                    {plant.plantName}
+                  </StepText>
+                ))
+              ) : (
+                <NoDataText>لا توجد نباتات مقترحة.</NoDataText>
+              )}
+            </CardContentStyled>
+          </StyledCard>
         </Grid>
 
-        <Grid item xs={12} md={6}>
-          <Card elevation={3} sx={{ borderRadius: 2 }}>
-            <CardContent>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <ScheduleIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6" gutterBottom>
-                  جدول زمني مقترح:
-                </Typography>
-              </Box>
-              {/* First Weeks */}
-              <Typography variant="body1" sx={{ mb: 0.5, fontWeight: "bold" }}>
-                الأسابيع الأولى:
-              </Typography>
-              {aiOutput?.suggestedTimelines?.firstWeeks?.map((item, index) => (
-                <Typography
-                  key={`firstWeeks-${index}`}
-                  variant="body2"
-                  sx={{ mb: 0.5, ml: 2 }}
-                >
-                  - {item.step}
-                </Typography>
-              )) || <Typography>لا توجد خطوات للأسبوع الأول.</Typography>}
-
-              {/* Second Weeks */}
-              <Typography
-                variant="body1"
-                sx={{ mb: 0.5, mt: 2, fontWeight: "bold" }}
-              >
-                الأسابيع الثانية:
-              </Typography>
-              {aiOutput?.suggestedTimelines?.secondWeeks?.map((item, index) => (
-                <Typography
-                  key={`secondWeeks-${index}`}
-                  variant="body2"
-                  sx={{ mb: 0.5, ml: 2 }}
-                >
-                  - {item.step}
-                </Typography>
-              )) || <Typography>لا توجد خطوات للأسبوع الثاني.</Typography>}
-
-              {/* First Months */}
-              <Typography
-                variant="body1"
-                sx={{ mb: 0.5, mt: 2, fontWeight: "bold" }}
-              >
-                الأشهر الأولى:
-              </Typography>
-              {aiOutput?.suggestedTimelines?.firstMonths?.map((item, index) => (
-                <Typography
-                  key={`firstMonths-${index}`}
-                  variant="body2"
-                  sx={{ mb: 0.5, ml: 2 }}
-                >
-                  - {item.step}
-                </Typography>
-              )) || <Typography>لا توجد خطوات للشهر الأول.</Typography>}
-
-              {/* Third Months */}
-              <Typography
-                variant="body1"
-                sx={{ mb: 0.5, mt: 2, fontWeight: "bold" }}
-              >
-                الأشهر الثلاثة:
-              </Typography>
-              {aiOutput?.suggestedTimelines?.thirdMonths?.map((item, index) => (
-                <Typography
-                  key={`thirdMonths-${index}`}
-                  variant="body2"
-                  sx={{ mb: 0.5, ml: 2 }}
-                >
-                  - {item.step}
-                </Typography>
-              )) || <Typography>لا توجد خطوات للشهر الثالث.</Typography>}
-            </CardContent>
-          </Card>
+        {/* Planting Steps */}
+        <Grid item xs={12}>
+          <StyledCard>
+            <CardHeader>
+              <HeaderIcon>
+                <ChecklistIcon />
+              </HeaderIcon>
+              <Typography variant="h6">خطوات الزراعة</Typography>
+            </CardHeader>
+            <CardContentStyled>
+              {renderSteps(
+                "تحضير التربة",
+                aiOutput?.plantingSteps?.prepareSoilSteps
+              )}
+              {renderSteps(
+                "اختيار النباتات",
+                aiOutput?.plantingSteps?.choosePlants
+              )}
+              {renderSteps("الري", aiOutput?.plantingSteps?.wateringSteps)}
+              {renderSteps(
+                "التسميد",
+                aiOutput?.plantingSteps?.fertilizationSteps
+              )}
+              {renderSteps("العناية", aiOutput?.plantingSteps?.careSteps)}
+            </CardContentStyled>
+          </StyledCard>
         </Grid>
 
-        <Grid item xs={12} md={6}>
-          <Card elevation={3} sx={{ borderRadius: 2 }}>
-            <CardContent>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <MaterialsIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6" gutterBottom>
-                  المواد المطلوبة:
-                </Typography>
-              </Box>
+        {/* Additional Tips */}
+        <Grid item xs={12}>
+          <StyledCard>
+            <CardHeader>
+              <HeaderIcon>
+                <TipsIcon />
+              </HeaderIcon>
+              <Typography variant="h6">نصائح إضافية</Typography>
+            </CardHeader>
+            <CardContentStyled>
+              {renderSteps("تحسين التربة", aiOutput?.soilImprovements)}
+              {renderSteps("الوقاية من الآفات", aiOutput?.pestPreventions)}
+              {renderSteps("تناوب المحاصيل", aiOutput?.cropRotations)}
+            </CardContentStyled>
+          </StyledCard>
+        </Grid>
 
-              {/* Suggested Materials */}
-              <Typography variant="body1" sx={{ mb: 0.5, fontWeight: "bold" }}>
-                المواد المقترحة:
-              </Typography>
-              {aiOutput?.suggestedMaterials?.map((material, index) => (
-                <Typography
-                  key={`material-${index}`}
-                  variant="body2"
-                  sx={{ mb: 0.5, ml: 2 }}
-                >
-                  - {material.materialName}
-                </Typography>
-              )) || <Typography>لا توجد مواد مقترحة.</Typography>}
+        {/* Suggested Timeline */}
+        <Grid item xs={12}>
+          <StyledCard>
+            <CardHeader>
+              <HeaderIcon>
+                <ScheduleIcon />
+              </HeaderIcon>
+              <Typography variant="h6">جدول زمني مقترح</Typography>
+            </CardHeader>
+            <CardContentStyled>
+              {renderSteps(
+                "الأسابيع الأولى",
+                aiOutput?.suggestedTimelines?.firstWeeks
+              )}
+              {renderSteps(
+                "الأسابيع الثانية",
+                aiOutput?.suggestedTimelines?.secondWeeks
+              )}
+              {renderSteps(
+                "الأشهر الأولى",
+                aiOutput?.suggestedTimelines?.firstMonths
+              )}
+              {renderSteps(
+                "الأشهر الثلاثة",
+                aiOutput?.suggestedTimelines?.thirdMonths
+              )}
+            </CardContentStyled>
+          </StyledCard>
+        </Grid>
 
-              {/* Suggested Farming Tools */}
-              <Typography
-                variant="body1"
-                sx={{ mb: 0.5, mt: 2, fontWeight: "bold" }}
-              >
-                أدوات الزراعة المقترحة:
-              </Typography>
-              {aiOutput?.suggestedFarmingTools?.map((tool, index) => (
-                <Typography
-                  key={`tool-${index}`}
-                  variant="body2"
-                  sx={{ mb: 0.5, ml: 2 }}
-                >
-                  - {tool.farmingToolName}
-                </Typography>
-              )) || <Typography>لا توجد أدوات زراعة مقترحة.</Typography>}
-
-              {/* Suggested Irrigation Systems */}
-              <Typography
-                variant="body1"
-                sx={{ mb: 0.5, mt: 2, fontWeight: "bold" }}
-              >
-                أنظمة الري المقترحة:
-              </Typography>
-              {aiOutput?.suggestedIrrigationSystems?.map((system, index) => (
-                <Typography
-                  key={`system-${index}`}
-                  variant="body2"
-                  sx={{ mb: 0.5, ml: 2 }}
-                >
-                  - {system.irrigationSystemName}
-                </Typography>
-              )) || <Typography>لا توجد أنظمة ري مقترحة.</Typography>}
-            </CardContent>
-          </Card>
+        {/* Required Materials */}
+        <Grid item xs={12}>
+          <StyledCard>
+            <CardHeader>
+              <HeaderIcon>
+                <MaterialsIcon />
+              </HeaderIcon>
+              <Typography variant="h6">المواد المطلوبة</Typography>
+            </CardHeader>
+            <CardContentStyled>
+              {renderSteps(
+                "المواد المقترحة",
+                aiOutput?.suggestedMaterials?.map((m) => ({
+                  step: m.materialName,
+                }))
+              )}
+              {renderSteps(
+                "أدوات الزراعة المقترحة",
+                aiOutput?.suggestedFarmingTools?.map((t) => ({
+                  step: t.farmingToolName,
+                }))
+              )}
+              {renderSteps(
+                "أنظمة الري المقترحة",
+                aiOutput?.suggestedIrrigationSystems?.map((s) => ({
+                  step: s.irrigationSystemName,
+                }))
+              )}
+            </CardContentStyled>
+          </StyledCard>
         </Grid>
       </Grid>
 
@@ -484,11 +384,20 @@ const PlantingOutputPage = () => {
         variant="contained"
         color="primary"
         onClick={handleChatClick}
-        sx={{ mt: 3, px: 4, py: 1.5, borderRadius: 8 }}
+        sx={{
+          mt: 4,
+          px: 5,
+          py: 1.5,
+          borderRadius: 25,
+          fontSize: "1.1rem",
+          textTransform: "none",
+          fontWeight: "bold",
+          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+        }}
       >
         التحدث مع المخرجات
       </Button>
-    </Box>
+    </Container>
   );
 };
 
