@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   Button,
-  IconButton,
   Box,
   List,
   ListItem,
@@ -38,6 +37,7 @@ function HomePage() {
   const [notifications, setNotifications] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
+  const [tips, setTips] = useState([]); // حالة لتخزين النصائح
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -55,8 +55,13 @@ function HomePage() {
         { time: "أمس", event: "تمت إضافة خطة زراعة" },
         { time: "منذ يومين", event: "تم تسجيل الدخول" },
       ]);
+      setTips([
+        "استخدم الأسمدة العضوية لتحسين جودة التربة.",
+        "قم بري النباتات في الصباح الباكر.",
+        "تأكد من تعرض النباتات لأشعة الشمس الكافية.",
+      ]); // نصائح وهمية
       setLoading(false);
-    }, 500); 
+    }, 500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -97,89 +102,121 @@ function HomePage() {
       </Box>
 
       <Grid container spacing={3}>
-        {/* Notifications Panel */}
+        {/* الإشعارات */}
         <Grid item xs={12} md={6}>
-          <Card elevation={3} sx={{ borderRadius: 2 }}>
-            <CardContent>
+          <Card elevation={3} sx={{ borderRadius: 2, height: "100%" }}>
+            <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <NotificationsIcon color="primary" sx={{ mr: 1 }} />
                 <Typography variant="h6">الإشعارات</Typography>
               </Box>
-              <List>
-                {notifications.map((notification) => (
-                  <React.Fragment key={notification.id}>
-                    <ListItem>
-                      <ListItemIcon>{notification.icon}</ListItemIcon>
-                      <ListItemText primary={notification.text} />
-                    </ListItem>
-                    <Divider />
-                  </React.Fragment>
-                ))}
-              </List>
+              <Box sx={{ flexGrow: 1 }}>
+                <List>
+                  {notifications.map((notification) => (
+                    <React.Fragment key={notification.id}>
+                      <ListItem>
+                        <ListItemIcon>{notification.icon}</ListItemIcon>
+                        <ListItemText primary={notification.text} />
+                      </ListItem>
+                      <Divider />
+                    </React.Fragment>
+                  ))}
+                </List>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Today's Suggestions */}
+        {/* اقتراحات اليوم */}
         <Grid item xs={12} md={6}>
-          <Card elevation={3} sx={{ borderRadius: 2 }}>
-            <CardContent>
+          <Card elevation={3} sx={{ borderRadius: 2, height: "100%" }}>
+            <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <LightbulbIcon color="primary" sx={{ mr: 1 }} />
                 <Typography variant="h6">اقتراحات اليوم</Typography>
               </Box>
-              {suggestions.map((suggestion, index) => (
-                <Typography key={index} variant="body1" sx={{ mb: 1 }}>
-                  - {suggestion}
-                </Typography>
-              ))}
+              <Box sx={{ flexGrow: 1 }}>
+                {suggestions.map((suggestion, index) => (
+                  <Typography key={index} variant="body1" sx={{ mb: 1 }}>
+                    - {suggestion}
+                  </Typography>
+                ))}
+              </Box>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Quick Actions */}
-        <Grid item xs={12}>
-          <Card elevation={3} sx={{ borderRadius: 2, p: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              إجراءات سريعة
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  startIcon={<AddCircleIcon sx={{ ml: 1 }} />}
-                  href="/planting-form"
-                >
-                  إضافة خطة زراعة
-                </Button>
-              </Grid>
+        {/* الإجراءات السريعة */}
+        <Grid item xs={12} md={6}>
+          <Card elevation={3} sx={{ borderRadius: 2, height: "100%" }}>
+            <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                <AddCircleIcon color="primary" sx={{ mr: 1 }} />
+                <Typography variant="h6">إجراءات سريعة</Typography>
+              </Box>
+              <Box sx={{ flexGrow: 1 }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      fullWidth
+                      startIcon={<AddCircleIcon sx={{ ml: 1 }} />}
+                      href="/planting-form"
+                    >
+                      إضافة خطة زراعة
+                    </Button>
+                  </Grid>
 
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  startIcon={<ChatBubbleIcon sx={{ ml: 1 }} />} 
-                  href="/chat"
-                >
-                  الدردشة
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  startIcon={<AssessmentIcon sx={{ ml: 1 }} />} 
-                  href="/reports"
-                >
-                  عرض التقارير
-                </Button>
-              </Grid>
-            </Grid>
+                  <Grid item xs={12}>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      fullWidth
+                      startIcon={<ChatBubbleIcon sx={{ ml: 1 }} />}
+                      href="/chat"
+                    >
+                      الدردشة
+                    </Button>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      fullWidth
+                      startIcon={<AssessmentIcon sx={{ ml: 1 }} />}
+                      href="/reports"
+                    >
+                      عرض التقارير
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Box>
+            </CardContent>
           </Card>
         </Grid>
 
-        {/* Recent Activity */}
+        {/* النصائح */}
+        <Grid item xs={12} md={6}>
+          <Card elevation={3} sx={{ borderRadius: 2, height: "100%" }}>
+            <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                <LightbulbIcon color="primary" sx={{ mr: 1 }} />
+                <Typography variant="h6">نصائح</Typography>
+              </Box>
+              <Box sx={{ flexGrow: 1 }}>
+                {tips.map((tip, index) => (
+                  <Typography key={index} variant="body1" sx={{ mb: 1 }}>
+                    - {tip}
+                  </Typography>
+                ))}
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* النشاط الأخير */}
         <Grid item xs={12}>
           <Card elevation={3} sx={{ borderRadius: 2, p: 2 }}>
             <Typography variant="h6" gutterBottom>

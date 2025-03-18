@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -18,6 +18,7 @@ function DrawerComponent({ drawerWidth }) {
   const [recentChatsOpen, setRecentChatsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -29,6 +30,11 @@ function DrawerComponent({ drawerWidth }) {
   const handleRecentChatsClick = () => {
     setRecentChatsOpen(!recentChatsOpen);
   };
+
+  // إذا كان المسار الحالي هو /login، لا تعرض السايد بار
+  if (location.pathname === "/login") {
+    return null;
+  }
 
   return (
     <Drawer

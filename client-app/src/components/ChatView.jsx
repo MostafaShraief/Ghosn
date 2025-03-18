@@ -19,14 +19,14 @@ function ChatView() {
 
   useEffect(() => {
     if (formData && Object.keys(formData).length > 0) {
-      const initialAIMessage = `Form data received:\n${JSON.stringify(
+      const initialAIMessage = `تم استلام بيانات النموذج:\n${JSON.stringify(
         formData,
         null,
         2
       )}`;
       setMessages([
         { text: initialAIMessage, sender: "ai" },
-        { text: "Data received.  Processing...", sender: "ai" },
+        { text: "تم استلام البيانات. جاري المعالجة...", sender: "ai" },
       ]);
     }
   }, [formData]);
@@ -39,7 +39,7 @@ function ChatView() {
       setTimeout(() => {
         setMessages((prev) => [
           ...prev,
-          { text: "I'm a simulated AI response!", sender: "ai" },
+          { text: "أنا استجابة ذكاء اصطناعي محاكاة!", sender: "ai" },
         ]);
       }, 500);
     }
@@ -71,7 +71,7 @@ function ChatView() {
           color: "primary.main",
         }}
       >
-        Chat
+        محادثة
       </Typography>
 
       <Paper
@@ -83,8 +83,7 @@ function ChatView() {
           mb: 2,
           bgcolor: "white",
           borderRadius: 2,
-          // Add maxHeight to constrain the height and ensure scrollbar appears
-          maxHeight: "calc(100vh - 200px)", // Adjust 200px as needed
+          maxHeight: "calc(100vh - 200px)", // تحديد ارتفاع ثابت مع إمكانية التمرير
         }}
       >
         {messages.map((message, index) => (
@@ -102,7 +101,7 @@ function ChatView() {
               <Avatar
                 sx={{ bgcolor: lightBlue[500], mr: 1, width: 32, height: 32 }}
               >
-                AI
+                ذكاء
               </Avatar>
             )}
             <Paper
@@ -125,7 +124,7 @@ function ChatView() {
               <Avatar
                 sx={{ bgcolor: deepOrange[500], ml: 1, width: 32, height: 32 }}
               >
-                U
+                أنا
               </Avatar>
             )}
           </Box>
@@ -137,7 +136,7 @@ function ChatView() {
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Type your message..."
+          placeholder="اكتب رسالتك..."
           value={newMessage}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}

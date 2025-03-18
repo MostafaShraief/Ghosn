@@ -23,8 +23,7 @@ function LoginForm() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        height: "100vh", // لجعل النموذج في وسط الشاشة
-        backgroundImage: "url('https://via.placeholder.com/1920x1080')", // صورة خلفية للصفحة (اختياري)
+        height: "100vh", // لجعل النموذج في وسط الشاشة// صورة خلفية للصفحة (اختياري)
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
