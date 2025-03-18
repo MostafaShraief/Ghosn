@@ -1,29 +1,48 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
+import ListItemIcon from "@mui/material/ListItemIcon"; // إضافة ListItemIcon
 import AddIcon from "@mui/icons-material/Add";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import NotificationsIcon from "@mui/icons-material/Notifications"; // أيقونة الإشعارات
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import { deepOrange } from "@mui/material/colors";
-import { Link } from "react-router-dom";
 import Divider from "@mui/material/Divider";
-import { Typography } from "@mui/material";
+import ghosnImage from "@/assets/ghosn.png";
 
 function DrawerComponent({ drawerWidth }) {
   const [recentChatsOpen, setRecentChatsOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   const handleRecentChatsClick = () => {
     setRecentChatsOpen(!recentChatsOpen);
   };
 
+  // إذا كان المسار الحالي هو /login، لا تعرض السايد بار
+  if (location.pathname === "/login") {
+    return null;
+  }
+
   return (
     <Drawer
       variant="permanent"
+      dir="rtl"
+      anchor="right"
       sx={{
         width: drawerWidth,
         flexShrink: 0,
@@ -31,43 +50,54 @@ function DrawerComponent({ drawerWidth }) {
           width: drawerWidth,
           boxSizing: "border-box",
           background: "linear-gradient(180deg, #ffffff, #f8f9fc)",
-          borderRight: "none",
+          borderLeft: "none",
           boxShadow: "2px 0 8px rgba(0,0,0,0.08)",
         },
       }}
     >
-      <Typography
-        variant="h4"
-        p={2}
-        sx={{ fontWeight: 600, color: "primary.main" }}
-        align="center"
-      >
-        Ghosn
-      </Typography>
-      <Divider />
+      <Box
+        component="img"
+        src={ghosnImage}
+        alt="Ghosn"
+        sx={{
+          maxWidth: "150px",
+          margin: "0 auto",
+          display: "block",
+          p: 1,
+        }}
+      />
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <List sx={{ px: 1 }}>
           {[
-            { text: "Home", to: "/" },
-            { text: "AI Prompt", to: "/ai-prompt" },
-            { text: "Add a planting plan", to: "/planting-form" },
-            { text: "New Chat", to: "/chat", icon: <AddIcon /> },
+            { text: "الصفحة الرئيسية", to: "/", icon: null },
+            { text: "الموجه الذكي", to: "/ai-prompt", icon: null },
+            { text: "إضافة خطة زراعة", to: "/planting-form", icon: null },
+            { text: "محادثة جديدة", to: "/chat", icon: <AddIcon /> },
+            {
+              text: "الإشعارات",
+              to: "/notifications",
+              icon: <NotificationsIcon />,
+            }, // إضافة عنصر الإشعارات
           ].map((item) => (
             <ListItem key={item.text} disablePadding>
               <ListItemButton
-                component={Link}
-                to={item.to}
+                onClick={() => navigate(item.to)}
                 sx={{
                   borderRadius: 2,
                   mb: 0.5,
                   "&:hover": { bgcolor: "rgba(25, 118, 210, 0.08)" },
                 }}
               >
+                {item.icon && (
+                  <ListItemIcon sx={{ minWidth: "40px" }}>
+                    {item.icon}
+                  </ListItemIcon>
+                )}
                 <ListItemText
                   primary={item.text}
                   primaryTypographyProps={{ fontWeight: 500 }}
+                  sx={{ textAlign: "right" }}
                 />
-                {item.icon}
               </ListItemButton>
             </ListItem>
           ))}
@@ -78,8 +108,9 @@ function DrawerComponent({ drawerWidth }) {
               sx={{ borderRadius: 2 }}
             >
               <ListItemText
-                primary="Recent Chats"
+                primary="الدردشات الأخيرة"
                 primaryTypographyProps={{ fontWeight: 500 }}
+                sx={{ textAlign: "right" }}
               />
               {recentChatsOpen ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
@@ -90,8 +121,7 @@ function DrawerComponent({ drawerWidth }) {
               {[1, 2, 3].map((num) => (
                 <ListItem key={num} disablePadding>
                   <ListItemButton
-                    component={Link}
-                    to={`/chat/${num}`}
+                    onClick={() => navigate(`/chat/${num}`)}
                     sx={{
                       borderRadius: 2,
                       py: 0.5,
@@ -99,8 +129,9 @@ function DrawerComponent({ drawerWidth }) {
                     }}
                   >
                     <ListItemText
-                      primary={`Chat ${num}`}
+                      primary={`الدردشة ${num}`}
                       primaryTypographyProps={{ color: "text.secondary" }}
+                      sx={{ textAlign: "right" }}
                     />
                   </ListItemButton>
                 </ListItem>
@@ -112,6 +143,9 @@ function DrawerComponent({ drawerWidth }) {
         <Box sx={{ mt: "auto", p: 2 }}>
           <Divider sx={{ mb: 2 }} />
           <ListItemButton
+            onClick={() =>
+              isLoggedIn ? navigate("/profile") : navigate("/login")
+            }
             sx={{
               color: "primary.main",
               borderRadius: 2,
@@ -120,14 +154,13 @@ function DrawerComponent({ drawerWidth }) {
               borderColor: "primary.main",
             }}
           >
-            <Avatar
-              sx={{ bgcolor: deepOrange[500], mr: 1.5, width: 32, height: 32 }}
-            >
+            <Avatar sx={{ bgcolor: deepOrange[500], width: 32, height: 32 }}>
               U
             </Avatar>
             <ListItemText
-              primary="Username"
+              primary={isLoggedIn ? "اسم المستخدم" : "تسجيل الدخول"}
               primaryTypographyProps={{ fontWeight: 500 }}
+              sx={{ textAlign: "right", pr: 2 }}
             />
           </ListItemButton>
         </Box>

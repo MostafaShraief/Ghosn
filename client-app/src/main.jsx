@@ -10,6 +10,7 @@ import HomePage from "@/pages/HomePage";
 import AIPromptPage from "@/pages/AIPromptPage";
 import PlantingFormPage from "@/pages/PlantingFormPage";
 import PlantingOutputPage from "@/pages/PlantingOutputPage";
+import Login from "@/pages/Login";
 
 const drawerWidth = 260;
 
@@ -24,7 +25,8 @@ const theme = createTheme({
     background: { default: "#f5f7fa" },
   },
   typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily:
+      '"Noto Sans Arabic", sans-serif, "Inter", "Roboto", "Helvetica", "Arial"',
   },
   components: {
     MuiButton: {
@@ -79,6 +81,7 @@ createRoot(document.getElementById("root")).render(
               path="planting-output"
               element={<PlantingOutputPage />}
             />{" "}
+                    <Route path="/login" element={<Login />} />
           </Route>
         </Routes>
       </BrowserRouter>

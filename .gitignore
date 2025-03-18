@@ -377,3 +377,4 @@ dist
 dist-ssr
 *.local
 .vite
+.env
