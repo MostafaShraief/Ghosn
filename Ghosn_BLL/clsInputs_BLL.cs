@@ -387,7 +387,7 @@ public class clsInputs_BLL
                 PlantStatus.Healthy => "صحية",
                 PlantStatus.Moderate => "متوسطة",
                 PlantStatus.NeedsCare => "تحتاج عناية",
-                _ => "غير معروف"
+                _ => "لا يوجد"
             };
         }
 

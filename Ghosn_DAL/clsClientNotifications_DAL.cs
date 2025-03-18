@@ -75,8 +75,10 @@ namespace Ghosn_DAL
             }
         }
 
-        public static ClientNotificationObject? GetClientNotificationByClientId(int ClientID)
+        public static List<ClientNotificationObject> GetClientNotificationsByClientId(int ClientID)
         {
+            List<ClientNotificationObject> notifications = new List<ClientNotificationObject>();
+
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 string query = "SELECT * FROM ClientNotifications WHERE ClientID = @ClientID";
@@ -86,18 +88,20 @@ namespace Ghosn_DAL
                     conn.Open();
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        if (reader.Read())
+                        while (reader.Read())
                         {
-                            return new ClientNotificationObject(
+                            ClientNotificationObject notification = new ClientNotificationObject(
                                 reader.GetInt32(reader.GetOrdinal("ClientNotificationID")),
                                 reader.GetInt32(reader.GetOrdinal("ClientID")),
                                 reader.GetInt32(reader.GetOrdinal("NotificationID"))
                             );
+                            notifications.Add(notification);
                         }
-                        return null;
                     }
                 }
             }
+
+            return notifications;
         }
 
         public static int AddClientNotification(ClientNotificationObject clientNotification)

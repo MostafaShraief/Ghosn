@@ -41,10 +41,19 @@ namespace Ghosn_BLL
         //    return clientNotificationObject != null ? ConvertToDTO(clientNotificationObject) : null;
         //}
 
-        public static ClientNotificationDTO? GetClientNotificationByClientId(int id)
+        public static List<NotificationDTO> GetClientNotificationByClientId(int ClientID)
         {
-            var clientNotificationObject = clsClientNotifications_DAL.GetClientNotificationByClientId(id);
-            return clientNotificationObject != null ? ConvertToDTO(clientNotificationObject) : null;
+            var clientNotificationObject = clsClientNotifications_DAL.GetClientNotificationsByClientId(ClientID);
+
+            List<NotificationDTO> clientNotifications = new();
+
+            foreach (var item in clientNotificationObject)
+            {
+                if (item != null)
+                    clientNotifications.Add(clsNotifications_BLL.GetNotificationById(item.NotificationID));
+            }
+
+            return clientNotifications;
         }
 
         public static int AddClientNotification(ClientNotificationRequestDTO dto)
