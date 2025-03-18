@@ -10,6 +10,7 @@ import HomePage from "@/pages/HomePage";
 import AIPromptPage from "@/pages/AIPromptPage";
 import PlantingFormPage from "@/pages/PlantingFormPage";
 import PlantingOutputPage from "@/pages/PlantingOutputPage";
+import Login from "@/pages/Login";
 
 const drawerWidth = 260;
 
@@ -80,6 +81,7 @@ createRoot(document.getElementById("root")).render(
               path="planting-output"
               element={<PlantingOutputPage />}
             />{" "}
+                    <Route path="/login" element={<Login />} />
           </Route>
         </Routes>
       </BrowserRouter>
