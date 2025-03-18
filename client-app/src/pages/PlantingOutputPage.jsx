@@ -7,7 +7,6 @@ import {
   Box,
   Divider,
   Grid,
-  IconButton,
   CircularProgress,
 } from "@mui/material";
 import {
@@ -19,14 +18,14 @@ import {
   Info as InfoIcon,
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "@/services/api";
 
 const PlantingOutputPage = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Get location object
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [aiOutput, setAiOutput] = useState(null);
-  const [userInputs, setUserInputs] = useState(null); // to add userInputs
+  const [userInputs, setUserInputs] = useState(null);
 
   const handleChatClick = () => {
     navigate("/chat");
@@ -39,10 +38,7 @@ const PlantingOutputPage = () => {
     const fetchData = async () => {
       if (inputData) {
         try {
-          const response = await axios.post(
-            "/api/Ghosn/GeneratePlan",
-            inputData
-          );
+          const response = await api.post("/api/Ghosn/GeneratePlan", inputData);
 
           setAiOutput(response.data);
           setLoading(false);

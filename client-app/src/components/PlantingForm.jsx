@@ -15,7 +15,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import axios from "axios";
+import api from "@/services/api";
 import { useNavigate } from "react-router-dom";
 
 const FormPaper = styled(Paper)(({ theme }) => ({
@@ -45,7 +45,7 @@ const PlantingForm = () => {
   useEffect(() => {
     const fetchPlants = async () => {
       try {
-        const { data } = await axios.get("/api/Ghosn/AllPlants");
+        const { data } = await api.get("/api/Ghosn/AllPlants");
         const uniquePlants = [...new Set(data)].map((name, index) => ({
           id: index,
           plantName: name,
