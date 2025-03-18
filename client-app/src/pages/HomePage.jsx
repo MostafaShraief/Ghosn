@@ -93,7 +93,12 @@ function HomePage() {
           textAlign: "center",
         }}
       >
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 700 }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          sx={{ fontWeight: 700 }}
+        >
           مرحبا بك في الصفحة الرئيسية!
         </Typography>
         <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
@@ -105,7 +110,9 @@ function HomePage() {
         {/* الإشعارات */}
         <Grid item xs={12} md={6}>
           <Card elevation={3} sx={{ borderRadius: 2, height: "100%" }}>
-            <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+            <CardContent
+              sx={{ display: "flex", flexDirection: "column", height: "100%" }}
+            >
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <NotificationsIcon color="primary" sx={{ mr: 1 }} />
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
@@ -132,7 +139,9 @@ function HomePage() {
         {/* اقتراحات اليوم */}
         <Grid item xs={12} md={6}>
           <Card elevation={3} sx={{ borderRadius: 2, height: "100%" }}>
-            <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+            <CardContent
+              sx={{ display: "flex", flexDirection: "column", height: "100%" }}
+            >
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <LightbulbIcon color="primary" sx={{ mr: 1 }} />
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
@@ -153,7 +162,9 @@ function HomePage() {
         {/* الإجراءات السريعة */}
         <Grid item xs={12} md={6}>
           <Card elevation={3} sx={{ borderRadius: 2, height: "100%" }}>
-            <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+            <CardContent
+              sx={{ display: "flex", flexDirection: "column", height: "100%" }}
+            >
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <AddCircleIcon color="primary" sx={{ mr: 1 }} />
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
@@ -206,7 +217,9 @@ function HomePage() {
         {/* النصائح */}
         <Grid item xs={12} md={6}>
           <Card elevation={3} sx={{ borderRadius: 2, height: "100%" }}>
-            <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+            <CardContent
+              sx={{ display: "flex", flexDirection: "column", height: "100%" }}
+            >
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <LightbulbIcon color="primary" sx={{ mr: 1 }} />
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
@@ -221,31 +234,6 @@ function HomePage() {
                 ))}
               </Box>
             </CardContent>
-          </Card>
-        </Grid>
-
-        {/* النشاط الأخير */}
-        <Grid item xs={12}>
-          <Card elevation={3} sx={{ borderRadius: 2, p: 2 }}>
-            <Typography variant="h6" gutterBottom sx={{ fontWeight: 700 }}>
-              النشاط الأخير
-            </Typography>
-            <Timeline position="alternate">
-              {recentActivity.map((activity, index) => (
-                <TimelineItem key={index}>
-                  <TimelineSeparator>
-                    <TimelineDot />
-                    {index < recentActivity.length - 1 && <TimelineConnector />}
-                  </TimelineSeparator>
-                  <TimelineContent>
-                    <Typography variant="body2" color="textSecondary">
-                      {activity.time}
-                    </Typography>
-                    <Typography>{activity.event}</Typography>
-                  </TimelineContent>
-                </TimelineItem>
-              ))}
-            </Timeline>
           </Card>
         </Grid>
       </Grid>

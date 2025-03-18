@@ -1,23 +1,43 @@
+// client-app/src/pages/Login.jsx
 import React, { useState } from "react";
-import { TextField, Button, Box, Typography, Paper, Container } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Box,
+  Typography,
+  Paper,
+  Container,
+} from "@mui/material";
+import { login } from "../services/api"; // Import the login function
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate(); // Initialize useNavigate
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!username || !password) {
       setError("يرجى ملء جميع الحقول");
       return;
     }
-    // هنا يمكنك إضافة منطق إرسال البيانات إلى الخادم
-    console.log("تم إرسال البيانات:", { username, password });
-    setError("");
+
+    try {
+      const responseData = await login(username, password); // Call the API
+      // Store clientID and username in localStorage
+      localStorage.setItem("clientID", responseData.clientID);
+      localStorage.setItem("username", username); // Store the username
+      navigate("/"); // Redirect to home page
+      setError(""); // Clear any previous errors
+    } catch (error) {
+      setError(error.message); // Display the error message from the API call
+    }
   };
 
   return (
+    // ... (rest of your LoginForm component JSX remains the same) ...
     <Container
       sx={{
         display: "flex",
@@ -59,7 +79,7 @@ function LoginForm() {
             fullWidth
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            sx={{ mb: 3, fontSize: "1.2rem" }} 
+            sx={{ mb: 3, fontSize: "1.2rem" }}
           />
 
           <TextField
@@ -77,7 +97,7 @@ function LoginForm() {
             variant="contained"
             color="primary"
             fullWidth
-            sx={{ mt: 3, py: 2, fontSize: "1.2rem" }} 
+            sx={{ mt: 3, py: 2, fontSize: "1.2rem" }}
           >
             تسجيل الدخول
           </Button>
