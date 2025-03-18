@@ -11,54 +11,56 @@ import {
   Box,
   CircularProgress,
 } from "@mui/material";
-import { Notifications as NotificationsIcon, Circle } from "@mui/icons-material";
+import {
+  Notifications as NotificationsIcon,
+  Circle,
+} from "@mui/icons-material";
+import { getNotifications } from "../services/api"; // Import the API function
+import { formatDistanceToNow } from "date-fns";
+import { ar } from "date-fns/locale"; // Import Arabic locale
 
 function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // بيانات وهمية للإشعارات
-    const mockNotifications = [
-      {
-        id: 1,
-        title: "تذكير: سقاية المحصول",
-        description: "يرجى سقاية المحصول الذي لديك اليوم.",
-        date: "منذ 5 دقائق",
-        read: false, // إشعار غير مقروء
-      },
-      {
-        id: 2,
-        title: "تذكير: قم بري النباتات",
-        description: "يرجى ري النباتات في الصباح الباكر.",
-        date: "منذ ساعة",
-        read: true, // إشعار مقروء
-      },
-      {
-        id: 3,
-        title: "تذكير: تفقد الآفات",
-        description: "تفقد النباتات بحثًا عن أي آفات.",
-        date: "منذ يومين",
-        read: false, // إشعار غير مقروء
-      },
-    ];
-
-    // محاكاة جلب البيانات من الباك إند
     const fetchNotifications = async () => {
       try {
-        // يمكنك استبدال هذا الجزء بطلب API حقيقي
-        setTimeout(() => {
-          setNotifications(mockNotifications);
-          setLoading(false);
-        }, 1000); // محاكاة تأخير الشبكة
+        const fetchedNotifications = await getNotifications();
+
+        // Format the date and add read status (defaulting to unread)
+        const formattedNotifications = fetchedNotifications.map(
+          (notification) => ({
+            id: notification.notificationID, // Use the correct ID from the API
+            title: notification.title,
+            description: notification.body,
+            date: formatDistanceToNow(new Date(notification.dateAndTime), {
+              addSuffix: true,
+              locale: ar,
+            }),
+            read: false, // Initially, all notifications are unread
+          })
+        );
+
+        setNotifications(formattedNotifications);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching notifications:", error);
         setLoading(false);
+        // Optionally, display an error message to the user.
       }
     };
 
     fetchNotifications();
   }, []);
+
+  const handleNotificationClick = (id) => {
+    setNotifications((prevNotifications) =>
+      prevNotifications.map((notification) =>
+        notification.id === id ? { ...notification, read: true } : notification
+      )
+    );
+  };
 
   if (loading) {
     return (
@@ -75,10 +77,37 @@ function NotificationsPage() {
     );
   }
 
+  // Check if notifications is empty and display a message
+  if (notifications.length === 0) {
+    return (
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <Paper
+          elevation={3}
+          sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
+        >
+          <Typography
+            variant="h4"
+            component="h1"
+            gutterBottom
+            sx={{ fontWeight: 700 }}
+          >
+            الإشعارات
+          </Typography>
+          <Typography variant="body1">لا توجد إشعارات لعرضها.</Typography>
+        </Paper>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 700 }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          sx={{ fontWeight: 700 }}
+        >
           الإشعارات
         </Typography>
 
@@ -86,8 +115,12 @@ function NotificationsPage() {
           {notifications.map((notification) => (
             <React.Fragment key={notification.id}>
               <ListItem
+                button // Make the list item clickable
+                onClick={() => handleNotificationClick(notification.id)}
                 sx={{
-                  bgcolor: notification.read ? "background.paper" : "action.hover",
+                  bgcolor: notification.read
+                    ? "background.paper"
+                    : "action.hover",
                   borderRadius: 2,
                   mb: 1,
                 }}

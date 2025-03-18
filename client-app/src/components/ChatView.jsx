@@ -1,3 +1,4 @@
+// client-app/src/components/ChatView.jsx
 import React, { useState, useRef, useEffect } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -8,6 +9,7 @@ import Paper from "@mui/material/Paper";
 import { deepOrange, lightBlue } from "@mui/material/colors";
 import { IconButton } from "@mui/material";
 import { useLocation } from "react-router-dom";
+import { getAICompletion } from "../services/api"; // Import the API function
 
 function ChatView() {
   const location = useLocation();
@@ -18,34 +20,61 @@ function ChatView() {
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    if (formData && Object.keys(formData).length > 0) {
-      const initialAIMessage = `تم استلام بيانات النموذج:\n${JSON.stringify(
-        formData,
-        null,
-        2
-      )}`;
-      setMessages([
-        { text: initialAIMessage, sender: "ai" },
-        { text: "تم استلام البيانات. جاري المعالجة...", sender: "ai" },
-      ]);
-    }
+    const initializeChat = async () => {
+      if (formData && Object.keys(formData).length > 0) {
+        const initialAIMessage = `تم استلام بيانات النموذج:\n${JSON.stringify(
+          formData,
+          null,
+          2
+        )}`;
+
+        // Send initial message to the AI
+        try {
+          const aiResponse = await getAICompletion(initialAIMessage);
+          console.log("AI Response:", aiResponse);
+          setMessages([
+            { text: initialAIMessage, sender: "user" }, // Show submitted form data
+            { text: aiResponse.data, sender: "ai" }, // Assuming the API returns { message: "..." }
+          ]);
+        } catch (error) {
+          setMessages([
+            { text: initialAIMessage, sender: "user" }, // Show submitted form
+            { text: "Error getting AI response.", sender: "ai" }, //error
+          ]);
+        }
+      }
+    };
+    initializeChat();
   }, [formData]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (newMessage.trim() !== "") {
-      setMessages([...messages, { text: newMessage, sender: "user" }]);
+      // Add the user's message to the chat
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: newMessage, sender: "user" },
+      ]);
       setNewMessage("");
 
-      setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          { text: "أنا استجابة ذكاء اصطناعي محاكاة!", sender: "ai" },
+      // Send the message to the AI and get the response
+      try {
+        const aiResponse = await getAICompletion(newMessage);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { text: aiResponse.res, sender: "ai" }, // Assuming the API returns { message: "..." }
         ]);
-      }, 500);
+      } catch (error) {
+        console.error("Error in handleSendMessage:", error);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { text: "Error getting AI response.", sender: "ai" },
+        ]);
+      }
     }
   };
 
   const handleInputChange = (event) => setNewMessage(event.target.value);
+
   const handleKeyPress = (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
@@ -83,8 +112,9 @@ function ChatView() {
           mb: 2,
           bgcolor: "white",
           borderRadius: 2,
-          maxHeight: "calc(100vh - 200px)", // تحديد ارتفاع ثابت مع إمكانية التمرير
+          maxHeight: "calc(100vh - 200px)",
         }}
+        dir="ltr"
       >
         {messages.map((message, index) => (
           <Box
