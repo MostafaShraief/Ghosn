@@ -85,6 +85,7 @@ function ChatView() {
           borderRadius: 2,
           maxHeight: "calc(100vh - 200px)", // تحديد ارتفاع ثابت مع إمكانية التمرير
         }}
+        dir="ltr"
       >
         {messages.map((message, index) => (
           <Box

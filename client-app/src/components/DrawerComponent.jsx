@@ -15,6 +15,7 @@ import Box from "@mui/material/Box";
 import { deepOrange } from "@mui/material/colors";
 import Divider from "@mui/material/Divider";
 import ghosnImage from "@/assets/ghosn.png";
+import { Agriculture, House } from "@mui/icons-material";
 
 function DrawerComponent({ drawerWidth }) {
   const [recentChatsOpen, setRecentChatsOpen] = useState(false);
@@ -69,15 +70,24 @@ function DrawerComponent({ drawerWidth }) {
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <List sx={{ px: 1 }}>
           {[
-            { text: "الصفحة الرئيسية", to: "/", icon: null },
-            { text: "الموجه الذكي", to: "/ai-prompt", icon: null },
-            { text: "إضافة خطة زراعة", to: "/planting-form", icon: null },
-            { text: "محادثة جديدة", to: "/chat", icon: <AddIcon /> },
+            { text: "الصفحة الرئيسية", to: "/", icon: <House /> },
+            // { text: "الموجه الذكي", to: "/ai-prompt", icon: null },
+            // { text: "محادثة جديدة", to: "/chat", icon: <AddIcon /> },
+            {
+              text: "إضافة خطة زراعة",
+              to: "/planting-form",
+              icon: <AddIcon />,
+            },
             {
               text: "الإشعارات",
               to: "/notifications",
               icon: <NotificationsIcon />,
-            }, // إضافة عنصر الإشعارات
+            },
+            {
+              text: "خطط الزراعية السابقة",
+              to: "/notifications",
+              icon: <Agriculture />,
+            },
           ].map((item) => (
             <ListItem key={item.text} disablePadding>
               <ListItemButton
@@ -102,7 +112,7 @@ function DrawerComponent({ drawerWidth }) {
             </ListItem>
           ))}
 
-          <ListItem disablePadding>
+          {/* <ListItem disablePadding>
             <ListItemButton
               onClick={handleRecentChatsClick}
               sx={{ borderRadius: 2 }}
@@ -114,7 +124,7 @@ function DrawerComponent({ drawerWidth }) {
               />
               {recentChatsOpen ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
-          </ListItem>
+          </ListItem> */}
 
           {recentChatsOpen && (
             <List disablePadding sx={{ pl: 2 }}>
