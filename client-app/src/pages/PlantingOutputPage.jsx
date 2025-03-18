@@ -1,4 +1,3 @@
-// client-app/src/pages/PlantingOutputPage.jsx
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -27,7 +26,6 @@ import { styled } from "@mui/system";
 // --- Styled Components ---
 
 const Container = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(4),
   minHeight: "100vh",
   [theme.breakpoints.down("md")]: {
     padding: theme.spacing(2),
