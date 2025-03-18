@@ -100,7 +100,7 @@ function DrawerComponent({ drawerWidth }) {
             },
             {
               text: "خطط الزراعية السابقة",
-              to: "/notifications",
+              to: "/plans",
               icon: <Agriculture />,
             },
           ].map((item) => (
