@@ -25,7 +25,8 @@ const theme = createTheme({
     background: { default: "#f5f7fa" },
   },
   typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily:
+      '"Noto Sans Arabic", sans-serif, "Inter", "Roboto", "Helvetica", "Arial"',
   },
   components: {
     MuiButton: {

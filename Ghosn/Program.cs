@@ -12,23 +12,16 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Ghosn API", Version = "v1" });
 });
 
-// Add HttpClient for DeepSeek API integration
-builder.Services.AddHttpClient("DeepSeekAPI", client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["DeepSeekAPI:BaseUrl"] ?? "https://api.deepseek.com/");
-    // Add default headers if API key is present
-    if (!string.IsNullOrEmpty(builder.Configuration["DeepSeekAPI:ApiKey"]))
-    {
-        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {builder.Configuration["DeepSeekAPI:ApiKey"]}");
-    }
-});
-
 // Add CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
         builder => builder
-            .WithOrigins("http://localhost:5173") // Vite's default port
+            .WithOrigins(
+                "http://localhost:5173",
+                "http://mostafashraief.bsite.net",
+                "https://mostafashraief.bsite.net"
+            )
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials());

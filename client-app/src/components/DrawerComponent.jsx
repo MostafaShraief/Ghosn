@@ -14,7 +14,7 @@ import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import { deepOrange } from "@mui/material/colors";
 import Divider from "@mui/material/Divider";
-import { Typography } from "@mui/material";
+import ghosnImage from "@/assets/ghosn.png";
 
 function DrawerComponent({ drawerWidth }) {
   const [recentChatsOpen, setRecentChatsOpen] = useState(false);
@@ -55,15 +55,17 @@ function DrawerComponent({ drawerWidth }) {
         },
       }}
     >
-      <Typography
-        variant="h4"
-        p={2}
-        sx={{ fontWeight: 600, color: "primary.main" }}
-        align="center"
-      >
-        Ghosn
-      </Typography>
-      <Divider />
+      <Box
+        component="img"
+        src={ghosnImage}
+        alt="Ghosn"
+        sx={{
+          maxWidth: "150px",
+          margin: "0 auto",
+          display: "block",
+          p: 1,
+        }}
+      />
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <List sx={{ px: 1 }}>
           {[
@@ -71,7 +73,11 @@ function DrawerComponent({ drawerWidth }) {
             { text: "الموجه الذكي", to: "/ai-prompt", icon: null },
             { text: "إضافة خطة زراعة", to: "/planting-form", icon: null },
             { text: "محادثة جديدة", to: "/chat", icon: <AddIcon /> },
-            { text: "الإشعارات", to: "/notifications", icon: <NotificationsIcon /> }, // إضافة عنصر الإشعارات
+            {
+              text: "الإشعارات",
+              to: "/notifications",
+              icon: <NotificationsIcon />,
+            }, // إضافة عنصر الإشعارات
           ].map((item) => (
             <ListItem key={item.text} disablePadding>
               <ListItemButton
@@ -137,7 +143,9 @@ function DrawerComponent({ drawerWidth }) {
         <Box sx={{ mt: "auto", p: 2 }}>
           <Divider sx={{ mb: 2 }} />
           <ListItemButton
-            onClick={() => (isLoggedIn ? navigate("/profile") : navigate("/login"))}
+            onClick={() =>
+              isLoggedIn ? navigate("/profile") : navigate("/login")
+            }
             sx={{
               color: "primary.main",
               borderRadius: 2,
