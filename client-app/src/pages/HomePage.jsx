@@ -93,10 +93,10 @@ function HomePage() {
           textAlign: "center",
         }}
       >
-        <Typography variant="h4" component="h1" gutterBottom>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 700 }}>
           مرحبا بك في الصفحة الرئيسية!
         </Typography>
-        <Typography variant="subtitle1">
+        <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
           إدارة زراعتك بسهولة وفعالية.
         </Typography>
       </Box>
@@ -108,7 +108,9 @@ function HomePage() {
             <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <NotificationsIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6">الإشعارات</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  الإشعارات
+                </Typography>
               </Box>
               <Box sx={{ flexGrow: 1 }}>
                 <List>
@@ -133,7 +135,9 @@ function HomePage() {
             <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <LightbulbIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6">اقتراحات اليوم</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  اقتراحات اليوم
+                </Typography>
               </Box>
               <Box sx={{ flexGrow: 1 }}>
                 {suggestions.map((suggestion, index) => (
@@ -152,7 +156,9 @@ function HomePage() {
             <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <AddCircleIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6">إجراءات سريعة</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  إجراءات سريعة
+                </Typography>
               </Box>
               <Box sx={{ flexGrow: 1 }}>
                 <Grid container spacing={2}>
@@ -203,7 +209,9 @@ function HomePage() {
             <CardContent sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
               <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                 <LightbulbIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6">نصائح</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  نصائح
+                </Typography>
               </Box>
               <Box sx={{ flexGrow: 1 }}>
                 {tips.map((tip, index) => (
@@ -219,7 +227,7 @@ function HomePage() {
         {/* النشاط الأخير */}
         <Grid item xs={12}>
           <Card elevation={3} sx={{ borderRadius: 2, p: 2 }}>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 700 }}>
               النشاط الأخير
             </Typography>
             <Timeline position="alternate">

@@ -5,9 +5,11 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
+import ListItemIcon from "@mui/material/ListItemIcon"; // إضافة ListItemIcon
 import AddIcon from "@mui/icons-material/Add";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import NotificationsIcon from "@mui/icons-material/Notifications"; // أيقونة الإشعارات
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import { deepOrange } from "@mui/material/colors";
@@ -65,10 +67,11 @@ function DrawerComponent({ drawerWidth }) {
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <List sx={{ px: 1 }}>
           {[
-            { text: "الصفحة الرئيسية", to: "/" },
-            { text: "الموجه الذكي", to: "/ai-prompt" },
-            { text: "إضافة خطة زراعة", to: "/planting-form" },
+            { text: "الصفحة الرئيسية", to: "/", icon: null },
+            { text: "الموجه الذكي", to: "/ai-prompt", icon: null },
+            { text: "إضافة خطة زراعة", to: "/planting-form", icon: null },
             { text: "محادثة جديدة", to: "/chat", icon: <AddIcon /> },
+            { text: "الإشعارات", to: "/notifications", icon: <NotificationsIcon /> }, // إضافة عنصر الإشعارات
           ].map((item) => (
             <ListItem key={item.text} disablePadding>
               <ListItemButton
@@ -79,12 +82,16 @@ function DrawerComponent({ drawerWidth }) {
                   "&:hover": { bgcolor: "rgba(25, 118, 210, 0.08)" },
                 }}
               >
+                {item.icon && (
+                  <ListItemIcon sx={{ minWidth: "40px" }}>
+                    {item.icon}
+                  </ListItemIcon>
+                )}
                 <ListItemText
                   primary={item.text}
                   primaryTypographyProps={{ fontWeight: 500 }}
                   sx={{ textAlign: "right" }}
                 />
-                {item.icon}
               </ListItemButton>
             </ListItem>
           ))}
