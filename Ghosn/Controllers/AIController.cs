@@ -428,20 +428,30 @@ public class GhosnController : ControllerBase
         }
     }
 
-    [HttpGet("Ai/{Prompt}")]
+    [HttpPost("Ai")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<string>> AskAi(string Prompt)
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<string>> AskAi([FromBody] AiPromptRequest request)
     {
+        if (request == null || string.IsNullOrWhiteSpace(request.Prompt))
+        {
+            return BadRequest("Prompt is required.");
+        }
         GeminiService geminiService = new GeminiService();
         try
         {
-            var response = await geminiService.GenerateTextAsync(Prompt);
-            return Ok(response);
+            var response = await geminiService.GenerateTextAsync(request.Prompt);
+            return Ok(new { Res = response });
         }
         catch (Exception ex)
         {
             return BadRequest($"Error: {ex.Message}");
         }
+    }
+
+    public class AiPromptRequest
+    {
+        public string Prompt { get; set; }
     }
 
     [HttpPost("GeneratePlan")]
