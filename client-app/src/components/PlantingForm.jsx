@@ -12,6 +12,7 @@ import {
   RadioGroup,
   Radio,
   Autocomplete,
+  CircularProgress,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import axios from "axios";
@@ -36,6 +37,8 @@ const PlantingForm = () => {
     pesticide: "",
     selectedPlants: [],
   });
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [availablePlants, setAvailablePlants] = useState([]);
   const navigate = useNavigate();
 
@@ -61,13 +64,55 @@ const PlantingForm = () => {
       ...prev,
       [field]: e.target.value,
     }));
+    // Clear error when field is modified
+    setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   const handleAreaChange = (dimension) => (e) => {
+    const value = e.target.value;
     setFormData((prev) => ({
       ...prev,
-      areaDimensions: { ...prev.areaDimensions, [dimension]: e.target.value },
+      areaDimensions: { ...prev.areaDimensions, [dimension]: value },
     }));
+    // Clear error when field is modified
+    setErrors((prev) => ({ ...prev, [`areaDimensions.${dimension}`]: "" }));
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Required radio group fields
+    const requiredFields = [
+      "locationType",
+      "areaShape",
+      "climate",
+      "temperature",
+      "soilType",
+      "soilFertility",
+      "plantHealth",
+      "pesticide",
+    ];
+
+    requiredFields.forEach((field) => {
+      if (!formData[field]) {
+        newErrors[field] = "هذا الحقل مطلوب";
+      }
+    });
+
+    // Area dimensions validation
+    if (!formData.areaDimensions.length) {
+      newErrors["areaDimensions.length"] = "الطول مطلوب";
+    } else if (parseFloat(formData.areaDimensions.length) <= 0) {
+      newErrors["areaDimensions.length"] = "يجب أن يكون الطول أكبر من 0";
+    }
+
+    if (!formData.areaDimensions.width) {
+      newErrors["areaDimensions.width"] = "العرض مطلوب";
+    } else if (parseFloat(formData.areaDimensions.width) <= 0) {
+      newErrors["areaDimensions.width"] = "يجب أن يكون العرض أكبر من 0";
+    }
+
+    return newErrors;
   };
 
   const mapToEnum = {
@@ -89,6 +134,15 @@ const PlantingForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setIsSubmitting(true);
+
     const { areaDimensions, selectedPlants, ...rest } = formData;
     const area =
       parseFloat(areaDimensions.length) * parseFloat(areaDimensions.width) || 0;
@@ -106,22 +160,18 @@ const PlantingForm = () => {
         ])
       ),
     };
-    console.log(payload);
+
     try {
-      await axios
-        .post(
-          "https://mostafashraief.bsite.net/api/Ghosn/GeneratePlan",
-          payload
-        )
-        .then((response) => {
-          console.log("Data submitted successfully:", response.data);
-        })
-        .catch((error) => {
-          console.error("Error submitting data:", error);
-        });
+      const response = await axios.post(
+        "https://mostafashraief.bsite.net/api/Ghosn/GeneratePlan",
+        payload
+      );
+      console.log("Data submitted successfully:", response.data);
       navigate("/planting-output", { state: { formData: payload } });
     } catch (error) {
       console.error("Error submitting data:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -190,7 +240,11 @@ const PlantingForm = () => {
         <Grid container spacing={3}>
           {radioGroups.map(({ label, field, options, required }) => (
             <Grid item xs={12} key={field}>
-              <FormControl fullWidth required={required}>
+              <FormControl
+                fullWidth
+                required={required}
+                error={!!errors[field]}
+              >
                 <FormLabel>{label}</FormLabel>
                 <RadioGroup
                   row
@@ -206,6 +260,11 @@ const PlantingForm = () => {
                     />
                   ))}
                 </RadioGroup>
+                {errors[field] && (
+                  <Typography color="error" variant="caption">
+                    {errors[field]}
+                  </Typography>
+                )}
               </FormControl>
             </Grid>
           ))}
@@ -221,6 +280,8 @@ const PlantingForm = () => {
                   fullWidth
                   type="number"
                   InputProps={{ inputProps: { min: 0 } }}
+                  error={!!errors["areaDimensions.length"]}
+                  helperText={errors["areaDimensions.length"]}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -231,6 +292,8 @@ const PlantingForm = () => {
                   fullWidth
                   type="number"
                   InputProps={{ inputProps: { min: 0 } }}
+                  error={!!errors["areaDimensions.width"]}
+                  helperText={errors["areaDimensions.width"]}
                 />
               </Grid>
             </Grid>
@@ -262,8 +325,13 @@ const PlantingForm = () => {
               color="primary"
               size="large"
               sx={{ px: 4, py: 1 }}
+              disabled={isSubmitting}
             >
-              إرسال
+              {isSubmitting ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "إرسال"
+              )}
             </Button>
           </Grid>
         </Grid>
