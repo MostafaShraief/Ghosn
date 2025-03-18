@@ -162,11 +162,6 @@ const PlantingForm = () => {
     };
 
     try {
-      const response = await axios.post(
-        "https://mostafashraief.bsite.net/api/Ghosn/GeneratePlan",
-        payload
-      );
-      console.log("Data submitted successfully:", response.data);
       navigate("/planting-output", { state: { formData: payload } });
     } catch (error) {
       console.error("Error submitting data:", error);
