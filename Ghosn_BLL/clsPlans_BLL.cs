@@ -71,6 +71,28 @@ namespace Ghosn_BLL
             var planObject = new PlanObject(0, dto.ClientID, inputID, outputID);
             int planID = clsPlans_DAL.AddPlan(planObject);
 
+            if (planID > 0)
+            {
+                ClientNotificationRequestDTO WelcomeNotification = new ClientNotificationRequestDTO
+                {
+                    ClientID = dto.ClientID,
+                    DateAndTime = DateTime.Now,
+                    Title = "خطة جديدة",
+                    Body = $"رائع {clsClients_BAL.GetClientById(dto.ClientID).FirstName}! سنقوم بتذكيرك يوميا لمتابعة التقدم, لا تفوت الخطوات القادمة و التذكيرات."
+                };
+                clsClientNotifications_BLL.AddClientNotification(WelcomeNotification);
+
+                ClientNotificationRequestDTO NextStepNotification = new ClientNotificationRequestDTO
+                {
+                    ClientID = dto.ClientID,
+                    DateAndTime = DateTime.Now,
+                    Title = "الخطوة التالية",
+                    Body = $"اهلا! تذكير ب: {dto.Output.SuggestedTimelines.FirstWeeks[0].Step}."
+                };
+
+                clsClientNotifications_BLL.AddClientNotification(NextStepNotification);
+            }
+
             return planID;
         }
 

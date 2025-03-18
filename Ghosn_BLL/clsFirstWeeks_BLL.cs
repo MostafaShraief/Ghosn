@@ -16,7 +16,7 @@ namespace Ghosn_BLL
 
     public class FirstWeekStepDTO
     {
-        public string Step { get; set; }
+        public string Step { get; set; } = "";
     }
 
     public class clsFirstWeeks_BLL

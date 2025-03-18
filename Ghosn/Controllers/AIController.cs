@@ -387,7 +387,7 @@ public class GhosnController : ControllerBase
     [HttpGet("Notification/ClientID={ClientID}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(NotificationDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<NotificationDTO> GetNotificationByClientId(int ClientID)
+    public ActionResult<List<NotificationDTO>> GetNotificationByClientId(int ClientID)
     {
         var notification = clsClientNotifications_BLL.GetClientNotificationByClientId(ClientID);
 
@@ -447,15 +447,14 @@ public class GhosnController : ControllerBase
     [HttpPost("GeneratePlan")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<OutputDTO>> GeneratePlan([FromBody] InputResponseDTO inputResponse)
+    public async Task<ActionResult<OutputResponseDTO>> GeneratePlan([FromBody] InputResponseDTO inputResponse)
     {
         GeminiService _geminiService = new GeminiService();
 
         try
         {
-            InputAIDTO inputAIDTO = clsInputs_BLL.ConvertToInputAiDto(inputResponse);
             // Send input to AI
-            var aiResponse = await _geminiService.GeneratePlanAsync(inputAIDTO);
+            var aiResponse = await _geminiService.GenerateNormalPlan(inputResponse);
 
             if (aiResponse != null)
                 return Ok(aiResponse);
@@ -466,5 +465,23 @@ public class GhosnController : ControllerBase
         {
             return BadRequest($"Error: {ex.Message}");
         }
+    }
+
+    [HttpGet("tip")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<string>> GetAgricultureTip()
+    {
+        GeminiService geminiService = new();
+        string tip = await geminiService.GetAgricultureTip();
+        return Ok(tip);
+    }
+
+    [HttpGet("Suggestion")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<string>> GetAgricultureSuggestion()
+    {
+        GeminiService geminiService = new();
+        var Suggestion = await geminiService.GetAgricultureSuggestion();
+        return Ok(Suggestion);
     }
 }
