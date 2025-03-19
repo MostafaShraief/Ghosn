@@ -49,18 +49,17 @@ function DrawerComponent({ drawerWidth }) {
     localStorage.removeItem("isLoggedIn");
 
     // Redirect to login page
-    navigate("/login");
+    navigate("/app/login");
   };
 
-  if (location.pathname === "/login") {
+  if (location.pathname === "/app/login") {
     return null;
   }
 
   return (
     <Drawer
       variant="permanent"
-      dir="rtl"
-      anchor="right"
+      anchor="left"
       sx={{
         width: drawerWidth,
         flexShrink: 0,
@@ -87,20 +86,20 @@ function DrawerComponent({ drawerWidth }) {
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <List sx={{ px: 1 }}>
           {[
-            { text: "الصفحة الرئيسية", to: "/", icon: <House /> },
+            { text: "الصفحة الرئيسية", to: "/app/home", icon: <House /> },
             {
               text: "إضافة خطة زراعة",
-              to: "/planting-form",
+              to: "/app/planting-form",
               icon: <AddIcon />,
             },
             {
               text: "الإشعارات",
-              to: "/notifications",
+              to: "/app/notifications",
               icon: <NotificationsIcon />,
             },
             {
               text: "خطط الزراعية السابقة",
-              to: "/plans",
+              to: "/app/plans",
               icon: <Agriculture />,
             },
           ].map((item) => (
@@ -156,7 +155,7 @@ function DrawerComponent({ drawerWidth }) {
             </ListItemButton>
           ) : (
             <ListItemButton
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/app/login")}
               sx={{
                 color: "primary.main",
                 borderRadius: 2,

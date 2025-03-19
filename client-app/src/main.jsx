@@ -11,12 +11,18 @@ import AIPromptPage from "@/pages/AIPromptPage";
 import PlantingFormPage from "@/pages/PlantingFormPage";
 import PlantingOutputPage from "@/pages/PlantingOutputPage";
 import Login from "@/pages/Login";
-import NotificationsPage from "./pages/NotificationsPage";
-import PlansPage from "./pages/PlansPage";
+import NotificationsPage from "@/pages/NotificationsPage";
+import PlansPage from "@/pages/PlansPage";
+import LandingPage from "@/pages/LandingPage";
+import rtlPlugin from "stylis-plugin-rtl";
+import { prefixer } from "stylis";
+import { CacheProvider } from "@emotion/react";
+import createCache from "@emotion/cache";
 
 const drawerWidth = 260;
 
 const theme = createTheme({
+  direction: "rtl",
   palette: {
     primary: {
       main: "#43a047",
@@ -42,6 +48,11 @@ const theme = createTheme({
   },
 });
 
+const cacheRtl = createCache({
+  key: "muirtl",
+  stylisPlugins: [prefixer, rtlPlugin],
+});
+
 function RootLayout() {
   return (
     <Box
@@ -50,6 +61,7 @@ function RootLayout() {
         minHeight: "100vh",
         bgcolor: "background.default",
       }}
+      dir="rtl"
     >
       <CssBaseline />
       <DrawerComponent drawerWidth={drawerWidth} />
@@ -71,24 +83,30 @@ function RootLayout() {
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<RootLayout />}>
-            <Route index element={<HomePage />} />
-            <Route path="chat" element={<ChatView />} />
-            <Route path="ai-prompt" element={<AIPromptPage />} />
-            <Route path="planting-form" element={<PlantingFormPage />} />
-            <Route path="notifications" element={<NotificationsPage />} />
-            <Route path="plans" element={<PlansPage />} />
-            <Route
-              path="planting-output"
-              element={<PlantingOutputPage />}
-            />{" "}
-            <Route path="/login" element={<Login />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
+    <CacheProvider value={cacheRtl}>
+      <ThemeProvider theme={theme}>
+        <BrowserRouter>
+          <Routes>
+            {/* Route for the standalone Landing Page */}
+            <Route path="/" element={<LandingPage />} />
+
+            {/* Routes for the main application (using RootLayout) */}
+            <Route path="/app" element={<RootLayout />}>
+              <Route path="home" element={<HomePage />} />
+              <Route path="chat" element={<ChatView />} />
+              <Route path="ai-prompt" element={<AIPromptPage />} />
+              <Route path="planting-form" element={<PlantingFormPage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
+              <Route path="plans" element={<PlansPage />} />
+              <Route
+                path="planting-output"
+                element={<PlantingOutputPage />}
+              />{" "}
+              <Route path="login" element={<Login />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </ThemeProvider>
+    </CacheProvider>
   </StrictMode>
 );
