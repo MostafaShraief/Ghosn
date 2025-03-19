@@ -1,4 +1,3 @@
-// client-app/src/pages/NotificationsPage.jsx
 import React, { useState, useEffect } from "react";
 import {
   Container,
