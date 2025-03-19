@@ -86,7 +86,7 @@ function DrawerComponent({ drawerWidth }) {
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <List sx={{ px: 1 }}>
           {[
-            { text: "الصفحة الرئيسية", to: "/app/home", icon: <House /> },
+            { text: "الصفحة الرئيسية", to: "/app", icon: <House /> },
             {
               text: "إضافة خطة زراعة",
               to: "/app/planting-form",

@@ -92,7 +92,7 @@ createRoot(document.getElementById("root")).render(
 
             {/* Routes for the main application (using RootLayout) */}
             <Route path="/app" element={<RootLayout />}>
-              <Route path="home" element={<HomePage />} />
+              <Route path="" element={<HomePage />} />
               <Route path="chat" element={<ChatView />} />
               <Route path="ai-prompt" element={<AIPromptPage />} />
               <Route path="planting-form" element={<PlantingFormPage />} />
