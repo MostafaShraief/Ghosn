@@ -13,10 +13,15 @@ import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import { deepOrange } from "@mui/material/colors";
 import ghosnImage from "@/assets/ghosn.png";
-import { Agriculture, House } from "@mui/icons-material";
+import {
+  Agriculture,
+  House,
+  MonetizationOn,
+  Support,
+} from "@mui/icons-material";
 import LogoutIcon from "@mui/icons-material/Logout";
 
-function DrawerComponent({ drawerWidth }) {
+function DrawerComponent({ drawerWidth, userType = "client" }) {
   const [recentChatsOpen, setRecentChatsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
@@ -24,23 +29,17 @@ function DrawerComponent({ drawerWidth }) {
   const location = useLocation();
 
   useEffect(() => {
-    // Removed the isLoggedIn check from localStorage.  We'll derive it from the presence of the name.
     const firstName = localStorage.getItem("firstName");
     const lastName = localStorage.getItem("lastName");
 
     if (firstName && lastName) {
-      // Check if both names exist
       setIsLoggedIn(true);
       setUserName(`${firstName} ${lastName}`);
     } else {
-      setIsLoggedIn(false); // Explicitly set to false if names are missing.
-      setUserName(""); // Clear username if not logged in.
+      setIsLoggedIn(false);
+      setUserName("");
     }
-  }, [location]); // Dependency on location ensures this runs when navigating
-
-  const handleRecentChatsClick = () => {
-    setRecentChatsOpen(!recentChatsOpen);
-  };
+  }, [location]);
 
   const handleLogout = () => {
     localStorage.removeItem("clientID");
@@ -52,6 +51,30 @@ function DrawerComponent({ drawerWidth }) {
   if (location.pathname === "/app/login") {
     return null;
   }
+
+  const clientItems = [
+    { text: "الصفحة الرئيسية", to: "/app", icon: <House /> },
+    { text: "إضافة خطة زراعة", to: "/app/planting-form", icon: <AddIcon /> },
+    {
+      text: "الإشعارات",
+      to: "/app/notifications",
+      icon: <NotificationsIcon />,
+    },
+    { text: "خطط الزراعية السابقة", to: "/app/plans", icon: <Agriculture /> },
+    { text: "الجوائز", to: "/app/awards", icon: <EmojiEventsIcon /> },
+  ];
+
+  const donorItems = [
+    { text: "الصفحة الرئيسية", to: "/donor", icon: <House /> },
+    {
+      text: "إنشاء جائزة",
+      to: "/donor/create-prize",
+      icon: <MonetizationOn />,
+    },
+    { text: "الدعم المباشر", to: "/donor/direct-support", icon: <Support /> },
+  ];
+
+  const menuItems = userType === "donor" ? donorItems : clientItems;
 
   return (
     <Drawer
@@ -82,29 +105,7 @@ function DrawerComponent({ drawerWidth }) {
       />
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <List sx={{ px: 1, textAlignLast: "start" }}>
-          {[
-            { text: "الصفحة الرئيسية", to: "/app", icon: <House /> },
-            {
-              text: "إضافة خطة زراعة",
-              to: "/app/planting-form",
-              icon: <AddIcon />,
-            },
-            {
-              text: "الإشعارات",
-              to: "/app/notifications",
-              icon: <NotificationsIcon />,
-            },
-            {
-              text: "خطط الزراعية السابقة",
-              to: "/app/plans",
-              icon: <Agriculture />,
-            },
-            {
-              text: "الجوائز",
-              to: "/app/awards",
-              icon: <EmojiEventsIcon />,
-            },
-          ].map((item) => (
+          {menuItems.map((item) => (
             <ListItem key={item.text} disablePadding>
               <ListItemButton
                 onClick={() => navigate(item.to)}

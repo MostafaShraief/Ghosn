@@ -17,10 +17,13 @@ import PlansPage from "@/pages/PlansPage";
 import LoginForm from "@/pages/Login";
 import AwardsPage from "@/pages/AwardsPage";
 import WinnerFormPage from "@/pages/WinnerFormPage";
+import DonorHomePage from "@/pages/DonorHomePage";
+import CreatePrizePage from "@/pages/CreatePrizePage";
+import DirectSupportPage from "@/pages/DirectSupportPage";
 
 export const drawerWidth = 260;
 
-function AppLayout() {
+function ClientLayout() {
   return (
     <Box
       sx={{
@@ -31,7 +34,35 @@ function AppLayout() {
       dir="rtl"
     >
       <CssBaseline />
-      <DrawerComponent drawerWidth={drawerWidth} />
+      <DrawerComponent drawerWidth={drawerWidth} userType="client" />
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 4,
+          width: `calc(100% - ${drawerWidth}px)`,
+          maxWidth: "1440px",
+          mx: "auto",
+        }}
+      >
+        <Outlet />
+      </Box>
+    </Box>
+  );
+}
+
+function DonorLayout() {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        bgcolor: "background.default",
+      }}
+      dir="rtl"
+    >
+      <CssBaseline />
+      <DrawerComponent drawerWidth={drawerWidth} userType="donor" />
       <Box
         component="main"
         sx={{
@@ -51,7 +82,7 @@ function AppLayout() {
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<LandingPage />} />
-    <Route path="/app" element={<AppLayout />}>
+    <Route path="/app" element={<ClientLayout />}>
       <Route index element={<HomePage />} />
       <Route path="chat" element={<ChatView />} />
       <Route path="ai-prompt" element={<AIPromptPage />} />
@@ -62,6 +93,11 @@ const AppRoutes = () => (
       <Route path="login" element={<LoginForm />} />
       <Route path="awards" element={<AwardsPage />} />
       <Route path="winner-form" element={<WinnerFormPage />} />
+    </Route>
+    <Route path="/donor" element={<DonorLayout />}>
+      <Route index element={<DonorHomePage />} />
+      <Route path="create-prize" element={<CreatePrizePage />} />
+      <Route path="direct-support" element={<DirectSupportPage />} />
     </Route>
   </Routes>
 );

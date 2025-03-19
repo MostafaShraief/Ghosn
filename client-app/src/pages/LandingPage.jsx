@@ -350,7 +350,7 @@ function LandingPage() {
                 variant="contained"
                 color="primary"
                 size={isMobile ? "small" : "medium"}
-                href="/app/login"
+                href="/app"
                 disableElevation
                 sx={{
                   borderRadius: "8px",
@@ -364,6 +364,7 @@ function LandingPage() {
                 variant="outlined"
                 color="primary"
                 size={isMobile ? "small" : "medium"}
+                href="/donor"
                 sx={{
                   borderRadius: "8px",
                   px: 2,
