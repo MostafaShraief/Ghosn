@@ -15,6 +15,8 @@ import PlantingOutputPage from "@/pages/PlantingOutputPage";
 import NotificationsPage from "@/pages/NotificationsPage";
 import PlansPage from "@/pages/PlansPage";
 import LoginForm from "@/pages/Login";
+import AwardsPage from "@/pages/AwardsPage";
+import WinnerFormPage from "@/pages/WinnerFormPage";
 
 export const drawerWidth = 260;
 
@@ -58,6 +60,8 @@ const AppRoutes = () => (
       <Route path="notifications" element={<NotificationsPage />} />
       <Route path="plans" element={<PlansPage />} />
       <Route path="login" element={<LoginForm />} />
+      <Route path="awards" element={<AwardsPage />} />
+      <Route path="winner-form" element={<WinnerFormPage />} />
     </Route>
   </Routes>
 );

@@ -1,4 +1,3 @@
-// client-app/src/components/DrawerComponent.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Drawer from "@mui/material/Drawer";
@@ -9,13 +8,13 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import AddIcon from "@mui/icons-material/Add";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"; // Import an appropriate icon
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import { deepOrange } from "@mui/material/colors";
-import Divider from "@mui/material/Divider";
-import ghosnImage from "@/assets/ghosn.png"; //  Replace with the correct path
+import ghosnImage from "@/assets/ghosn.png";
 import { Agriculture, House } from "@mui/icons-material";
-import LogoutIcon from "@mui/icons-material/Logout"; // Import Logout icon
+import LogoutIcon from "@mui/icons-material/Logout";
 
 function DrawerComponent({ drawerWidth }) {
   const [recentChatsOpen, setRecentChatsOpen] = useState(false);
@@ -25,14 +24,12 @@ function DrawerComponent({ drawerWidth }) {
   const location = useLocation();
 
   useEffect(() => {
-    // Check for login status and get user data
     const loggedIn = localStorage.getItem("isLoggedIn") === "true";
     setIsLoggedIn(loggedIn);
 
     if (loggedIn) {
       const firstName = localStorage.getItem("firstName");
       const lastName = localStorage.getItem("lastName");
-      // Combine first and last name (or use just one if preferred)
       setUserName(`${firstName} ${lastName}`);
     }
   }, []);
@@ -42,13 +39,10 @@ function DrawerComponent({ drawerWidth }) {
   };
 
   const handleLogout = () => {
-    // Clear user data from localStorage
     localStorage.removeItem("clientID");
     localStorage.removeItem("firstName");
     localStorage.removeItem("lastName");
     localStorage.removeItem("isLoggedIn");
-
-    // Redirect to login page
     navigate("/app/login");
   };
 
@@ -84,7 +78,7 @@ function DrawerComponent({ drawerWidth }) {
         }}
       />
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-        <List sx={{ px: 1 }}>
+        <List sx={{ px: 1, textAlignLast: "start" }}>
           {[
             { text: "الصفحة الرئيسية", to: "/app", icon: <House /> },
             {
@@ -101,6 +95,11 @@ function DrawerComponent({ drawerWidth }) {
               text: "خطط الزراعية السابقة",
               to: "/app/plans",
               icon: <Agriculture />,
+            },
+            {
+              text: "الجوائز",
+              to: "/app/awards",
+              icon: <EmojiEventsIcon />,
             },
           ].map((item) => (
             <ListItem key={item.text} disablePadding>
@@ -128,10 +127,9 @@ function DrawerComponent({ drawerWidth }) {
         </List>
 
         <Box sx={{ mt: "auto", p: 2 }}>
-          <Divider sx={{ mb: 2 }} />
-          {isLoggedIn ? ( // Conditionally render based on login status
+          {isLoggedIn ? (
             <ListItemButton
-              onClick={handleLogout} // Call handleLogout on click
+              onClick={handleLogout}
               sx={{
                 color: "primary.main",
                 borderRadius: 2,
@@ -141,16 +139,15 @@ function DrawerComponent({ drawerWidth }) {
               }}
             >
               <Avatar sx={{ bgcolor: deepOrange[500], width: 32, height: 32 }}>
-                {userName.charAt(0).toUpperCase()}{" "}
-                {/* Display first letter of name */}
+                {userName.charAt(0).toUpperCase()}
               </Avatar>
               <ListItemText
-                primary={userName} // Display the user's name
+                primary={userName}
                 primaryTypographyProps={{ fontWeight: 500 }}
                 sx={{ textAlign: "right", pr: 2 }}
               />
               <ListItemIcon>
-                <LogoutIcon /> {/* Add a logout icon */}
+                <LogoutIcon />
               </ListItemIcon>
             </ListItemButton>
           ) : (
@@ -158,19 +155,17 @@ function DrawerComponent({ drawerWidth }) {
               onClick={() => navigate("/app/login")}
               sx={{
                 color: "primary.main",
+                border: "black 1px solid",
                 borderRadius: 2,
                 p: 1,
                 "&:hover": { opacity: 0.9 },
                 borderColor: "primary.main",
               }}
             >
-              <Avatar sx={{ bgcolor: deepOrange[500], width: 32, height: 32 }}>
-                U
-              </Avatar>
               <ListItemText
                 primary={"تسجيل الدخول"}
                 primaryTypographyProps={{ fontWeight: 500 }}
-                sx={{ textAlign: "right", pr: 2 }}
+                sx={{ textAlign: "right", pr: 2, textAlignLast: "center" }}
               />
             </ListItemButton>
           )}

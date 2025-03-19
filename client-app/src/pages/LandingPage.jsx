@@ -265,7 +265,7 @@ function LandingPage() {
 
   const teamMembers = [
     {
-      name: "ابوبكر الشيخ",
+      name: "ابوبكر",
       role: "مطور",
       description: "عنوان يشرح ماذا فعل الشخص",
       avatar: "https://placehold.co/100x100?text=Abubakr",
@@ -1015,17 +1015,6 @@ function LandingPage() {
                 منصة زراعية ذكية تساعدك على تحويل أي مساحة إلى حديقة مزدهرة
                 باستخدام الذكاء الاصطناعي والخبرة الزراعية.
               </Typography>
-              <Stack direction="row" spacing={1}>
-                <IconButton href="#" sx={{ color: "text.secondary" }}>
-                  <AgricultureIcon />
-                </IconButton>
-                <IconButton href="#" sx={{ color: "text.secondary" }}>
-                  <EcoIcon />
-                </IconButton>
-                <IconButton href="#" sx={{ color: "text.secondary" }}>
-                  <LocalFloristIcon />
-                </IconButton>
-              </Stack>
             </Grid>
 
             <Grid item xs={12} md={2}>
