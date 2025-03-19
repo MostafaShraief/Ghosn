@@ -202,7 +202,7 @@ public class GeminiService
 
     public async Task<string> GetAgricultureSuggestion()
     {
-        string Prompt = "You are required to provide agricultural suggestions in Arabic. Follow these rules strictly:" +
+        string Prompt = "You are required to provide agricultural suggestions (like what can user do today or somthing else) in Arabic. Follow these rules strictly:" +
             "\r\n\r\nThe response must be exactly 10 words long, no more, no less.\r\n\r\nUse only the Arabic language." +
             "\r\n\r\nDo not add any extra words, explanations, or greetings.\r\n\r\nIf the rules are not followed, you " +
             "must rewrite the response until it meets the requirements.\r\n\r\nNow, provide 10-word Arabic agricultural " +
@@ -292,6 +292,25 @@ public class GeminiService
             JsonConvert.SerializeObject(plan) +
             "\r\n\r\n**Your Task:**  \r\n1. Analyze the plan step by step, as outlined above.  \r\n2. Provide a conversational and" +
             " detailed evaluation **in Arabic only**.  \r\n3. Highlight strengths, weaknesses, and areas for improvement.");
+
+        string Result = await GenerateTextAsync(Prompt);
+
+        return Result;
+    }
+
+    public async Task<string> TalkToAi(string Message)
+    {
+        string Prompt = "You are an agricultural assistant AI. Your task is to strictly follow these rules:  " +
+                        "\r\n1. Focus on Agriculture: Only answer questions or provide information related to agriculture (e.g., " +
+                        "crops, farming techniques, irrigation, soil, pests, agricultural technology, etc.).  \r\n2. Off-Topic Responses: " +
+                        "If the user asks about anything unrelated to agriculture, respond by politely stating that you can only answer questions " +
+                        "related to agriculture. Let your response be natural and in Arabic.  \r\n3. Greetings or Role Questions: If the user greets you " +
+                        "or asks about your role, respond politely by introducing yourself as an agricultural assistant. Let your response be natural and " +
+                        "in Arabic.  \r\n4. Language: Always respond in Arabic only.  \r\n5. User Interaction: Leave room for the user to respond after " +
+                        "your reply. Do not preemptively suggest questions or topics.  \r\n\r\nYour responses must always comply with these " +
+                        "guidelines. Do not provide any information, explanations, or assistance outside the scope of agriculture unless the user explicitly " +
+                        "greets you or asks about your role.\r\nHere is user message (i will not tell you message will end):\r\n"
+                        + Message;
 
         string Result = await GenerateTextAsync(Prompt);
 

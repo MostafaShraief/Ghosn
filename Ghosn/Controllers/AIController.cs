@@ -428,27 +428,6 @@ public class GhosnController : ControllerBase
         }
     }
 
-    [HttpPost("Ai")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<string>> AskAi([FromBody] AiPromptRequest request)
-    {
-        if (request == null || string.IsNullOrWhiteSpace(request.Prompt))
-        {
-            return BadRequest("Prompt is required.");
-        }
-        GeminiService geminiService = new GeminiService();
-        try
-        {
-            var response = await geminiService.GenerateTextAsync(request.Prompt);
-            return Ok(new { Res = response });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest($"Error: {ex.Message}");
-        }
-    }
-
     public class AiPromptRequest
     {
         public string Prompt { get; set; }
@@ -477,13 +456,34 @@ public class GhosnController : ControllerBase
         }
     }
 
-    [HttpGet("tip")]
+    [HttpPost("Ai")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<string>> AskAi([FromBody] AiPromptRequest request)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(request.Prompt))
+        {
+            return BadRequest("Prompt is required.");
+        }
+        GeminiService geminiService = new GeminiService();
+        try
+        {
+            var response = await geminiService.TalkToAi(request.Prompt);
+            return Ok(new { Res = response });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Error: {ex.Message}");
+        }
+    }
+
+    [HttpGet("Tip")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<string>> GetAgricultureTip()
     {
         GeminiService geminiService = new();
         string tip = await geminiService.GetAgricultureTip();
-        return Ok(tip);
+        return Ok(new { Res = tip });
     }
 
     [HttpGet("Suggestion")]
@@ -492,6 +492,160 @@ public class GhosnController : ControllerBase
     {
         GeminiService geminiService = new();
         var Suggestion = await geminiService.GetAgricultureSuggestion();
-        return Ok(Suggestion);
+        return Ok(new { Res = Suggestion });
+    }
+
+    /// Retrieve all plan summaries.
+    [HttpGet("Plans/summaries")]
+    [ProducesResponseType(StatusCodes.Status200OK)] // Success response
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // Not found response
+    public ActionResult<List<PlanSummaryDTO>> GetAllPlanSummaries()
+    {
+        var planSummaries = clsPlans_BLL.GetAllPlanSummaries();
+
+        if (planSummaries.Count == 0)
+        {
+            return NotFound("No plans found to get summaries.");
+        }
+
+        return Ok(planSummaries);
+    }
+
+    /// Mark a plan as completed.
+    [HttpPut("Plan/SetAsCompleted/{planID}")]
+    [ProducesResponseType(StatusCodes.Status200OK)] // Success response
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // Not found response
+    public IActionResult UpdatePlanCompleted(int planID)
+    {
+        bool isUpdated = clsPlans_BLL.UpdatePlanCompleted(planID);
+
+        if (!isUpdated)
+        {
+            return NotFound("Plan not found.");
+        }
+
+        return Ok("Plan has been completed.");
+    }
+
+    [HttpGet("Plans/OrderByArea")]
+    [ProducesResponseType(StatusCodes.Status200OK)] // Success response
+    public ActionResult<List<PlanAreaDetailsDTO>> GetPlanAreaDetailsOrderedByArea()
+    {
+        var planAreaDetails = clsPlanPrizes_BLL.GetPlanAreaDetailsOrderedByArea();
+
+        if (planAreaDetails.Count == 0)
+            return NotFound("No completed plans yet.");
+
+        return Ok(planAreaDetails);
+    }
+
+    [HttpGet("Plan/ProduceWinner")]
+    [ProducesResponseType(StatusCodes.Status200OK)] // Success response
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // Not found response
+    public IActionResult GetPlanWinner()
+    {
+        var planWinner = clsPlanPrizes_BLL.GetPlanWinner();
+
+        if (planWinner == null)
+        {
+            return NotFound("No plan winner found.");
+        }
+
+        return Ok(planWinner);
+    }
+
+    [HttpGet("Prizes/Coming")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<List<PrizeDTO>> GetAllComingPrizes()
+    {
+        try
+        {
+            var prizes = clsPrizes_BLL.GetAllComingPrizes();
+            if (prizes.Count == 0)
+            {
+                return NotFound("No coming prizes.");
+            }
+            return Ok(prizes);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
+    [HttpGet("Prizes/Nearest")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<PrizeDTO> GetNearestPrize()
+    {
+        try
+        {
+            var prize = clsPrizes_BLL.GetNearestPrize();
+
+            if (prize == null)
+                return NotFound("No upcoming prize found.");
+
+            return Ok(prize);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
+    [HttpGet("Prizes/{PrizeID}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<PrizeDTO> GetPrizeById(int PrizeID)
+    {
+        try
+        {
+            var prize = clsPrizes_BLL.GetPrizeById(PrizeID);
+
+            if (prize == null)
+                return NotFound($"Prize with ID {PrizeID} not found.");
+
+            return Ok(prize);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Add a new prize.
+    /// </summary>
+    /// <param name="dto">The prize data to add.</param>
+    /// <returns>The newly created prize's ID.</returns>
+    [HttpPost("Prizes/Add")]
+    [ProducesResponseType(StatusCodes.Status201Created)] // Created response
+    [ProducesResponseType(StatusCodes.Status400BadRequest)] // Invalid input response
+    [ProducesResponseType(StatusCodes.Status409Conflict)] // Conflict response (prize already exists for the date)
+    public IActionResult AddPrize([FromBody] PrizeDTO dto)
+    {
+        if (dto.Date < DateTime.Today.Date && dto.PrizeMoney <= 0)
+        {
+            return BadRequest("Data is not valid.");
+        }
+
+        try
+        {
+            int prizeId = clsPrizes_BLL.AddPrize(dto);
+            if (prizeId < 0)
+                return BadRequest("This date already schedualed.");
+
+            return CreatedAtAction(nameof(GetPrizeById), new { PrizeID = prizeId }, dto);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest("This date already schedualed.");
+        }
+        catch (Exception ex)
+        {
+            // Handle other unexpected errors
+            return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
+        }
     }
 }

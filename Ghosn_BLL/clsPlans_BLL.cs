@@ -17,6 +17,13 @@ namespace Ghosn_BLL
         public InputResponseDTO? Input { get; set; }
     }
 
+    public class PlanSummaryDTO
+    {
+        public int PlanID { get; set; }
+        public bool IsCompleted { get; set; } // Convert IsCompleted to boolean for better readability
+        public int? PrizeID { get; set; } // Nullable since it may not always have a value
+    }
+
     public class clsPlans_BLL
     {
 
@@ -41,6 +48,22 @@ namespace Ghosn_BLL
             }
 
             return plans;
+        }
+
+        public static List<PlanSummaryDTO> GetAllPlanSummaries()
+        {
+            var planObjects = clsPlans_DAL.GetAllSummeryPlans();
+            return planObjects.Select(ConvertToSummaryDTO).ToList();
+        }
+
+        private static PlanSummaryDTO ConvertToSummaryDTO(PlanObject obj)
+        {
+            return new PlanSummaryDTO
+            {
+                PlanID = obj.PlanID,
+                IsCompleted = obj.IsCompleted, // Convert integer to boolean
+                PrizeID = obj.PrizeID
+            };
         }
 
         // Retrieve a Plan by ID with related data
@@ -78,7 +101,7 @@ namespace Ghosn_BLL
                     ClientID = dto.ClientID,
                     DateAndTime = DateTime.Now,
                     Title = "خطة جديدة",
-                    Body = $"رائع {clsClients_BAL.GetClientById(dto.ClientID).FirstName}! سنقوم بتذكيرك يوميا لمتابعة التقدم, لا تفوت الخطوات القادمة و التذكيرات."
+                    Body = $"رائع {clsClients_BAL.GetClientById(dto.ClientID).FirstName}! سنقوم بتذكيرك يوميا لمتابعة التقدم، لا تفوت الخطوات القادمة و التذكيرات."
                 };
                 clsClientNotifications_BLL.AddClientNotification(WelcomeNotification);
 
@@ -87,7 +110,7 @@ namespace Ghosn_BLL
                     ClientID = dto.ClientID,
                     DateAndTime = DateTime.Now,
                     Title = "الخطوة التالية",
-                    Body = $"اهلا! تذكير ب: {dto.Output.SuggestedTimelines.FirstWeeks[0].Step}."
+                    Body = $"اهلا! تذكير ب{dto.Output.SuggestedTimelines.FirstWeeks[0].Step}."
                 };
 
                 clsClientNotifications_BLL.AddClientNotification(NextStepNotification);
@@ -118,6 +141,55 @@ namespace Ghosn_BLL
             bool isPlanUpdated = clsPlans_DAL.UpdatePlan(updatedPlanObject);
 
             return isOutputUpdated && isInputUpdated && isPlanUpdated;
+        }
+
+        /// <summary>
+        /// Update the winner (PrizeID) for a specific plan.
+        /// </summary>
+        /// <param name="planID">The ID of the plan.</param>
+        /// <param name="prizeID">The ID of the prize.</param>
+        /// <returns>True if the update was successful, otherwise false.</returns>
+        public static bool UpdatePlanWinner(int planID, int prizeID)
+        {
+            bool IsUpdated = clsPlans_DAL.UpdatePlanWinner(planID, prizeID);
+
+            if (IsUpdated)
+            {
+                ClientNotificationRequestDTO WinNotification = new ClientNotificationRequestDTO
+                {
+                    ClientID = clsPlans_DAL.GetPlanById(planID).ClientID,
+                    DateAndTime = DateTime.Now,
+                    Title = "خطة رابحة",
+                    Body = $"مبارك! نالت خطتك المركز الأول في إحدى المسابقات، كتقدير لجهودك نود إهدائك جائزة قيمتها {clsPrizes_DAL.GetPrizeById(prizeID).PrizeMoney} دولار."
+                };
+                clsClientNotifications_BLL.AddClientNotification(WinNotification);
+            }
+
+            return IsUpdated;
+        }
+
+        /// <summary>
+        /// Mark a plan as completed.
+        /// </summary>
+        /// <param name="planID">The ID of the plan.</param>
+        /// <returns>True if the update was successful, otherwise false.</returns>
+        public static bool UpdatePlanCompleted(int planID)
+        {
+            bool IsUpdated = clsPlans_DAL.UpdatePlanCompleted(planID);
+
+            if (IsUpdated)
+            {
+                ClientNotificationRequestDTO WinNotification = new ClientNotificationRequestDTO
+                {
+                    ClientID = clsPlans_DAL.GetPlanById(planID).ClientID,
+                    DateAndTime = DateTime.Now,
+                    Title = "خطة مكتملة",
+                    Body = $"تهانيا على إكمال الخطة و المثابرة و الصبر على تحقيق غايتكم، شكرا لكم."
+                };
+                clsClientNotifications_BLL.AddClientNotification(WinNotification);
+            }
+
+            return IsUpdated;
         }
 
         // Delete a Plan and its related data
