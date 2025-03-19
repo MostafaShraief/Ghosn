@@ -105,7 +105,7 @@ namespace Ghosn_DAL
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "INSERT INTO Prizes (PrizeMoney, PrizeDate) VALUES (@PrizeMoney, @PrizeDate, @IsEnd); SELECT SCOPE_IDENTITY();";
+                string query = "INSERT INTO Prizes (PrizeMoney, PrizeDate, IsEnd) VALUES (@PrizeMoney, @PrizeDate, @IsEnd); SELECT SCOPE_IDENTITY();";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@PrizeMoney", prize.PrizeMoney);

@@ -77,8 +77,10 @@ namespace Ghosn_DAL
                         {
                             plans.Add(new PlanObject(
                                 reader.GetInt32(reader.GetOrdinal("PlanID")),
-                                Convert.ToBoolean(reader.GetInt32(reader.GetOrdinal("IsCompleted"))),
-                                reader.GetInt32(reader.GetOrdinal("PrizeID"))
+                                Convert.ToBoolean((reader["IsCompleted"].ToString())),
+                                reader.IsDBNull(reader.GetOrdinal("PrizeID"))
+                                    ? (int?)null
+                                    : reader.GetInt32(reader.GetOrdinal("PrizeID"))
                                 ));
                         }
                     }
@@ -117,7 +119,7 @@ namespace Ghosn_DAL
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "INSERT INTO Plans (ClientID, InputID, OutputID) VALUES (@ClientID, @InputID, @OutputID, @IsCompleted); SELECT SCOPE_IDENTITY();";
+                string query = "INSERT INTO Plans (ClientID, InputID, OutputID, IsCompleted) VALUES (@ClientID, @InputID, @OutputID, @IsCompleted); SELECT SCOPE_IDENTITY();";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@ClientID", plan.ClientID);
