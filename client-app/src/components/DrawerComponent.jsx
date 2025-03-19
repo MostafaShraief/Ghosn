@@ -8,7 +8,7 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import AddIcon from "@mui/icons-material/Add";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"; // Import an appropriate icon
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import { deepOrange } from "@mui/material/colors";
@@ -24,15 +24,19 @@ function DrawerComponent({ drawerWidth }) {
   const location = useLocation();
 
   useEffect(() => {
-    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
-    setIsLoggedIn(loggedIn);
+    // Removed the isLoggedIn check from localStorage.  We'll derive it from the presence of the name.
+    const firstName = localStorage.getItem("firstName");
+    const lastName = localStorage.getItem("lastName");
 
-    if (loggedIn) {
-      const firstName = localStorage.getItem("firstName");
-      const lastName = localStorage.getItem("lastName");
+    if (firstName && lastName) {
+      // Check if both names exist
+      setIsLoggedIn(true);
       setUserName(`${firstName} ${lastName}`);
+    } else {
+      setIsLoggedIn(false); // Explicitly set to false if names are missing.
+      setUserName(""); // Clear username if not logged in.
     }
-  }, []);
+  }, [location]); // Dependency on location ensures this runs when navigating
 
   const handleRecentChatsClick = () => {
     setRecentChatsOpen(!recentChatsOpen);
@@ -42,7 +46,6 @@ function DrawerComponent({ drawerWidth }) {
     localStorage.removeItem("clientID");
     localStorage.removeItem("firstName");
     localStorage.removeItem("lastName");
-    localStorage.removeItem("isLoggedIn");
     navigate("/app/login");
   };
 
