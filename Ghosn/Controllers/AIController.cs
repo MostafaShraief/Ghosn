@@ -666,25 +666,12 @@ public class GhosnController : ControllerBase
             int supportId = clsSupports_BLL.AddSupport(dto);
 
             // Return the newly created support's ID
-            return CreatedAtAction(nameof(GetSupportById), new { id = supportId }, new { supportId });
+            return Ok("Added.");
         }
         catch (Exception ex)
         {
             // Handle unexpected errors
             return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
         }
-    }
-
-    [HttpGet("Support/{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)] // Success response
-    [ProducesResponseType(StatusCodes.Status404NotFound)] // Not found response
-    public ActionResult<SupportDTO> GetSupportById(int id)
-    {
-        var support = clsSupports_BLL.GetSupportById(id);
-        if (support == null)
-        {
-            return NotFound("Support not found.");
-        }
-        return Ok(support);
     }
 }
