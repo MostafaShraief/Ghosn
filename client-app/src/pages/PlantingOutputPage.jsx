@@ -11,8 +11,8 @@ import {
   CircularProgress,
   useMediaQuery,
   Avatar,
-  Snackbar, // Import Snackbar
-  Alert, // Import Alert
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import {
   LocalFlorist as PlantIcon,
@@ -21,7 +21,7 @@ import {
   CalendarMonth as ScheduleIcon,
   Build as MaterialsIcon,
   Info as InfoIcon,
-  Save as SaveIcon, // Icon for the save button
+  Save as SaveIcon,
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "@/services/api";
@@ -103,9 +103,10 @@ const PlantingOutputPage = () => {
   const [aiOutput, setAiOutput] = useState(null);
   const [userInputs, setUserInputs] = useState(null);
   const isMdDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
-  const [snackbarOpen, setSnackbarOpen] = useState(false); // State for Snackbar
-  const [snackbarMessage, setSnackbarMessage] = useState(""); // Message for Snackbar
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // Severity for Snackbar
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [isSaving, setIsSaving] = useState(false); // Loading state for saving
 
   const handleChatClick = () => {
     navigate("/chat");
@@ -140,14 +141,14 @@ const PlantingOutputPage = () => {
       return;
     }
 
-    // Assuming you have a client ID. Replace '123' with the actual client ID.
-    // You might get the client ID from user authentication or context.
-    const clientId = 2;
+    setIsSaving(true); // Start loading
+
+    const clientId = 3;
 
     const payload = {
-      planID: 0, // Usually, the API handles ID generation on creation, so it could be 0 or omitted.
+      planID: 0,
       clientID: clientId,
-      output: aiOutput, // Send the generated plan data directly.
+      output: aiOutput,
       input: userInputs,
     };
 
@@ -166,6 +167,8 @@ const PlantingOutputPage = () => {
       );
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
+    } finally {
+      setIsSaving(false); // End loading, regardless of success/failure
     }
   };
 
@@ -254,7 +257,6 @@ const PlantingOutputPage = () => {
     ));
   };
 
-  // Helper function to render steps (now without Accordion)
   const renderSteps = (title, steps) => (
     <>
       <SectionTitle variant="h6">{title}</SectionTitle>
@@ -432,7 +434,7 @@ const PlantingOutputPage = () => {
           variant="contained"
           color="primary"
           onClick={handleChatClick}
-          startIcon={<MaterialsIcon />} // You can replace MaterialsIcon with a suitable chat icon.
+          startIcon={<MaterialsIcon />}
           sx={{
             px: 5,
             py: 1.5,
@@ -447,9 +449,10 @@ const PlantingOutputPage = () => {
         </Button>
         <Button
           variant="contained"
-          color="secondary" // Use a different color to distinguish
+          color="secondary"
           onClick={handleSavePlan}
           startIcon={<SaveIcon />}
+          disabled={isSaving} // Disable the button while saving
           sx={{
             px: 5,
             py: 1.5,
@@ -460,7 +463,11 @@ const PlantingOutputPage = () => {
             boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
           }}
         >
-          حفظ الخطة
+          {isSaving ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            "حفظ الخطة"
+          )}
         </Button>
       </Box>
       <Snackbar
