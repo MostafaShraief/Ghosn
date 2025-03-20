@@ -122,4 +122,37 @@ export const fetchWinner = async () => {
   };
 };
 
+// Submit support (tools or financial)
+export const submitSupport = async (supportData) => {
+  try {
+    const response = await api.post("/api/Ghosn/Support", supportData);
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting support:", error);
+    throw error;
+  }
+};
+
+// Fetch plan summaries
+export const fetchPlanSummaries = async () => {
+  try {
+    const response = await api.get("/api/Ghosn/Plans/summaries");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching plan summaries:", error);
+    throw error;
+  }
+};
+
+// Fetch all farming tools
+export const fetchAllFarmingTools = async () => {
+  try {
+    const response = await api.get("/api/Ghosn/AllFarmingTools");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching farming tools:", error);
+    throw error;
+  }
+};
+
 export default api;
