@@ -38,6 +38,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import BallotIcon from "@mui/icons-material/Ballot";
+import { Link as LinkRouter } from "react-router-dom";
 
 // Enhanced styled components with better animations and visual design
 const HeroBox = styled(Box)(({ theme }) => ({
@@ -314,7 +315,7 @@ function LandingPage() {
               component="div"
               sx={{ color: "primary.main", fontWeight: "bold" }}
             >
-              <Link
+              <LinkRouter
                 href="#"
                 sx={{
                   textDecoration: "none",
@@ -324,7 +325,7 @@ function LandingPage() {
                 }}
               >
                 <img src={logo} alt="Ghosn Logo" height="55" />
-              </Link>
+              </LinkRouter>
             </Typography>
             <Box
               sx={{
@@ -354,7 +355,8 @@ function LandingPage() {
                 variant="contained"
                 color="primary"
                 size={isMobile ? "small" : "medium"}
-                href="/app"
+                component={LinkRouter}
+                to="/app"
                 disableElevation
                 sx={{
                   borderRadius: "8px",
@@ -368,7 +370,8 @@ function LandingPage() {
                 variant="outlined"
                 color="primary"
                 size={isMobile ? "small" : "medium"}
-                href="/donor"
+                component={LinkRouter}
+                to="/donor"
                 sx={{
                   borderRadius: "8px",
                   px: 2,
