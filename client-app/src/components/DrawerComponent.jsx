@@ -94,6 +94,7 @@ function DrawerComponent({ drawerWidth, userType = "client" }) {
     >
       <Box
         component="img"
+        onClick={() => navigate("/")}
         src={ghosnImage}
         alt="Ghosn"
         sx={{
@@ -101,6 +102,9 @@ function DrawerComponent({ drawerWidth, userType = "client" }) {
           margin: "0 auto",
           display: "block",
           p: 1,
+          ":hover": {
+            cursor: "pointer",
+          },
         }}
       />
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>

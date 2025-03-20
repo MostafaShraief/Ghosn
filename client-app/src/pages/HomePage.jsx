@@ -38,6 +38,7 @@ function HomePage() {
         // Get the last three notifications, and map the icons
         const lastThreeNotifications = notificationsResponse
           .slice(-3)
+          .sort((a, b) => new Date(b.dateAndTime) - new Date(a.dateAndTime))
           .map((notification) => ({
             id: notification.notificationID,
             text: notification.body,
