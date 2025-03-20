@@ -199,7 +199,7 @@ namespace Ghosn_BLL
             foreach (var suggestedMaterial in dto.SuggestedMaterials)
             {
 
-                int? MaterialID = clsPlants_BLL.GetPlantIdByName(suggestedMaterial.MaterialName);
+                int? MaterialID = clsMaterials_BLL.GetMaterialIdByName(suggestedMaterial.MaterialName);
 
                 if (MaterialID == null)
                     continue;
@@ -214,7 +214,7 @@ namespace Ghosn_BLL
             // Add SuggestedFarmingTools
             foreach (var suggestedFarmingTool in dto.SuggestedFarmingTools)
             {
-                int? FarmingToolID = clsPlants_BLL.GetPlantIdByName(suggestedFarmingTool.FarmingToolName);
+                int? FarmingToolID = clsFarmingTools_BLL.GetFarmingToolIdByName(suggestedFarmingTool.FarmingToolName);
 
                 if (FarmingToolID == null)
                     continue;
@@ -229,7 +229,7 @@ namespace Ghosn_BLL
             // Add SuggestedIrrigationSystems
             foreach (var suggestedIrrigationSystem in dto.SuggestedIrrigationSystems)
             {
-                int? IrrigationSystemID = clsPlants_BLL.GetPlantIdByName(suggestedIrrigationSystem.IrrigationSystemName);
+                int? IrrigationSystemID = clsIrrigationSystems_BLL.GetIrrigationSystemIdByName(suggestedIrrigationSystem.IrrigationSystemName);
 
                 if (IrrigationSystemID == null)
                     continue;

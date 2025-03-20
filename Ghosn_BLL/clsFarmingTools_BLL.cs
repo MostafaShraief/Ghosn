@@ -78,6 +78,11 @@ namespace Ghosn_BLL
             return farmingToolObjects.Select(ConvertToNameDTO).ToList();
         }
 
+        public static int? GetFarmingToolIdByName(string ToolName)
+        {
+            return clsFarmingTools_DAL.GetFarmingToolIdByName(ToolName);
+        }
+
         public static FarmingToolNameDTO? GetFarmingToolNameById(int id)
         {
             var farmingToolObject = clsFarmingTools_DAL.GetFarmingToolById(id);

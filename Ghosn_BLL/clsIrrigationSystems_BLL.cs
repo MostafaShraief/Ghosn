@@ -85,6 +85,11 @@ namespace Ghosn_BLL
             return irrigationSystemObject != null ? ConvertToNameDTO(irrigationSystemObject) : null;
         }
 
+        public static int? GetIrrigationSystemIdByName(string IrrigationSystemName)
+        {
+            return clsIrrigationSystems_DAL.GetIrrigationSystemIdByName(IrrigationSystemName);
+        }
+
         // Conversion method for Name-only DTO
         private static IrrigationSystemNameDTO ConvertToNameDTO(IrrigationSystemObject obj)
         {

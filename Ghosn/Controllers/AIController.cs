@@ -648,4 +648,43 @@ public class GhosnController : ControllerBase
             return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
         }
     }
+
+    [HttpPost("Support")]
+    [ProducesResponseType(StatusCodes.Status201Created)] // Created response
+    [ProducesResponseType(StatusCodes.Status400BadRequest)] // Invalid input response
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)] // Unexpected error response
+    public ActionResult<SupportDTO> AddSupport([FromBody] PlanSupportDTO dto)
+    {
+        if ((dto.Price == null && dto.FarmingTool == null) || dto.PlanID <= 0)
+        {
+            return BadRequest("Data is not valid.");
+        }
+
+        try
+        {
+            // Call the BLL method to add the support
+            int supportId = clsSupports_BLL.AddSupport(dto);
+
+            // Return the newly created support's ID
+            return CreatedAtAction(nameof(GetSupportById), new { id = supportId }, new { supportId });
+        }
+        catch (Exception ex)
+        {
+            // Handle unexpected errors
+            return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
+        }
+    }
+
+    [HttpGet("Support/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)] // Success response
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // Not found response
+    public ActionResult<SupportDTO> GetSupportById(int id)
+    {
+        var support = clsSupports_BLL.GetSupportById(id);
+        if (support == null)
+        {
+            return NotFound("Support not found.");
+        }
+        return Ok(support);
+    }
 }

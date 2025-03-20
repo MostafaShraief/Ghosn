@@ -192,6 +192,27 @@ namespace Ghosn_BLL
             return IsUpdated;
         }
 
+        public static bool UpdatePlanSupportID(int planID, int SupportId, PlanSupportDTO SupportDto)
+        {
+            bool IsUpdated = clsPlans_DAL.UpdatePlanSupportID(planID, SupportId);
+
+            if (IsUpdated)
+            {
+                ClientNotificationRequestDTO SupportNotification = new ClientNotificationRequestDTO
+                {
+                    ClientID = clsPlans_DAL.GetPlanById(planID).ClientID,
+                    DateAndTime = DateTime.Now,
+                    Title = "تم دعم خطتك",
+                    Body = $"قام احد المتبرعين بدعم خطتك الزراعية، التفاصيل:" +
+                    (SupportDto.FarmingTool is null ? "" : $"\nأداة زراعية: {SupportDto.FarmingTool}") +
+                    (SupportDto.Price is null ? "" : $"\nمبلغ مالي: {SupportDto.Price}")
+                };
+                clsClientNotifications_BLL.AddClientNotification(SupportNotification);
+            }
+
+            return IsUpdated;
+        }
+
         // Delete a Plan and its related data
         public static bool DeletePlanWithDetails(int planID)
         {

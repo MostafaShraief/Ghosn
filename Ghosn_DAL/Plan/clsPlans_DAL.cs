@@ -15,6 +15,7 @@ namespace Ghosn_DAL
         public int OutputID { get; set; }
         public bool IsCompleted { get; set; }
         public int? PrizeID { get; set; }
+        public int? SupportID { get; set; }
 
         public PlanObject(int planID, int clientID, int inputID, int outputID)
         {
@@ -24,11 +25,12 @@ namespace Ghosn_DAL
             OutputID = outputID;
         }
 
-        public PlanObject(int planID, bool IsCompleted, int? PrizeID)
+        public PlanObject(int planID, bool IsCompleted, int? PrizeID, int? SupportID)
         {
             PlanID = planID;
             this.IsCompleted = IsCompleted;
             this.PrizeID = PrizeID;
+            this.SupportID = SupportID;
         }
     }
 
@@ -67,7 +69,7 @@ namespace Ghosn_DAL
             var plans = new List<PlanObject>();
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string query = "SELECT PlanID, IsCompleted, PrizeID FROM Plans";
+                string query = "SELECT PlanID, IsCompleted, PrizeID, SupportID FROM Plans";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     conn.Open();
@@ -80,7 +82,10 @@ namespace Ghosn_DAL
                                 Convert.ToBoolean((reader["IsCompleted"].ToString())),
                                 reader.IsDBNull(reader.GetOrdinal("PrizeID"))
                                     ? (int?)null
-                                    : reader.GetInt32(reader.GetOrdinal("PrizeID"))
+                                    : reader.GetInt32(reader.GetOrdinal("PrizeID")),
+                                reader.IsDBNull(reader.GetOrdinal("SupportID"))
+                                    ? (int?)null
+                                    : reader.GetInt32(reader.GetOrdinal("SupportID"))
                                 ));
                         }
                     }
@@ -174,6 +179,22 @@ namespace Ghosn_DAL
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@PlanID", PlanID);
+                    conn.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
+        }
+
+        public static bool UpdatePlanSupportID(int PlanID, int SupportID)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "UPDATE Plans SET SupportID = @SupportID WHERE PlanID = @PlanID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@PlanID", PlanID);
+                    cmd.Parameters.AddWithValue("@SupportID", SupportID);
                     conn.Open();
                     int rowsAffected = cmd.ExecuteNonQuery();
                     return rowsAffected > 0;

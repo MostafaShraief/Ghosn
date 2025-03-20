@@ -49,6 +49,10 @@ namespace Ghosn_BLL
             return clsMaterials_DAL.DeleteMaterial(id);
         }
 
+        public static int? GetMaterialIdByName(string MaterialName)
+        {
+            return clsMaterials_DAL.GetMaterialIdByName(MaterialName);
+        }
 
         private static MaterialDTO ConvertToDTO(MaterialObject obj)
         {
