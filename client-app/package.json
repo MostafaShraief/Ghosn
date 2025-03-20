@@ -15,11 +15,15 @@
     "@mui/icons-material": "^6.4.7",
     "@mui/lab": "^6.0.0-beta.30",
     "@mui/material": "^6.4.8",
+    "@mui/x-date-pickers": "^7.28.0",
     "axios": "^1.8.3",
+    "date-fns": "^2.30.0",
     "lottie-react": "^2.4.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.3.0",
+    "stylis": "^4.3.6",
+    "stylis-plugin-rtl": "^2.1.1",
     "three": "^0.174.0"
   },
   "devDependencies": {
