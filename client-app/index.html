@@ -11,6 +11,31 @@
       rel="stylesheet"
     />
     <title>Ghosn</title>
+    <style>
+      /* WebKit (Chrome, Safari, Edge) scrollbar styling */
+      ::-webkit-scrollbar {
+        width: 12px; /* Width of the scrollbar */
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Background of the scrollbar track */
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #43a047; /* Green color for the scrollbar thumb */
+        border-radius: 10px; /* Optional: rounded edges */
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: #43a047; /* Darker green when hovering */
+      }
+
+      /* Firefox scrollbar styling */
+      html {
+        scrollbar-color: #43a047 #f1f1f1; /* Thumb color, track color */
+        scrollbar-width: thin; /* Makes the scrollbar thinner */
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
