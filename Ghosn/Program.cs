@@ -19,6 +19,7 @@ builder.Services.AddCors(options =>
         builder => builder
             .WithOrigins(
                 "http://localhost:5173",
+                "https://ghosn-samacode.netlify.app/app",
                 "http://mostafashraief.bsite.net",
                 "https://mostafashraief.bsite.net"
             )
