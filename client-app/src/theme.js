@@ -10,6 +10,16 @@ export const theme = createTheme({
     primary: { main: "#43a047" },
     secondary: { main: "#00c853" },
     background: { default: "#f5f7fa" },
+
+    gold: {
+      main: "#FFD700",
+    },
+    silver: {
+      main: "#C0C0C0",
+    },
+    bronze: {
+      main: "#CD7F32",
+    },
   },
   typography: {
     fontFamily:

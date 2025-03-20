@@ -23,47 +23,49 @@ import {
   Event as EventIcon,
   WaterDrop,
 } from "@mui/icons-material";
-import {
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-} from "@mui/lab";
-
+import { api, getNotifications } from "@/services/api";
 function HomePage() {
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
-  const [recentActivity, setRecentActivity] = useState([]);
-  const [tips, setTips] = useState([]); // حالة لتخزين النصائح
+  const [tips, setTips] = useState([]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setNotifications([
-        { id: 1, text: "تذكير: سقاية المحصول الذي لديك.", icon: <WaterDrop /> },
-        { id: 2, text: "تذكير: قم بري النباتات اليوم.", icon: <EventIcon /> },
-      ]);
-      setSuggestions([
-        "تحقق من رطوبة التربة اليوم.",
-        "قم بتسميد النباتات المغذية.",
-        "تفقد النباتات بحثًا عن أي آفات.",
-      ]);
-      setRecentActivity([
-        { time: "اليوم", event: "تم إنشاء تقرير جديد" },
-        { time: "أمس", event: "تمت إضافة خطة زراعة" },
-        { time: "منذ يومين", event: "تم تسجيل الدخول" },
-      ]);
-      setTips([
-        "استخدم الأسمدة العضوية لتحسين جودة التربة.",
-        "قم بري النباتات في الصباح الباكر.",
-        "تأكد من تعرض النباتات لأشعة الشمس الكافية.",
-      ]); // نصائح وهمية
-      setLoading(false);
-    }, 500);
+    const fetchData = async () => {
+      try {
+        // Fetch Notifications
+        const notificationsResponse = await getNotifications();
+        // Get the last three notifications, and map the icons
+        const lastThreeNotifications = notificationsResponse
+          .slice(-3)
+          .map((notification) => ({
+            id: notification.notificationID,
+            text: notification.body,
+            title: notification.title, //added title
+            date: notification.dateAndTime, // added date
+            icon: <EventIcon />, //  Default icon, you might want a mapping based on notification type
+          }));
+        setNotifications(lastThreeNotifications);
 
-    return () => clearTimeout(timer);
+        // Fetch Suggestions
+        const suggestionsResponse = await api.get("/api/Ghosn/Suggestion");
+        setSuggestions(
+          suggestionsResponse.data.res.split("،").map((item) => item.trim())
+        );
+
+        // Fetch Tips
+        const tipsResponse = await api.get("/api/Ghosn/Tip");
+        setTips(tipsResponse.data.res.split("،").map((item) => item.trim()));
+
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        //  Handle errors appropriately, e.g., show an error message to the user
+        setLoading(false); // Ensure loading is set to false even on error
+      }
+    };
+
+    fetchData();
   }, []);
 
   if (loading) {
@@ -125,7 +127,23 @@ function HomePage() {
                     <React.Fragment key={notification.id}>
                       <ListItem>
                         <ListItemIcon>{notification.icon}</ListItemIcon>
-                        <ListItemText primary={notification.text} />
+                        <ListItemText
+                          primary={notification.text}
+                          secondary={
+                            <>
+                              <Typography
+                                component="span"
+                                variant="body2"
+                                color="textPrimary"
+                              >
+                                {notification.title}
+                              </Typography>
+                              {` — ${new Date(
+                                notification.date
+                              ).toLocaleString()}`}
+                            </>
+                          }
+                        />
                       </ListItem>
                       <Divider />
                     </React.Fragment>

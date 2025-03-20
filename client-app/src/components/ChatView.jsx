@@ -1,4 +1,3 @@
-// client-app/src/components/ChatView.jsx
 import React, { useState, useRef, useEffect } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -9,7 +8,7 @@ import Paper from "@mui/material/Paper";
 import { deepOrange, lightBlue } from "@mui/material/colors";
 import { IconButton } from "@mui/material";
 import { useLocation } from "react-router-dom";
-import { getAICompletion } from "../services/api"; // Import the API function
+import { getAICompletion } from "@/services/api";
 
 function ChatView() {
   const location = useLocation();

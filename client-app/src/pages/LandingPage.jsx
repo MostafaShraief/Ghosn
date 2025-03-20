@@ -23,6 +23,8 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import logo from "@/assets/ghosn.png";
+import hero from "@/assets/hero.png";
+import about from "@/assets/about.png";
 import WavingHandIcon from "@mui/icons-material/WavingHand";
 import AgricultureIcon from "@mui/icons-material/Agriculture";
 import GroupsIcon from "@mui/icons-material/Groups";
@@ -54,6 +56,8 @@ const SectionBox = styled(Box)(({ theme }) => ({
 const FeatureCard = styled(Card)(({ theme }) => ({
   height: "100%",
   transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+  position: "relative",
+  transform: "translateY(0)",
   overflow: "hidden",
   "&:hover": {
     transform: "translateY(-8px)",
@@ -138,7 +142,7 @@ const GradientText = styled(Typography)(({ theme }) => ({
 }));
 
 const FloatingImage = styled(Box)(({ theme }) => ({
-  borderRadius: theme.shape.borderRadius * 3,
+  borderRadius: theme.shape.borderRadius * 5,
   overflow: "hidden",
   boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
   position: "relative",
@@ -319,7 +323,7 @@ function LandingPage() {
                   alignItems: "center",
                 }}
               >
-                <img src={logo} alt="Ghosn Logo" height="40" />
+                <img src={logo} alt="Ghosn Logo" height="55" />
               </Link>
             </Typography>
             <Box
@@ -581,7 +585,7 @@ function LandingPage() {
                 <Box>
                   <FloatingImage>
                     <img
-                      src="https://placehold.co/800x600?text=Ghosn+Illustration"
+                      src={hero}
                       alt="Ghosn Illustration"
                       style={{ width: "100%", display: "block" }}
                     />
@@ -637,31 +641,29 @@ function LandingPage() {
           <Grid container spacing={3} justifyContent="center">
             {features.map((feature, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
-                <Fade in={true} timeout={1000 + index * 200}>
-                  <FeatureCard>
-                    <CardContent sx={{ p: 3, height: "100%" }}>
-                      <Stack
-                        direction="row"
-                        spacing={2}
-                        alignItems="center"
-                        sx={{ mb: 2 }}
+                <FeatureCard>
+                  <CardContent sx={{ p: 3, height: "100%" }}>
+                    <Stack
+                      direction="row"
+                      spacing={2}
+                      alignItems="center"
+                      sx={{ mb: 2 }}
+                    >
+                      <InlineFeatureIcon>{feature.icon}</InlineFeatureIcon>
+                      <Typography
+                        variant="h6"
+                        component="h3"
+                        gutterBottom
+                        fontWeight="bold"
                       >
-                        <InlineFeatureIcon>{feature.icon}</InlineFeatureIcon>
-                        <Typography
-                          variant="h6"
-                          component="h3"
-                          gutterBottom
-                          fontWeight="bold"
-                        >
-                          {feature.title}
-                        </Typography>
-                      </Stack>
-                      <Typography variant="body1" color="text.secondary">
-                        {feature.description}
+                        {feature.title}
                       </Typography>
-                    </CardContent>
-                  </FeatureCard>
-                </Fade>
+                    </Stack>
+                    <Typography variant="body1" color="text.secondary">
+                      {feature.description}
+                    </Typography>
+                  </CardContent>
+                </FeatureCard>
               </Grid>
             ))}
           </Grid>
@@ -772,7 +774,7 @@ function LandingPage() {
                   }}
                 >
                   <img
-                    src="https://placehold.co/800x800?text=About+Ghosn"
+                    src={about}
                     alt="About Ghosn"
                     style={{
                       width: "100%",
@@ -949,38 +951,36 @@ function LandingPage() {
           <Grid container spacing={4} justifyContent="center">
             {teamMembers.map((member, index) => (
               <Grid item xs={12} sm={6} md={3} key={index}>
-                <Fade in={true} timeout={1000 + index * 200}>
-                  <TeamCard>
-                    <CardContent sx={{ p: 3, textAlign: "center" }}>
-                      <Avatar
-                        src={member.avatar}
-                        alt={member.name}
-                        sx={{
-                          width: 100,
-                          height: 100,
-                          mx: "auto",
-                          mb: 2,
-                          border: `3px solid ${theme.palette.primary.main}`,
-                          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                        }}
-                      />
-                      <Typography variant="h6" fontWeight="bold" gutterBottom>
-                        {member.name}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="primary"
-                        fontWeight="medium"
-                        gutterBottom
-                      >
-                        {member.role}
-                      </Typography>
-                      <Typography variant="body1" color="text.secondary">
-                        {member.description}
-                      </Typography>
-                    </CardContent>
-                  </TeamCard>
-                </Fade>
+                <TeamCard>
+                  <CardContent sx={{ p: 3, textAlign: "center" }}>
+                    <Avatar
+                      src={member.avatar}
+                      alt={member.name}
+                      sx={{
+                        width: 100,
+                        height: 100,
+                        mx: "auto",
+                        mb: 2,
+                        border: `3px solid ${theme.palette.primary.main}`,
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                      }}
+                    />
+                    <Typography variant="h6" fontWeight="bold" gutterBottom>
+                      {member.name}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="primary"
+                      fontWeight="medium"
+                      gutterBottom
+                    >
+                      {member.role}
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                      {member.description}
+                    </Typography>
+                  </CardContent>
+                </TeamCard>
               </Grid>
             ))}
           </Grid>

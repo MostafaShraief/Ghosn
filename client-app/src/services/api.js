@@ -1,9 +1,9 @@
 import axios from "axios";
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://mostafashraief.bsite.net";
+  import.meta.env.VITE_API_URL || "http://ghosnwebsite.runasp.net/";
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
@@ -79,9 +79,7 @@ export const login = async (username, password) => {
 // Added function to fetch notifications
 export const getNotifications = async () => {
   try {
-    const response = await api.get(
-      "/api/Ghosn/Notifications/AllClientNotifications"
-    );
+    const response = await api.get("/api/Ghosn/AllNotifications");
     return response.data;
   } catch (error) {
     console.error("Error fetching notifications:", error);
@@ -92,6 +90,36 @@ export const getNotifications = async () => {
     }
     throw error; // Re-throw the error for handling in the component
   }
+};
+
+export const fetchPlans = async () => {
+  const response = await api.get("/api/Ghosn/Plans/OrderByArea");
+  return response.data.map((plan, index) => ({
+    id: index + 1, // Or use plan.id if you have it
+    name: plan.name || "Client name",
+    firstName: plan.name.split(" ")[0] || "Client",
+    lastName: plan.name.split(" ")[1] || `#${index + 1}`,
+    areaSize: plan.areaSize,
+  }));
+};
+
+export const fetchNearestPrize = async () => {
+  const response = await api.get("/api/Ghosn/Prizes/Nearest");
+  return {
+    prizeID: response.data.prizeID,
+    prizeMoney: response.data.prizeMoney,
+    date: new Date(response.data.date),
+  };
+};
+
+export const fetchWinner = async () => {
+  const response = await api.get("/api/Ghosn/Plan/ProduceWinner");
+  return {
+    planID: response.data.planID,
+    name: response.data.name,
+    prizeMoney: response.data.prizeMoney,
+    prizeDate: response.data.prizeDate,
+  };
 };
 
 export default api;

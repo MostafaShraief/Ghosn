@@ -1,3 +1,4 @@
+// client-app/src/pages/PlantingOutputPage.jsx
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -10,6 +11,8 @@ import {
   CircularProgress,
   useMediaQuery,
   Avatar,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import {
   LocalFlorist as PlantIcon,
@@ -18,6 +21,7 @@ import {
   CalendarMonth as ScheduleIcon,
   Build as MaterialsIcon,
   Info as InfoIcon,
+  Save as SaveIcon,
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "@/services/api";
@@ -92,8 +96,6 @@ const HeaderIcon = styled(Avatar)(({ theme }) => ({
   marginRight: theme.spacing(2),
 }));
 
-// --- Main Component ---
-
 const PlantingOutputPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -101,6 +103,10 @@ const PlantingOutputPage = () => {
   const [aiOutput, setAiOutput] = useState(null);
   const [userInputs, setUserInputs] = useState(null);
   const isMdDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [isSaving, setIsSaving] = useState(false); // Loading state for saving
 
   const handleChatClick = () => {
     navigate("/chat");
@@ -126,6 +132,52 @@ const PlantingOutputPage = () => {
     };
     fetchData();
   }, [location.state]);
+
+  const handleSavePlan = async () => {
+    if (!aiOutput) {
+      setSnackbarMessage("لا توجد خطة لحفظها.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+      return;
+    }
+
+    setIsSaving(true); // Start loading
+
+    const clientId = 3;
+
+    const payload = {
+      planID: 0,
+      clientID: clientId,
+      output: aiOutput,
+      input: userInputs,
+    };
+
+    try {
+      const response = await api.post(`/api/Ghosn/Plan/${clientId}`, payload);
+      console.log("Plan saved:", response.data);
+      setSnackbarMessage("تم حفظ الخطة بنجاح!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error("Error saving plan:", error.response || error);
+      setSnackbarMessage(
+        `حدث خطأ أثناء حفظ الخطة: ${
+          error.response?.data?.message || error.message || "Unknown error"
+        }`
+      );
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    } finally {
+      setIsSaving(false); // End loading, regardless of success/failure
+    }
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
 
   if (loading) {
     return (
@@ -205,7 +257,6 @@ const PlantingOutputPage = () => {
     ));
   };
 
-  // Helper function to render steps (now without Accordion)
   const renderSteps = (title, steps) => (
     <>
       <SectionTitle variant="h6">{title}</SectionTitle>
@@ -378,23 +429,61 @@ const PlantingOutputPage = () => {
         </Grid>
       </Grid>
 
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleChatClick}
-        sx={{
-          mt: 4,
-          px: 5,
-          py: 1.5,
-          borderRadius: 25,
-          fontSize: "1.1rem",
-          textTransform: "none",
-          fontWeight: "bold",
-          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
-        }}
+      <Box sx={{ display: "flex", gap: 2, mt: 4, justifyContent: "center" }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleChatClick}
+          startIcon={<MaterialsIcon />}
+          sx={{
+            px: 5,
+            py: 1.5,
+            borderRadius: 25,
+            fontSize: "1.1rem",
+            textTransform: "none",
+            fontWeight: "bold",
+            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+          }}
+        >
+          التحدث مع المخرجات
+        </Button>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={handleSavePlan}
+          startIcon={<SaveIcon />}
+          disabled={isSaving} // Disable the button while saving
+          sx={{
+            px: 5,
+            py: 1.5,
+            borderRadius: 25,
+            fontSize: "1.1rem",
+            textTransform: "none",
+            fontWeight: "bold",
+            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+          }}
+        >
+          {isSaving ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            "حفظ الخطة"
+          )}
+        </Button>
+      </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        التحدث مع المخرجات
-      </Button>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
