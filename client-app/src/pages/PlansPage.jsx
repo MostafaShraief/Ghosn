@@ -7,18 +7,23 @@ import {
   Grid,
   CircularProgress,
   Avatar,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  Alert,
 } from "@mui/material";
 import {
-  ExpandMore as ExpandMoreIcon,
   LocalFlorist as PlantIcon,
   Checklist as ChecklistIcon,
   TipsAndUpdates as TipsIcon,
   CalendarMonth as ScheduleIcon,
   Build as MaterialsIcon,
   Info as InfoIcon,
+  CheckCircle as CheckCircleIcon,
+  Cancel as CancelIcon,
+  Close as CloseIcon,
 } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import api from "@/services/api";
@@ -27,23 +32,22 @@ import api from "@/services/api";
 
 const Container = styled(Box)(({ theme }) => ({
   minHeight: "100vh",
-  padding: theme.spacing(4), // Add some padding around the container
+  padding: theme.spacing(6),
+  background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
   [theme.breakpoints.down("md")]: {
-    padding: theme.spacing(2),
+    padding: theme.spacing(3),
   },
 }));
 
 const StyledCard = styled(Card)(({ theme }) => ({
-  borderRadius: theme.spacing(2.5),
-  boxShadow: "0 6px 12px rgba(0, 0, 0, 0.08)",
-  transition: "transform 0.2s ease-in-out",
+  borderRadius: theme.spacing(2),
+  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.1)",
+  transition: "all 0.3s ease",
   "&:hover": {
-    transform: "translateY(-6px)",
+    transform: "translateY(-8px)",
+    boxShadow: "0 12px 32px rgba(0, 0, 0, 0.15)",
   },
-  overflow: "hidden", // Handles Accordion overflow
-  width: "100%",
-  display: "flex",
-  flexDirection: "column", // Stack header and content vertically
+  backgroundColor: theme.palette.background.paper,
   border: `1px solid ${theme.palette.grey[200]}`,
 }));
 
@@ -51,21 +55,20 @@ const CardHeader = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   padding: theme.spacing(2),
-  backgroundColor: theme.palette.primary.main,
+  background: `linear-gradient(to right, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
   color: theme.palette.common.white,
-  borderRadius: `${theme.spacing(2.5)} ${theme.spacing(2.5)} 0 0`,
+  borderRadius: `${theme.spacing(2)} ${theme.spacing(2)} 0 0`,
 }));
 
 const CardContentStyled = styled(CardContent)(({ theme }) => ({
-  flexGrow: 1, // Allow content to grow and fill available space
   padding: theme.spacing(3),
+  "&:last-child": { paddingBottom: theme.spacing(3) },
 }));
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
-  fontWeight: 600,
-  color: theme.palette.primary.dark,
-  marginBottom: theme.spacing(1.5),
-  marginTop: theme.spacing(2),
+  fontWeight: 700,
+  color: theme.palette.primary.main,
+  margin: theme.spacing(2, 0, 1),
 }));
 
 const StepText = styled(Typography)(({ theme }) => ({
@@ -83,40 +86,110 @@ const StepText = styled(Typography)(({ theme }) => ({
 
 const NoDataText = styled(Typography)(({ theme }) => ({
   fontStyle: "italic",
-  color: theme.palette.text.disabled,
-  marginLeft: theme.spacing(3),
+  color: theme.palette.grey[500],
+  marginLeft: theme.spacing(2),
 }));
 
 const HeaderIcon = styled(Avatar)(({ theme }) => ({
   backgroundColor: theme.palette.common.white,
   color: theme.palette.primary.main,
-  marginRight: theme.spacing(2),
+  marginRight: theme.spacing(1.5),
+  width: 36,
+  height: 36,
+}));
+
+const CompletionButton = styled(Button)(({ theme, completed }) => ({
+  borderRadius: theme.spacing(1),
+  fontWeight: 600,
+  backgroundColor: completed
+    ? theme.palette.success.main
+    : theme.palette.warning.main,
+  color: theme.palette.common.white,
+  "&:hover": {
+    backgroundColor: completed
+      ? theme.palette.success.dark
+      : theme.palette.warning.dark,
+  },
+  margin: theme.spacing(1),
+  display: "block",
+  width: "fit-content",
+}));
+
+const StyledDialog = styled(Dialog)(({ theme }) => ({
+  "& .MuiDialog-paper": {
+    borderRadius: theme.spacing(2),
+    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2)",
+    overflow: "hidden",
+  },
 }));
 
 const PlansPage = () => {
-  const [plans, setPlans] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState(false);
-
-  const handleChange = (panel) => (event, isExpanded) => {
-    setExpanded(isExpanded ? panel : false);
-  };
+  const [planSummaries, setPlanSummaries] = useState([]);
+  const [loadingSummaries, setLoadingSummaries] = useState(true);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [completionStatusMessage, setCompletionStatusMessage] = useState(null);
 
   useEffect(() => {
-    const fetchPlans = async () => {
+    const fetchPlanSummaries = async () => {
       try {
-        const response = await api.get("/api/Ghosn/AllPlans");
-        setPlans(response.data);
-        setLoading(false);
+        const response = await api.get("/api/Ghosn/Plans/summaries");
+        setPlanSummaries(response.data);
       } catch (error) {
-        console.error("Error fetching plans:", error);
-        setLoading(false);
+        console.error("Error fetching plan summaries:", error);
+      } finally {
+        setLoadingSummaries(false);
       }
     };
-    fetchPlans();
+    fetchPlanSummaries();
   }, []);
 
-  if (loading) {
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedPlan(null);
+    setLoadingDetails(false);
+  };
+
+  const handleOpenDialog = async (planID) => {
+    setLoadingDetails(true);
+    setOpenDialog(true);
+    try {
+      const response = await api.get(`/api/Ghosn/Plan/PlanID/${planID}`);
+      setSelectedPlan(response.data);
+    } catch (error) {
+      console.error("Error fetching plan details:", error);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  const handleCompletePlan = async (planID) => {
+    try {
+      await api.put(`/api/Ghosn/Plan/SetAsCompleted/${planID}`);
+      setPlanSummaries((prev) =>
+        prev.map((summary) =>
+          summary.planID === planID
+            ? { ...summary, isCompleted: true }
+            : summary
+        )
+      );
+      setCompletionStatusMessage({
+        message: "تم تحديد الخطة كمكتملة بنجاح",
+        type: "success",
+      });
+      setTimeout(() => setCompletionStatusMessage(null), 3000);
+    } catch (error) {
+      console.error("Error marking plan as complete:", error);
+      setCompletionStatusMessage({
+        message: "حدث خطأ أثناء تحديد الخطة كمكتملة",
+        type: "error",
+      });
+      setTimeout(() => setCompletionStatusMessage(null), 3000);
+    }
+  };
+
+  if (loadingSummaries) {
     return (
       <Container>
         <Box
@@ -124,35 +197,33 @@ const PlansPage = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            height: "50vh",
+            minHeight: "50vh",
           }}
         >
-          <CircularProgress />
+          <CircularProgress size={60} thickness={4} />
         </Box>
       </Container>
     );
   }
 
-  // Helper function to render steps, now with Accordion
   const renderSteps = (title, steps) => (
     <>
       <SectionTitle variant="h6">{title}</SectionTitle>
-      {steps && steps.length > 0 ? (
+      {steps?.length > 0 ? (
         steps.map((step, index) => (
           <StepText key={`${title}-${index}`} variant="body2">
-            {step.step}
+            {step.step || step}
           </StepText>
         ))
       ) : (
-        <NoDataText>لا توجد خطوات {title.toLowerCase()}.</NoDataText>
+        <NoDataText>لا توجد بيانات متاحة لهذا القسم.</NoDataText>
       )}
     </>
   );
 
   const formatUserInputs = (input) => {
-    if (!input) {
-      return <NoDataText>No user input data available.</NoDataText>;
-    }
+    if (!input)
+      return <NoDataText>لا توجد بيانات مدخلة من المستخدم.</NoDataText>;
 
     const mapToText = {
       locationType: {
@@ -198,196 +269,260 @@ const PlansPage = () => {
       }`,
       `مساحة المنطقة: ${input.areaSize || 0} متر مربع`,
       `النباتات المزروعة: ${
-        input.currentlyPlantedPlants
-          ?.map((plant) => plant.plantName)
-          .join(", ") || "لا يوجد"
+        input.currentlyPlantedPlants?.map((p) => p.plantName).join(", ") ||
+        "لا يوجد"
       }`,
     ];
 
-    return inputs.map((inputItem, index) => (
-      <StepText key={index} variant="body1">
-        {inputItem}
+    return inputs.map((item, index) => (
+      <StepText key={index} variant="body2">
+        {item}
       </StepText>
     ));
   };
 
   return (
-    <Container dir="rtl">
+    <Container>
       <Typography
-        variant="h4"
-        gutterBottom
-        color="primary"
+        variant="h3"
         align="center"
-        sx={{ fontWeight: "bold", mb: 4 }}
+        sx={{ fontWeight: 700, color: "primary.main", mb: 5 }}
       >
         الخطط الزراعية
       </Typography>
 
-      {plans.length === 0 ? (
-        <Typography variant="h6" align="center" color="textSecondary">
-          لا توجد خطط زراعية متاحة حاليًا.
+      {completionStatusMessage && (
+        <Alert
+          severity={completionStatusMessage.type}
+          sx={{ mb: 3, borderRadius: 2 }}
+        >
+          {completionStatusMessage.message}
+        </Alert>
+      )}
+
+      {planSummaries.length === 0 ? (
+        <Typography
+          variant="h6"
+          align="center"
+          color="text.secondary"
+          sx={{ mt: 4 }}
+        >
+          لا توجد خطط زراعية متاحة حاليًا
         </Typography>
       ) : (
         <Grid container spacing={3}>
-          {plans.map((plan, planIndex) => (
-            <Grid item xs={12} key={planIndex}>
+          {planSummaries.map((summary, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
               <StyledCard>
-                <Accordion
-                  expanded={expanded === `panel${planIndex}`}
-                  onChange={handleChange(`panel${planIndex}`)}
-                >
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls={`panel${planIndex}-content`}
-                    id={`panel${planIndex}-header`}
+                <CardHeader>
+                  <HeaderIcon>
+                    <InfoIcon />
+                  </HeaderIcon>
+                  <Typography variant="h6">الخطة {index + 1}</Typography>
+                </CardHeader>
+                <CardContentStyled>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mb={2}
                   >
-                    <Typography variant="h6">الخطة {planIndex + 1}</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    {/* User Inputs */}
-                    <CardHeader>
-                      <HeaderIcon>
-                        <InfoIcon />
-                      </HeaderIcon>
-                      <Typography variant="h6">بيانات المستخدم</Typography>
-                    </CardHeader>
-                    <CardContentStyled>
-                      {formatUserInputs(plan.input)}
-                    </CardContentStyled>
-
-                    {/* Suggested Plants */}
-                    <CardHeader>
-                      <HeaderIcon>
-                        <PlantIcon />
-                      </HeaderIcon>
-                      <Typography variant="h6">النباتات المقترحة</Typography>
-                    </CardHeader>
-                    <CardContentStyled>
-                      {plan.output?.suggestedPlants?.length > 0 ? (
-                        plan.output.suggestedPlants.map((plant, index) => (
-                          <StepText key={index} variant="body1">
-                            {plant.plantName}
-                          </StepText>
-                        ))
-                      ) : (
-                        <NoDataText>لا توجد نباتات مقترحة.</NoDataText>
-                      )}
-                    </CardContentStyled>
-
-                    {/* Planting Steps */}
-
-                    <CardHeader>
-                      <HeaderIcon>
-                        <ChecklistIcon />
-                      </HeaderIcon>
-                      <Typography variant="h6">خطوات الزراعة</Typography>
-                    </CardHeader>
-                    <CardContentStyled>
-                      {renderSteps(
-                        "تحضير التربة",
-                        plan.output?.plantingSteps?.prepareSoilSteps
-                      )}
-                      {renderSteps(
-                        "اختيار النباتات",
-                        plan.output?.plantingSteps?.choosePlants
-                      )}
-                      {renderSteps(
-                        "الري",
-                        plan.output?.plantingSteps?.wateringSteps
-                      )}
-                      {renderSteps(
-                        "التسميد",
-                        plan.output?.plantingSteps?.fertilizationSteps
-                      )}
-                      {renderSteps(
-                        "العناية",
-                        plan.output?.plantingSteps?.careSteps
-                      )}
-                    </CardContentStyled>
-
-                    {/* Additional Tips */}
-                    <CardHeader>
-                      <HeaderIcon>
-                        <TipsIcon />
-                      </HeaderIcon>
-                      <Typography variant="h6">نصائح إضافية</Typography>
-                    </CardHeader>
-                    <CardContentStyled>
-                      {renderSteps(
-                        "تحسين التربة",
-                        plan.output?.soilImprovements
-                      )}
-                      {renderSteps(
-                        "الوقاية من الآفات",
-                        plan.output?.pestPreventions
-                      )}
-                      {renderSteps(
-                        "تناوب المحاصيل",
-                        plan.output?.cropRotations
-                      )}
-                    </CardContentStyled>
-
-                    {/* Suggested Timeline */}
-                    <CardHeader>
-                      <HeaderIcon>
-                        <ScheduleIcon />
-                      </HeaderIcon>
-                      <Typography variant="h6">جدول زمني مقترح</Typography>
-                    </CardHeader>
-                    <CardContentStyled>
-                      {renderSteps(
-                        "الأسابيع الأولى",
-                        plan.output?.suggestedTimelines?.firstWeeks
-                      )}
-                      {renderSteps(
-                        "الأسابيع الثانية",
-                        plan.output?.suggestedTimelines?.secondWeeks
-                      )}
-                      {renderSteps(
-                        "الأشهر الأولى",
-                        plan.output?.suggestedTimelines?.firstMonths
-                      )}
-                      {renderSteps(
-                        "الأشهر الثلاثة",
-                        plan.output?.suggestedTimelines?.thirdMonths
-                      )}
-                    </CardContentStyled>
-
-                    {/* Required Materials */}
-                    <CardHeader>
-                      <HeaderIcon>
-                        <MaterialsIcon />
-                      </HeaderIcon>
-                      <Typography variant="h6">المواد المطلوبة</Typography>
-                    </CardHeader>
-
-                    <CardContentStyled>
-                      {renderSteps(
-                        "المواد المقترحة",
-                        plan.output?.suggestedMaterials?.map((m) => ({
-                          step: m.materialName,
-                        }))
-                      )}
-                      {renderSteps(
-                        "أدوات الزراعة المقترحة",
-                        plan.output?.suggestedFarmingTools?.map((t) => ({
-                          step: t.farmingToolName,
-                        }))
-                      )}
-                      {renderSteps(
-                        "أنظمة الري المقترحة",
-                        plan.output?.suggestedIrrigationSystems?.map((s) => ({
-                          step: s.irrigationSystemName,
-                        }))
-                      )}
-                    </CardContentStyled>
-                  </AccordionDetails>
-                </Accordion>
+                    <Typography variant="body1" color="text.secondary">
+                      الحالة:
+                    </Typography>
+                    {summary.isCompleted ? (
+                      <CheckCircleIcon sx={{ color: "success.main" }} />
+                    ) : (
+                      <CancelIcon sx={{ color: "error.main" }} />
+                    )}
+                  </Box>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Button
+                      variant="outlined"
+                      fullWidth
+                      onClick={() => handleOpenDialog(summary.planID)}
+                      sx={{ borderRadius: 1 }}
+                    >
+                      عرض التفاصيل
+                    </Button>
+                    <CompletionButton
+                      completed={summary.isCompleted}
+                      onClick={() => handleCompletePlan(summary.planID)}
+                    >
+                      {summary.isCompleted ? "مكتملة" : "تحديد كمكتملة"}
+                    </CompletionButton>
+                  </Box>
+                </CardContentStyled>
               </StyledCard>
             </Grid>
           ))}
         </Grid>
       )}
+
+      <StyledDialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        fullWidth
+        maxWidth="md"
+        dir="rtl"
+      >
+        <DialogTitle
+          sx={{
+            bgcolor: "primary.main",
+            color: "white",
+            p: 2,
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          تفاصيل الخطة
+          <IconButton onClick={handleCloseDialog} sx={{ color: "white" }}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          {loadingDetails ? (
+            <Box sx={{ textAlign: "center", py: 4 }}>
+              <CircularProgress />
+              <Typography variant="body2" color="text.secondary" mt={2}>
+                جارٍ تحميل تفاصيل الخطة...
+              </Typography>
+            </Box>
+          ) : selectedPlan ? (
+            <>
+              <CardHeader sx={{ mt: 3 }}>
+                <HeaderIcon>
+                  <InfoIcon />
+                </HeaderIcon>
+                <Typography variant="h6">بيانات المستخدم</Typography>
+              </CardHeader>
+              <CardContentStyled>
+                {formatUserInputs(selectedPlan.input)}
+              </CardContentStyled>
+
+              <CardHeader>
+                <HeaderIcon>
+                  <PlantIcon />
+                </HeaderIcon>
+                <Typography variant="h6">النباتات المقترحة</Typography>
+              </CardHeader>
+              <CardContentStyled>
+                {selectedPlan.output?.suggestedPlants?.map((plant, index) => (
+                  <StepText key={index}>{plant.plantName}</StepText>
+                )) || <NoDataText>لا توجد نباتات مقترحة.</NoDataText>}
+              </CardContentStyled>
+
+              <CardHeader>
+                <HeaderIcon>
+                  <ChecklistIcon />
+                </HeaderIcon>
+                <Typography variant="h6">خطوات الزراعة</Typography>
+              </CardHeader>
+              <CardContentStyled>
+                {renderSteps(
+                  "تحضير التربة",
+                  selectedPlan.output?.plantingSteps?.prepareSoilSteps
+                )}
+                {renderSteps(
+                  "اختيار النباتات",
+                  selectedPlan.output?.plantingSteps?.choosePlants
+                )}
+                {renderSteps(
+                  "الري",
+                  selectedPlan.output?.plantingSteps?.wateringSteps
+                )}
+                {renderSteps(
+                  "التسميد",
+                  selectedPlan.output?.plantingSteps?.fertilizationSteps
+                )}
+                {renderSteps(
+                  "العناية",
+                  selectedPlan.output?.plantingSteps?.careSteps
+                )}
+              </CardContentStyled>
+
+              <CardHeader>
+                <HeaderIcon>
+                  <TipsIcon />
+                </HeaderIcon>
+                <Typography variant="h6">نصائح إضافية</Typography>
+              </CardHeader>
+              <CardContentStyled>
+                {renderSteps(
+                  "تحسين التربة",
+                  selectedPlan.output?.soilImprovements
+                )}
+                {renderSteps(
+                  "الوقاية من الآفات",
+                  selectedPlan.output?.pestPreventions
+                )}
+                {renderSteps(
+                  "تناوب المحاصيل",
+                  selectedPlan.output?.cropRotations
+                )}
+              </CardContentStyled>
+
+              <CardHeader>
+                <HeaderIcon>
+                  <ScheduleIcon />
+                </HeaderIcon>
+                <Typography variant="h6">جدول زمني مقترح</Typography>
+              </CardHeader>
+              <CardContentStyled>
+                {renderSteps(
+                  "الأسابيع الأولى",
+                  selectedPlan.output?.suggestedTimelines?.firstWeeks
+                )}
+                {renderSteps(
+                  "الأسابيع الثانية",
+                  selectedPlan.output?.suggestedTimelines?.secondWeeks
+                )}
+                {renderSteps(
+                  "الأشهر الأولى",
+                  selectedPlan.output?.suggestedTimelines?.firstMonths
+                )}
+                {renderSteps(
+                  "الأشهر الثلاثة",
+                  selectedPlan.output?.suggestedTimelines?.thirdMonths
+                )}
+              </CardContentStyled>
+
+              <CardHeader>
+                <HeaderIcon>
+                  <MaterialsIcon />
+                </HeaderIcon>
+                <Typography variant="h6">المواد المطلوبة</Typography>
+              </CardHeader>
+              <CardContentStyled>
+                {renderSteps(
+                  "المواد المقترحة",
+                  selectedPlan.output?.suggestedMaterials?.map((m) => ({
+                    step: m.materialName,
+                  }))
+                )}
+                {renderSteps(
+                  "أدوات الزراعة",
+                  selectedPlan.output?.suggestedFarmingTools?.map((t) => ({
+                    step: t.farmingToolName,
+                  }))
+                )}
+                {renderSteps(
+                  "أنظمة الري",
+                  selectedPlan.output?.suggestedIrrigationSystems?.map((s) => ({
+                    step: s.irrigationSystemName,
+                  }))
+                )}
+              </CardContentStyled>
+            </>
+          ) : (
+            <Typography color="error">فشل في تحميل تفاصيل الخطة.</Typography>
+          )}
+        </DialogContent>
+      </StyledDialog>
     </Container>
   );
 };
