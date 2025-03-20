@@ -94,7 +94,7 @@ const CreatePrizePage = () => {
         // Handle non-successful responses (e.g., 400, 500)
         setSubmitStatus({
           type: "error",
-          message: `حدث خطأ أثناء إنشاء الجائزة.  رمز الحالة: ${response.status}`,
+          message: `حدث خطأ أثناء إنشاء الجائزة.  رمز الحالة: ${response.status} - ${response.data}`,
         });
         console.error(
           "Error creating prize: Status",
@@ -116,7 +116,7 @@ const CreatePrizePage = () => {
         console.error("Response status:", error.response.status);
         console.error("Response headers:", error.response.headers);
         errorMessage = `حدث خطأ من الخادم: ${error.response.status} - ${
-          error.response.data.message || "تفاصيل غير متوفرة"
+          error.response.data.details || "تفاصيل غير متوفرة"
         }`; // Try to use server-provided error message if available.
       } else if (error.request) {
         // The request was made but no response was received

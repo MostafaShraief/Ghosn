@@ -1,130 +1,56 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
-  List,
-  ListItem,
-  ListItemText,
-  ListItemAvatar,
   Typography,
   Box,
-  Button,
-  Avatar,
-  Card,
-  CardContent,
   Grid,
-  LinearProgress,
   CircularProgress,
-} from "@mui/material";
+  Alert,
+  useTheme,
+  Button,
+} from "@mui/material"; // Added Button
 import { useNavigate } from "react-router-dom";
-import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
-import api from "@/services/api";
+import Leaderboard from "@/components/Leaderboard";
+import PrizeCountdown from "@/components/PrizeCountdown";
+import { fetchPlans, fetchNearestPrize, fetchWinner } from "@/services/api";
+import { Skeleton } from "@mui/material";
 
 const AwardsPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [daysRemaining, setDaysRemaining] = useState(0);
-  const [competitionEnded, setCompetitionEnded] = useState(false);
-  const [sortedClients, setSortedClients] = useState([]);
-  const [prize, setPrize] = useState({
-    prizeID: 0,
-    prizeMoney: 0,
-    date: null,
-  });
+  const [clients, setClients] = useState([]);
+  const [prize, setPrize] = useState({ prizeID: 0, prizeMoney: 0, date: null });
+  const theme = useTheme();
+  const [showAlert, setShowAlert] = useState(false);
+  const [simulatedDaysRemaining, setSimulatedDaysRemaining] = useState(null); // Track simulated days
 
-  // Fetch the plans ordered by area
-  const fetchPlans = async () => {
-    try {
-      const response = await api.get("/api/Ghosn/Plans/OrderByArea");
-      // Transform the data to match your client structure
-      const clientsData = response.data.map((plan, index) => ({
-        id: index + 1, // You might need to adjust this if you have actual client IDs
-        firstName: plan.name.split(" ")[0] || "Client", // Assuming name format is "FirstName LastName"
-        lastName: plan.name.split(" ")[1] || `#${index + 1}`,
-        areaSize: plan.areaSize,
-      }));
-      setSortedClients(clientsData);
-    } catch (err) {
-      console.error("Error fetching plans:", err);
-      setError("Failed to load leaderboard data");
-    }
-  };
-
-  // Fetch the nearest prize
-  const fetchPrize = async () => {
-    try {
-      const response = await api.get("/api/Ghosn/Prizes/Nearest");
-      setPrize({
-        prizeID: response.data.prizeID,
-        prizeMoney: response.data.prizeMoney,
-        date: new Date(response.data.date),
-      });
-
-      // Calculate days remaining
-      if (response.data.date) {
-        const today = new Date();
-        const prizeDate = new Date(response.data.date);
-        const diffTime = prizeDate - today;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        setDaysRemaining(Math.max(0, diffDays));
-        setCompetitionEnded(diffDays <= 0);
-      }
-    } catch (err) {
-      console.error("Error fetching prize:", err);
-      setError("Failed to load prize information");
-    }
-  };
-
-  // Fetch winner when competition ends
-  const fetchWinner = async () => {
-    try {
-      const response = await api.get("/api/Ghosn/Plan/ProduceWinner");
-
-      // Get current user ID from localStorage
-      const loggedInClientId = parseInt(localStorage.getItem("clientID"));
-
-      // Show alert if current user is the winner
-      if (response.data.planID === loggedInClientId) {
-        alert(
-          `لقد فزت بجائزة قيمتها ${response.data.prizeMoney}! تحقق من إشعاراتك.`
-        );
-      }
-
-      // Create winner object from API response
-      const winner = {
-        id: response.data.planID,
-        firstName: response.data.name.split(" ")[0] || "",
-        lastName: response.data.name.split(" ")[1] || "",
-        fullName: response.data.name,
-      };
-
-      // Create prize object from API response
-      const prizeData = {
-        prizeID: prize.prizeID,
-        prizeMoney: response.data.prizeMoney,
-        prizeDate: response.data.prizeDate,
-      };
-
-      // Navigate to winner page with data
-      navigate("/app/winner-form", {
-        state: {
-          winner,
-          prize: prizeData,
-        },
-      });
-    } catch (err) {
-      console.error("Error fetching winner:", err);
-      // Don't set error state as this might be an optional operation
-    }
-  };
-
-  // Load data on component mount
+  // Load data on component mount (same as before)
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
+      setError(null);
       try {
-        await Promise.all([fetchPlans(), fetchPrize()]);
+        const [plansData, prizeData] = await Promise.all([
+          fetchPlans(),
+          fetchNearestPrize(),
+        ]);
+        setClients(plansData);
+        setPrize(prizeData);
+        //Initialize simulatedDaysRemaining with actual days remaining:
+        if (prizeData.date) {
+          const today = new Date();
+          const prizeDate = new Date(prizeData.date);
+          const diffTime = prizeDate.getTime() - today.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          setSimulatedDaysRemaining(Math.max(0, diffDays));
+        }
       } catch (err) {
         console.error("Error loading data:", err);
+        console.log(err.response.data);
+        setError(
+          "حدث خطأ أثناء تحميل البيانات.  يرجى المحاولة مرة أخرى. تفاصيل المشكلة: " +
+            err.response.data
+        );
       } finally {
         setLoading(false);
       }
@@ -133,51 +59,119 @@ const AwardsPage = () => {
     loadData();
   }, []);
 
-  // Check if competition has ended and fetch winner
+  const handleSimulateDay = useCallback(() => {
+    setSimulatedDaysRemaining((prev) => {
+      const newRemaining = Math.max(0, prev - 1); // Decrement, but not below 0
+      if (newRemaining === 0) {
+        checkWinnerForSimulation(); // Call a separate function for simulation
+      }
+      return newRemaining;
+    });
+  }, []);
+
+  const checkWinnerForSimulation = useCallback(async () => {
+    setLoading(true);
+    try {
+      const winnerData = await fetchWinner();
+      const loggedInClientId = parseInt(localStorage.getItem("clientID"));
+
+      if (winnerData.planID === loggedInClientId) {
+        setShowAlert(true); // Show alert only for the logged-in user
+      }
+
+      navigate("/app/winner-form", {
+        state: {
+          winner: {
+            id: winnerData.planID,
+            firstName: winnerData.name.split(" ")[0] || "",
+            lastName: winnerData.name.split(" ")[1] || "",
+            fullName: winnerData.name,
+          },
+          prize: {
+            prizeID: prize.prizeID, //Keep using the *current* prize ID
+            prizeMoney: winnerData.prizeMoney,
+            prizeDate: winnerData.prizeDate,
+          },
+        },
+      });
+    } catch (err) {
+      console.error("Error fetching winner during simulation:", err);
+      setError("حدث خطأ أثناء محاكاة الفائز."); // Show simulation-specific error
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate, prize.prizeID]);
+
+  const checkWinner = useCallback(
+    async (currentPrize) => {
+      if (!currentPrize?.date) return;
+
+      const today = new Date();
+      const prizeDate = new Date(currentPrize.date);
+      // Real Check winner
+      if (prizeDate <= today && simulatedDaysRemaining === null) {
+        try {
+          const winnerData = await fetchWinner();
+          // Get current user ID from localStorage
+          const loggedInClientId = parseInt(localStorage.getItem("clientID"));
+
+          // Show alert if current user is the winner
+          if (winnerData.planID === loggedInClientId) {
+            setShowAlert(true);
+          }
+          navigate("/app/winner-form", {
+            state: {
+              winner: {
+                id: winnerData.planID,
+                firstName: winnerData.name.split(" ")[0] || "",
+                lastName: winnerData.name.split(" ")[1] || "",
+                fullName: winnerData.name,
+              },
+              prize: {
+                prizeID: prize.prizeID,
+                prizeMoney: winnerData.prizeMoney,
+                prizeDate: winnerData.prizeDate,
+              },
+            },
+          });
+        } catch (winnerErr) {
+          console.error("Error fetching winner (in checkWinner):", winnerErr);
+        }
+      }
+    },
+    [navigate, prize.prizeID, simulatedDaysRemaining]
+  );
+
   useEffect(() => {
-    if (competitionEnded) {
-      fetchWinner();
-    }
-  }, [competitionEnded]);
-
-  // This is for demonstration only - in a real app, you wouldn't simulate days passing
-  const handleSimulateDay = () => {
-    setDaysRemaining((prev) => Math.max(0, prev - 1));
-    if (daysRemaining <= 1) {
-      setCompetitionEnded(true);
-    }
-  };
-
-  const getRankingColor = (rank) => {
-    if (rank === 0) return "gold";
-    if (rank === 1) return "silver";
-    if (rank === 2) return "#cd7f32"; // Bronze
-    return "transparent"; // Default color
-  };
-
-  const getRankingIcon = (rank) => {
-    if (rank < 3) return <MilitaryTechIcon />;
-    return null;
-  };
+    checkWinner(prize);
+  }, [checkWinner, prize]);
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress />
+      // Same loading screen as before
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          الجوائز / قائمة المتصدرين
+        </Typography>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
+            <Skeleton variant="rectangular" width="100%" height={120} />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Skeleton variant="rectangular" width="100%" height={120} />
+          </Grid>
+          <Grid item xs={12}>
+            <Skeleton variant="rectangular" width="100%" height={200} />
+          </Grid>
+        </Grid>
       </Box>
     );
   }
 
   if (error) {
+    // Same error handling as before
     return (
-      <Box sx={{ p: 3 }}>
+      <Box dir="rtl" sx={{ p: 3 }}>
         <Typography color="error" variant="h6">
           {error}
         </Typography>
@@ -193,95 +187,44 @@ const AwardsPage = () => {
       <Typography variant="h4" component="h1" gutterBottom>
         الجوائز / قائمة المتصدرين
       </Typography>
-
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={6}>
-              <Typography variant="h6" component="h2">
-                الموعد النهائي
-              </Typography>
-              <Typography variant="h5" color="primary">
-                {daysRemaining} أيام متبقية
-              </Typography>
-              {/* Optional: Linear Progress Bar */}
-              <LinearProgress
-                variant="determinate"
-                value={(daysRemaining / 30) * 100} // Assuming 30 days is the maximum
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="h6" component="h2">
-                الجائزة الحالية
-              </Typography>
-              <Typography variant="h5">$ {prize.prizeMoney}</Typography>
-              {prize.date && (
-                <Typography variant="body2">
-                  {new Date(prize.date).toLocaleDateString("ar-SY")}
-                </Typography>
-              )}
-            </Grid>
-          </Grid>
-          <Box mt={2}>
-            <Button variant="contained" onClick={handleSimulateDay}>
-              محاكاة مرور يوم
-            </Button>
-          </Box>
-        </CardContent>
-      </Card>
-
-      <Typography variant="h5" component="h2" gutterBottom>
-        قائمة المتصدرين
-      </Typography>
-
-      <List>
-        {sortedClients.map((client, index) => (
-          <Card
-            key={client.id}
-            sx={{
-              mb: 2,
-              bgcolor: getRankingColor(index),
-              borderRadius: 2,
-              boxShadow: index < 3 ? 3 : 1, // Add more shadow for top 3
-              border: index < 3 ? "2px solid" : "none",
-            }}
-          >
-            <CardContent>
-              <ListItem disableGutters>
-                <ListItemAvatar>
-                  <Avatar
-                    sx={{
-                      bgcolor:
-                        getRankingColor(index) !== "transparent"
-                          ? getRankingColor(index)
-                          : "grey.300",
-                    }}
-                  >
-                    {client.firstName.charAt(0)}
-                    {client.lastName.charAt(0)}
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary={`${client.firstName} ${client.lastName}`}
-                  secondary={`المساحة: ${client.areaSize} متر مربع`}
-                  primaryTypographyProps={{
-                    variant: "h6",
-                    fontWeight: index < 3 ? 700 : 400,
-                  }}
-                />
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  {getRankingIcon(index)}
-                  <Typography variant="h6" sx={{ ml: 1 }}>
-                    {index + 1}
-                  </Typography>
-                </Box>
-              </ListItem>
-            </CardContent>
-          </Card>
-        ))}
-      </List>
+      {showAlert && (
+        <Alert
+          severity="success"
+          onClose={() => setShowAlert(false)}
+          sx={{ mb: 2 }}
+        >
+          لقد فزت بجائزة! تحقق من إشعاراتك.
+        </Alert>
+      )}
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <PrizeCountdown
+            prize={{
+              ...prize,
+              date:
+                simulatedDaysRemaining !== null
+                  ? addDays(new Date(), simulatedDaysRemaining)
+                  : prize.date,
+            }} // Use simulated date if available
+            onSimulateDay={handleSimulateDay}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="h5" component="h2" gutterBottom>
+            قائمة المتصدرين
+          </Typography>
+          <Leaderboard clients={clients} />
+        </Grid>
+      </Grid>
     </Box>
   );
 };
+
+// Helper function to add days to a date (for simulation)
+function addDays(date, days) {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
 
 export default AwardsPage;

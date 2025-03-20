@@ -92,4 +92,34 @@ export const getNotifications = async () => {
   }
 };
 
+export const fetchPlans = async () => {
+  const response = await api.get("/api/Ghosn/Plans/OrderByArea");
+  return response.data.map((plan, index) => ({
+    id: index + 1, // Or use plan.id if you have it
+    name: plan.name || "Client name",
+    firstName: plan.name.split(" ")[0] || "Client",
+    lastName: plan.name.split(" ")[1] || `#${index + 1}`,
+    areaSize: plan.areaSize,
+  }));
+};
+
+export const fetchNearestPrize = async () => {
+  const response = await api.get("/api/Ghosn/Prizes/Nearest");
+  return {
+    prizeID: response.data.prizeID,
+    prizeMoney: response.data.prizeMoney,
+    date: new Date(response.data.date),
+  };
+};
+
+export const fetchWinner = async () => {
+  const response = await api.get("/api/Ghosn/Plan/ProduceWinner");
+  return {
+    planID: response.data.planID,
+    name: response.data.name,
+    prizeMoney: response.data.prizeMoney,
+    prizeDate: response.data.prizeDate,
+  };
+};
+
 export default api;
