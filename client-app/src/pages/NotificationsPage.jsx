@@ -81,19 +81,21 @@ function NotificationsPage() {
   const [snackbarOpen, setSnackbarOpen] = useState(false); //for showing error in snackbar
 
   const theme = useTheme(); // Get the current theme
-
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         const fetchedNotifications = await getNotifications();
 
+        // Sort notifications by dateAndTime in descending order (newest first)
+        const sortedNotifications = fetchedNotifications.sort(
+          (a, b) => new Date(b.dateAndTime) - new Date(a.dateAndTime)
+        );
+
         // Improved notification type handling and date formatting
-        const formattedNotifications = fetchedNotifications.map(
+        const formattedNotifications = sortedNotifications.map(
           (notification) => {
             let icon;
-            switch (
-              notification.type // Consider adding a 'type' field in your API
-            ) {
+            switch (notification.type) {
               case "success":
                 icon = <CheckCircleIcon color="success" />;
                 break;
@@ -104,7 +106,7 @@ function NotificationsPage() {
                 icon = <InfoIcon color="info" />;
                 break;
               default:
-                icon = <NotificationsIcon />; // Default icon
+                icon = <NotificationsIcon />;
             }
 
             return {
@@ -115,28 +117,23 @@ function NotificationsPage() {
                 addSuffix: true,
                 locale: ar,
               }),
-              read: notification.read || false, //  Handle existing 'read' status, default to false if not present
-              icon: icon, // Add the icon to the notification object
+              read: notification.read || false,
+              icon: icon,
             };
           }
         );
 
         setNotifications(formattedNotifications);
       } catch (err) {
-        setError(err.message || "Failed to fetch notifications."); // Store error message
-        setSnackbarOpen(true); // Open the snackbar
+        setError(err.message || "Failed to fetch notifications.");
+        setSnackbarOpen(true);
       } finally {
         setLoading(false);
       }
     };
     fetchNotifications();
 
-    // Cleanup function:  This is important to avoid memory leaks if
-    //the component unmounts before the timeout finishes.  It's a good
-    //practice for any asynchronous operations within useEffect.
-    return () => {
-      //  clearTimeout(timer);  //No timer here but added to prevent error
-    };
+    return () => {};
   }, []);
 
   const handleNotificationClick = (id) => {
