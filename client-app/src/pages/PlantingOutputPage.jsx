@@ -1,3 +1,4 @@
+// client-app/src/pages/PlantingOutputPage.jsx
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -10,6 +11,8 @@ import {
   CircularProgress,
   useMediaQuery,
   Avatar,
+  Snackbar, // Import Snackbar
+  Alert, // Import Alert
 } from "@mui/material";
 import {
   LocalFlorist as PlantIcon,
@@ -18,6 +21,7 @@ import {
   CalendarMonth as ScheduleIcon,
   Build as MaterialsIcon,
   Info as InfoIcon,
+  Save as SaveIcon, // Icon for the save button
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "@/services/api";
@@ -92,8 +96,6 @@ const HeaderIcon = styled(Avatar)(({ theme }) => ({
   marginRight: theme.spacing(2),
 }));
 
-// --- Main Component ---
-
 const PlantingOutputPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -101,6 +103,9 @@ const PlantingOutputPage = () => {
   const [aiOutput, setAiOutput] = useState(null);
   const [userInputs, setUserInputs] = useState(null);
   const isMdDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
+  const [snackbarOpen, setSnackbarOpen] = useState(false); // State for Snackbar
+  const [snackbarMessage, setSnackbarMessage] = useState(""); // Message for Snackbar
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // Severity for Snackbar
 
   const handleChatClick = () => {
     navigate("/chat");
@@ -126,6 +131,50 @@ const PlantingOutputPage = () => {
     };
     fetchData();
   }, [location.state]);
+
+  const handleSavePlan = async () => {
+    if (!aiOutput) {
+      setSnackbarMessage("لا توجد خطة لحفظها.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+      return;
+    }
+
+    // Assuming you have a client ID. Replace '123' with the actual client ID.
+    // You might get the client ID from user authentication or context.
+    const clientId = 2;
+
+    const payload = {
+      planID: 0, // Usually, the API handles ID generation on creation, so it could be 0 or omitted.
+      clientID: clientId,
+      output: aiOutput, // Send the generated plan data directly.
+      input: userInputs,
+    };
+
+    try {
+      const response = await api.post(`/api/Ghosn/Plan/${clientId}`, payload);
+      console.log("Plan saved:", response.data);
+      setSnackbarMessage("تم حفظ الخطة بنجاح!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error("Error saving plan:", error.response || error);
+      setSnackbarMessage(
+        `حدث خطأ أثناء حفظ الخطة: ${
+          error.response?.data?.message || error.message || "Unknown error"
+        }`
+      );
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
 
   if (loading) {
     return (
@@ -378,23 +427,56 @@ const PlantingOutputPage = () => {
         </Grid>
       </Grid>
 
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleChatClick}
-        sx={{
-          mt: 4,
-          px: 5,
-          py: 1.5,
-          borderRadius: 25,
-          fontSize: "1.1rem",
-          textTransform: "none",
-          fontWeight: "bold",
-          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
-        }}
+      <Box sx={{ display: "flex", gap: 2, mt: 4, justifyContent: "center" }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleChatClick}
+          startIcon={<MaterialsIcon />} // You can replace MaterialsIcon with a suitable chat icon.
+          sx={{
+            px: 5,
+            py: 1.5,
+            borderRadius: 25,
+            fontSize: "1.1rem",
+            textTransform: "none",
+            fontWeight: "bold",
+            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+          }}
+        >
+          التحدث مع المخرجات
+        </Button>
+        <Button
+          variant="contained"
+          color="secondary" // Use a different color to distinguish
+          onClick={handleSavePlan}
+          startIcon={<SaveIcon />}
+          sx={{
+            px: 5,
+            py: 1.5,
+            borderRadius: 25,
+            fontSize: "1.1rem",
+            textTransform: "none",
+            fontWeight: "bold",
+            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+          }}
+        >
+          حفظ الخطة
+        </Button>
+      </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        التحدث مع المخرجات
-      </Button>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

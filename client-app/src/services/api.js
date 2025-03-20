@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://mostafashraief.bsite.net";
+  import.meta.env.VITE_API_URL || "http://ghosnwebsite.runasp.net/";
 
 export const api = axios.create({
   baseURL: API_URL,
