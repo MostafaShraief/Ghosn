@@ -1,4 +1,3 @@
-// client-app/src/pages/PlantingOutputPage.jsx
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -109,7 +108,7 @@ const PlantingOutputPage = () => {
   const [isSaving, setIsSaving] = useState(false); // Loading state for saving
 
   const handleChatClick = () => {
-    navigate("/chat");
+    navigate("/app/chat");
   };
 
   useEffect(() => {
