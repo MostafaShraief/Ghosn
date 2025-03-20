@@ -3,7 +3,7 @@ import axios from "axios";
 const API_URL =
   import.meta.env.VITE_API_URL || "http://mostafashraief.bsite.net";
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
@@ -79,9 +79,7 @@ export const login = async (username, password) => {
 // Added function to fetch notifications
 export const getNotifications = async () => {
   try {
-    const response = await api.get(
-      "/api/Ghosn/Notifications/AllClientNotifications"
-    );
+    const response = await api.get("/api/Ghosn/AllNotifications");
     return response.data;
   } catch (error) {
     console.error("Error fetching notifications:", error);
