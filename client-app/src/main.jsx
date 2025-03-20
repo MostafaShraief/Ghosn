@@ -20,6 +20,7 @@ import WinnerFormPage from "@/pages/WinnerFormPage";
 import DonorHomePage from "@/pages/DonorHomePage";
 import CreatePrizePage from "@/pages/CreatePrizePage";
 import DirectSupportPage from "@/pages/DirectSupportPage";
+import ErrorPage from "@/pages/ErrorPage";
 
 export const drawerWidth = 260;
 
@@ -99,6 +100,7 @@ const AppRoutes = () => (
       <Route path="create-prize" element={<CreatePrizePage />} />
       <Route path="direct-support" element={<DirectSupportPage />} />
     </Route>
+    <Route path="*" element={<ErrorPage />} />
   </Routes>
 );
 
