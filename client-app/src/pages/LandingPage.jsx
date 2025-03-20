@@ -362,7 +362,7 @@ function LandingPage() {
                   fontWeight: "600",
                 }}
               >
-                المستخدمين
+                العملاء
               </Button>
               <Button
                 variant="outlined"
