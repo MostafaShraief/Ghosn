@@ -323,7 +323,7 @@ function LandingPage() {
                   alignItems: "center",
                 }}
               >
-                <img src={logo} alt="Ghosn Logo" height="40" />
+                <img src={logo} alt="Ghosn Logo" height="55" />
               </Link>
             </Typography>
             <Box
@@ -362,7 +362,7 @@ function LandingPage() {
                   fontWeight: "600",
                 }}
               >
-                العملاء
+                المستخدمين
               </Button>
               <Button
                 variant="outlined"
