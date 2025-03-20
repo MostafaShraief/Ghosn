@@ -89,7 +89,7 @@ const NoDataText = styled(Typography)(({ theme }) => ({
 const HeaderIcon = styled(Avatar)(({ theme }) => ({
   backgroundColor: theme.palette.common.white,
   color: theme.palette.primary.main,
-  marginLeft: theme.spacing(2),
+  marginRight: theme.spacing(2),
 }));
 
 // --- Main Component ---

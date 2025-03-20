@@ -162,7 +162,7 @@ const PlantingForm = () => {
     };
 
     try {
-      navigate("/planting-output", { state: { formData: payload } });
+      navigate("/app/planting-output", { state: { formData: payload } });
     } catch (error) {
       console.error("Error submitting data:", error);
     } finally {

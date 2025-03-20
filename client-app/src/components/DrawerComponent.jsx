@@ -1,4 +1,3 @@
-// client-app/src/components/DrawerComponent.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Drawer from "@mui/material/Drawer";
@@ -9,15 +8,20 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import AddIcon from "@mui/icons-material/Add";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import { deepOrange } from "@mui/material/colors";
-import Divider from "@mui/material/Divider";
-import ghosnImage from "@/assets/ghosn.png"; //  Replace with the correct path
-import { Agriculture, House } from "@mui/icons-material";
-import LogoutIcon from "@mui/icons-material/Logout"; // Import Logout icon
+import ghosnImage from "@/assets/ghosn.png";
+import {
+  Agriculture,
+  House,
+  MonetizationOn,
+  Support,
+} from "@mui/icons-material";
+import LogoutIcon from "@mui/icons-material/Logout";
 
-function DrawerComponent({ drawerWidth }) {
+function DrawerComponent({ drawerWidth, userType = "client" }) {
   const [recentChatsOpen, setRecentChatsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
@@ -25,42 +29,57 @@ function DrawerComponent({ drawerWidth }) {
   const location = useLocation();
 
   useEffect(() => {
-    // Check for login status and get user data
-    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
-    setIsLoggedIn(loggedIn);
+    const firstName = localStorage.getItem("firstName");
+    const lastName = localStorage.getItem("lastName");
 
-    if (loggedIn) {
-      const firstName = localStorage.getItem("firstName");
-      const lastName = localStorage.getItem("lastName");
-      // Combine first and last name (or use just one if preferred)
+    if (firstName && lastName) {
+      setIsLoggedIn(true);
       setUserName(`${firstName} ${lastName}`);
+    } else {
+      setIsLoggedIn(false);
+      setUserName("");
     }
-  }, []);
-
-  const handleRecentChatsClick = () => {
-    setRecentChatsOpen(!recentChatsOpen);
-  };
+  }, [location]);
 
   const handleLogout = () => {
-    // Clear user data from localStorage
     localStorage.removeItem("clientID");
     localStorage.removeItem("firstName");
     localStorage.removeItem("lastName");
-    localStorage.removeItem("isLoggedIn");
-
-    // Redirect to login page
-    navigate("/login");
+    navigate("/app/login");
   };
 
-  if (location.pathname === "/login") {
+  if (location.pathname === "/app/login") {
     return null;
   }
+
+  const clientItems = [
+    { text: "الصفحة الرئيسية", to: "/app", icon: <House /> },
+    { text: "إضافة خطة زراعة", to: "/app/planting-form", icon: <AddIcon /> },
+    {
+      text: "الإشعارات",
+      to: "/app/notifications",
+      icon: <NotificationsIcon />,
+    },
+    { text: "خطط الزراعية السابقة", to: "/app/plans", icon: <Agriculture /> },
+    { text: "الجوائز", to: "/app/awards", icon: <EmojiEventsIcon /> },
+  ];
+
+  const donorItems = [
+    { text: "الصفحة الرئيسية", to: "/donor", icon: <House /> },
+    {
+      text: "إنشاء جائزة",
+      to: "/donor/create-prize",
+      icon: <MonetizationOn />,
+    },
+    { text: "الدعم المباشر", to: "/donor/direct-support", icon: <Support /> },
+  ];
+
+  const menuItems = userType === "donor" ? donorItems : clientItems;
 
   return (
     <Drawer
       variant="permanent"
-      dir="rtl"
-      anchor="right"
+      anchor="left"
       sx={{
         width: drawerWidth,
         flexShrink: 0,
@@ -85,25 +104,8 @@ function DrawerComponent({ drawerWidth }) {
         }}
       />
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-        <List sx={{ px: 1 }}>
-          {[
-            { text: "الصفحة الرئيسية", to: "/", icon: <House /> },
-            {
-              text: "إضافة خطة زراعة",
-              to: "/planting-form",
-              icon: <AddIcon />,
-            },
-            {
-              text: "الإشعارات",
-              to: "/notifications",
-              icon: <NotificationsIcon />,
-            },
-            {
-              text: "خطط الزراعية السابقة",
-              to: "/plans",
-              icon: <Agriculture />,
-            },
-          ].map((item) => (
+        <List sx={{ px: 1, textAlignLast: "start" }}>
+          {menuItems.map((item) => (
             <ListItem key={item.text} disablePadding>
               <ListItemButton
                 onClick={() => navigate(item.to)}
@@ -128,54 +130,54 @@ function DrawerComponent({ drawerWidth }) {
           ))}
         </List>
 
-        <Box sx={{ mt: "auto", p: 2 }}>
-          <Divider sx={{ mb: 2 }} />
-          {isLoggedIn ? ( // Conditionally render based on login status
-            <ListItemButton
-              onClick={handleLogout} // Call handleLogout on click
-              sx={{
-                color: "primary.main",
-                borderRadius: 2,
-                p: 1,
-                "&:hover": { opacity: 0.9 },
-                borderColor: "primary.main",
-              }}
-            >
-              <Avatar sx={{ bgcolor: deepOrange[500], width: 32, height: 32 }}>
-                {userName.charAt(0).toUpperCase()}{" "}
-                {/* Display first letter of name */}
-              </Avatar>
-              <ListItemText
-                primary={userName} // Display the user's name
-                primaryTypographyProps={{ fontWeight: 500 }}
-                sx={{ textAlign: "right", pr: 2 }}
-              />
-              <ListItemIcon>
-                <LogoutIcon /> {/* Add a logout icon */}
-              </ListItemIcon>
-            </ListItemButton>
-          ) : (
-            <ListItemButton
-              onClick={() => navigate("/login")}
-              sx={{
-                color: "primary.main",
-                borderRadius: 2,
-                p: 1,
-                "&:hover": { opacity: 0.9 },
-                borderColor: "primary.main",
-              }}
-            >
-              <Avatar sx={{ bgcolor: deepOrange[500], width: 32, height: 32 }}>
-                U
-              </Avatar>
-              <ListItemText
-                primary={"تسجيل الدخول"}
-                primaryTypographyProps={{ fontWeight: 500 }}
-                sx={{ textAlign: "right", pr: 2 }}
-              />
-            </ListItemButton>
-          )}
-        </Box>
+        {userType === "client" && (
+          <Box sx={{ mt: "auto", p: 2 }}>
+            {isLoggedIn ? (
+              <ListItemButton
+                onClick={handleLogout}
+                sx={{
+                  color: "primary.main",
+                  borderRadius: 2,
+                  p: 1,
+                  "&:hover": { opacity: 0.9 },
+                  borderColor: "primary.main",
+                }}
+              >
+                <Avatar
+                  sx={{ bgcolor: deepOrange[500], width: 32, height: 32 }}
+                >
+                  {userName.charAt(0).toUpperCase()}
+                </Avatar>
+                <ListItemText
+                  primary={userName}
+                  primaryTypographyProps={{ fontWeight: 500 }}
+                  sx={{ textAlign: "right", pr: 2 }}
+                />
+                <ListItemIcon>
+                  <LogoutIcon />
+                </ListItemIcon>
+              </ListItemButton>
+            ) : (
+              <ListItemButton
+                onClick={() => navigate("/app/login")}
+                sx={{
+                  color: "primary.main",
+                  border: "black 1px solid",
+                  borderRadius: 2,
+                  p: 1,
+                  "&:hover": { opacity: 0.9 },
+                  borderColor: "primary.main",
+                }}
+              >
+                <ListItemText
+                  primary={"تسجيل الدخول"}
+                  primaryTypographyProps={{ fontWeight: 500 }}
+                  sx={{ textAlign: "right", pr: 2, textAlignLast: "center" }}
+                />
+              </ListItemButton>
+            )}
+          </Box>
+        )}
       </Box>
     </Drawer>
   );
