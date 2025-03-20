@@ -1,3 +1,5 @@
+Site link: https://ghosn-samacode.netlify.app/
+
 Ghosn is an AI-driven smart farming platform designed to help farmers and agricultural enthusiasts generate optimized farming plans based on their specific environmental conditions. The project was developed as part of **Salam Hack 2025** to showcase the power of **Generative AI** in agriculture.  
 
 ## 🚀 Features  
