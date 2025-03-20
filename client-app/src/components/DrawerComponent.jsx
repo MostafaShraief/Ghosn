@@ -130,50 +130,54 @@ function DrawerComponent({ drawerWidth, userType = "client" }) {
           ))}
         </List>
 
-        <Box sx={{ mt: "auto", p: 2 }}>
-          {isLoggedIn ? (
-            <ListItemButton
-              onClick={handleLogout}
-              sx={{
-                color: "primary.main",
-                borderRadius: 2,
-                p: 1,
-                "&:hover": { opacity: 0.9 },
-                borderColor: "primary.main",
-              }}
-            >
-              <Avatar sx={{ bgcolor: deepOrange[500], width: 32, height: 32 }}>
-                {userName.charAt(0).toUpperCase()}
-              </Avatar>
-              <ListItemText
-                primary={userName}
-                primaryTypographyProps={{ fontWeight: 500 }}
-                sx={{ textAlign: "right", pr: 2 }}
-              />
-              <ListItemIcon>
-                <LogoutIcon />
-              </ListItemIcon>
-            </ListItemButton>
-          ) : (
-            <ListItemButton
-              onClick={() => navigate("/app/login")}
-              sx={{
-                color: "primary.main",
-                border: "black 1px solid",
-                borderRadius: 2,
-                p: 1,
-                "&:hover": { opacity: 0.9 },
-                borderColor: "primary.main",
-              }}
-            >
-              <ListItemText
-                primary={"تسجيل الدخول"}
-                primaryTypographyProps={{ fontWeight: 500 }}
-                sx={{ textAlign: "right", pr: 2, textAlignLast: "center" }}
-              />
-            </ListItemButton>
-          )}
-        </Box>
+        {userType === "client" && (
+          <Box sx={{ mt: "auto", p: 2 }}>
+            {isLoggedIn ? (
+              <ListItemButton
+                onClick={handleLogout}
+                sx={{
+                  color: "primary.main",
+                  borderRadius: 2,
+                  p: 1,
+                  "&:hover": { opacity: 0.9 },
+                  borderColor: "primary.main",
+                }}
+              >
+                <Avatar
+                  sx={{ bgcolor: deepOrange[500], width: 32, height: 32 }}
+                >
+                  {userName.charAt(0).toUpperCase()}
+                </Avatar>
+                <ListItemText
+                  primary={userName}
+                  primaryTypographyProps={{ fontWeight: 500 }}
+                  sx={{ textAlign: "right", pr: 2 }}
+                />
+                <ListItemIcon>
+                  <LogoutIcon />
+                </ListItemIcon>
+              </ListItemButton>
+            ) : (
+              <ListItemButton
+                onClick={() => navigate("/app/login")}
+                sx={{
+                  color: "primary.main",
+                  border: "black 1px solid",
+                  borderRadius: 2,
+                  p: 1,
+                  "&:hover": { opacity: 0.9 },
+                  borderColor: "primary.main",
+                }}
+              >
+                <ListItemText
+                  primary={"تسجيل الدخول"}
+                  primaryTypographyProps={{ fontWeight: 500 }}
+                  sx={{ textAlign: "right", pr: 2, textAlignLast: "center" }}
+                />
+              </ListItemButton>
+            )}
+          </Box>
+        )}
       </Box>
     </Drawer>
   );

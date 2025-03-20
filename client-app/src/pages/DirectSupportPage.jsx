@@ -1,3 +1,4 @@
+// client-app/src/pages/DirectSupportPage.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -12,6 +13,8 @@ import {
   Alert,
   Tabs,
   Tab,
+  Grid, // Import Grid
+  CircularProgress, // Import CircularProgress
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -25,6 +28,7 @@ const DirectSupportPage = () => {
   });
   const [errors, setErrors] = useState({});
   const [submitStatus, setSubmitStatus] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Loading state
 
   // Mock plan data - replace with actual data from your backend
   const plans = [
@@ -83,6 +87,9 @@ const DirectSupportPage = () => {
 
     if (!validateForm()) return;
 
+    setIsSubmitting(true); // Start loading
+    setSubmitStatus(null); // Clear previous status
+
     try {
       if (tabValue === 0) {
         // Agricultural Tools submission
@@ -93,6 +100,7 @@ const DirectSupportPage = () => {
 
         // Simulated API call - replace with your actual endpoint
         console.log("Submitting tools support:", supportData);
+        // await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
         // const response = await fetch('/api/support/tools', {
         //   method: 'POST',
         //   headers: { 'Content-Type': 'application/json' },
@@ -113,6 +121,7 @@ const DirectSupportPage = () => {
 
         // Simulated API call - replace with your actual endpoint
         console.log("Submitting financial support:", supportData);
+        // await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
         // const response = await fetch('/api/support/financial', {
         //   method: 'POST',
         //   headers: { 'Content-Type': 'application/json' },
@@ -139,12 +148,22 @@ const DirectSupportPage = () => {
         type: "error",
         message: "حدث خطأ أثناء تقديم الدعم. يرجى المحاولة مرة أخرى",
       });
+      console.error("Error submitting support:", error); // Log errors
+    } finally {
+      setIsSubmitting(false); // End loading
     }
   };
 
   return (
-    <Box sx={{ p: 4, maxWidth: 600, mx: "auto" }}>
-      <Typography variant="h4" gutterBottom>
+    <Box
+      sx={{
+        p: 3, // Reduced padding for overall box
+        mx: "auto",
+      }}
+    >
+      <Typography variant="h5" gutterBottom component="h2">
+        {" "}
+        {/* Changed to h5 and component */}
         الدعم المباشر
       </Typography>
 
@@ -153,90 +172,110 @@ const DirectSupportPage = () => {
         <Tab label="دعم مالي لخطة" />
       </Tabs>
 
-      <Paper elevation={3} sx={{ p: 3 }}>
+      <Paper
+        elevation={3}
+        sx={{
+          p: 3,
+          backgroundColor: "background.paper", // Ensure paper background matches theme
+        }}
+      >
         <Box component="form" onSubmit={handleSubmit} noValidate>
-          {tabValue === 0 ? (
-            // Agricultural Tools Form
-            <TextField
-              fullWidth
-              label="قيمة الدعم للأدوات الزراعية"
-              value={formData.toolAmount}
-              onChange={handleChange("toolAmount")}
-              error={!!errors.toolAmount}
-              helperText={errors.toolAmount}
-              type="number"
-              sx={{ mb: 3 }}
-              InputProps={{ inputProps: { min: 1 } }}
-            />
-          ) : (
-            // Financial Support Form
-            <>
-              <FormControl
+          <Grid container spacing={3}>
+            {" "}
+            {/* Grid container for layout */}
+            {tabValue === 0 ? (
+              // Agricultural Tools Form
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="قيمة الدعم للأدوات الزراعية"
+                  value={formData.toolAmount}
+                  onChange={handleChange("toolAmount")}
+                  error={!!errors.toolAmount}
+                  helperText={errors.toolAmount}
+                  type="number"
+                  InputProps={{ inputProps: { min: 1 } }}
+                />
+              </Grid>
+            ) : (
+              // Financial Support Form
+              <>
+                <Grid item xs={12}>
+                  <FormControl fullWidth error={!!errors.selectedPlan}>
+                    <InputLabel>اختر خطة لدعمها</InputLabel>
+                    <Select
+                      value={formData.selectedPlan}
+                      onChange={handleChange("selectedPlan")}
+                      label="اختر خطة لدعمها"
+                    >
+                      {plans.map((plan) => (
+                        <MenuItem key={plan.id} value={plan.id}>
+                          {plan.name} - {plan.location}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.selectedPlan && (
+                      <Typography color="error" variant="caption">
+                        {errors.selectedPlan}
+                      </Typography>
+                    )}
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="قيمة الدعم المالي"
+                    value={formData.financialAmount}
+                    onChange={handleChange("financialAmount")}
+                    error={!!errors.financialAmount}
+                    helperText={errors.financialAmount}
+                    type="number"
+                    InputProps={{ inputProps: { min: 1 } }}
+                  />
+                </Grid>
+              </>
+            )}
+            <Grid item xs={12}>
+              {submitStatus && (
+                <Alert severity={submitStatus.type} sx={{ mb: 2 }}>
+                  {submitStatus.message}
+                </Alert>
+              )}
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Button
+                type="submit"
+                variant="contained"
+                size="large"
                 fullWidth
-                sx={{ mb: 3 }}
-                error={!!errors.selectedPlan}
+                disabled={isSubmitting} // Disable during submission
+                startIcon={
+                  isSubmitting && <CircularProgress size={20} color="inherit" />
+                } // Loading indicator
               >
-                <InputLabel>اختر خطة لدعمها</InputLabel>
-                <Select
-                  value={formData.selectedPlan}
-                  onChange={handleChange("selectedPlan")}
-                  label="اختر خطة لدعمها"
-                >
-                  {plans.map((plan) => (
-                    <MenuItem key={plan.id} value={plan.id}>
-                      {plan.name} - {plan.location}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.selectedPlan && (
-                  <Typography color="error" variant="caption">
-                    {errors.selectedPlan}
-                  </Typography>
-                )}
-              </FormControl>
-
-              <TextField
+                تقديم الدعم
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={() => navigate("/donor")}
                 fullWidth
-                label="قيمة الدعم المالي"
-                value={formData.financialAmount}
-                onChange={handleChange("financialAmount")}
-                error={!!errors.financialAmount}
-                helperText={errors.financialAmount}
-                type="number"
-                sx={{ mb: 3 }}
-                InputProps={{ inputProps: { min: 1 } }}
-              />
-            </>
-          )}
-
-          {submitStatus && (
-            <Alert severity={submitStatus.type} sx={{ mb: 2 }}>
-              {submitStatus.message}
-            </Alert>
-          )}
-
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              sx={{ flex: 1 }}
-            >
-              تقديم الدعم
-            </Button>
-            <Button
-              variant="outlined"
-              size="large"
-              onClick={() => navigate("/donor")}
-              sx={{ flex: 1 }}
-            >
-              إلغاء
-            </Button>
-          </Box>
+                disabled={isSubmitting} // Disable during submission
+              >
+                إلغاء
+              </Button>
+            </Grid>
+          </Grid>
         </Box>
       </Paper>
 
-      <Typography variant="body2" sx={{ mt: 2, color: "text.secondary" }}>
+      <Typography
+        variant="body2"
+        sx={{ mt: 2, color: "text.secondary", textAlign: "center" }} // Centered text
+      >
         {tabValue === 0
           ? "سيتم استخدام الدعم لتوفير الأدوات الزراعية للمزارعين"
           : "سيتم إضافة الدعم المالي إلى الخطة المختارة وإعلام صاحب الخطة"}
