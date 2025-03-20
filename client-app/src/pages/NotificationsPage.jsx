@@ -31,8 +31,8 @@ import { styled } from "@mui/material/styles"; // Import styled
 // Styled component for the notification item
 const StyledListItem = styled(ListItem)(({ theme, read }) => ({
   backgroundColor: read
-    ? theme.palette.background.default
-    : theme.palette.action.selected, // Use a more subtle color
+    ? theme.palette.background.selected
+    : theme.palette.action.default, // Use a more subtle color
   borderRadius: theme.shape.borderRadius,
   marginBottom: theme.spacing(1),
   transition: "background-color 0.2s ease-in-out", // Smooth transition
