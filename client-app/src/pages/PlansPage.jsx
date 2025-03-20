@@ -24,6 +24,7 @@ import {
   CheckCircle as CheckCircleIcon,
   Cancel as CancelIcon,
   Close as CloseIcon,
+  MonetizationOn as MoneyIcon,
 } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import api from "@/services/api";
@@ -98,21 +99,24 @@ const HeaderIcon = styled(Avatar)(({ theme }) => ({
   height: 36,
 }));
 
-const CompletionButton = styled(Button)(({ theme, completed }) => ({
+const CompletionButton = styled(Button)(({ theme, completed, loading }) => ({
   borderRadius: theme.spacing(1),
   fontWeight: 600,
   backgroundColor: completed
     ? theme.palette.success.main
-    : theme.palette.warning.main,
+    : theme.palette.error.main,
   color: theme.palette.common.white,
   "&:hover": {
     backgroundColor: completed
       ? theme.palette.success.dark
-      : theme.palette.warning.dark,
+      : theme.palette.error.dark,
+    opacity: loading ? 0.8 : 1, // Reduce opacity during loading
   },
   margin: theme.spacing(1),
   display: "block",
-  width: "fit-content",
+  minWidth: "fit-content",
+  cursor: loading ? "not-allowed" : "pointer", // Change cursor during loading
+  pointerEvents: loading ? "none" : "auto", // Disable pointer events
 }));
 
 const StyledDialog = styled(Dialog)(({ theme }) => ({
@@ -130,14 +134,29 @@ const PlansPage = () => {
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [completionStatusMessage, setCompletionStatusMessage] = useState(null);
+  const [prizes, setPrizes] = useState({}); // Store prizes by prizeID
+  const [loadingCompletion, setLoadingCompletion] = useState({}); // Track loading state for each plan
 
   useEffect(() => {
     const fetchPlanSummaries = async () => {
       try {
         const response = await api.get("/api/Ghosn/Plans/summaries");
         setPlanSummaries(response.data);
+        const prizeIds = response.data
+          .map((summary) => summary.prizeID)
+          .filter((id) => id !== null);
+        const prizePromises = prizeIds.map((prizeId) =>
+          api.get(`/api/Ghosn/Prizes/${prizeId}`)
+        );
+        const prizeResponses = await Promise.all(prizePromises);
+
+        const prizesData = {};
+        prizeResponses.forEach((res) => {
+          prizesData[res.data.prizeID] = res.data;
+        });
+        setPrizes(prizesData);
       } catch (error) {
-        console.error("Error fetching plan summaries:", error);
+        console.error("Error fetching plan summaries or prizes:", error);
       } finally {
         setLoadingSummaries(false);
       }
@@ -165,6 +184,7 @@ const PlansPage = () => {
   };
 
   const handleCompletePlan = async (planID) => {
+    setLoadingCompletion((prev) => ({ ...prev, [planID]: true })); // Set loading for this plan
     try {
       await api.put(`/api/Ghosn/Plan/SetAsCompleted/${planID}`);
       setPlanSummaries((prev) =>
@@ -186,6 +206,8 @@ const PlansPage = () => {
         type: "error",
       });
       setTimeout(() => setCompletionStatusMessage(null), 3000);
+    } finally {
+      setLoadingCompletion((prev) => ({ ...prev, [planID]: false })); // Reset loading
     }
   };
 
@@ -336,6 +358,17 @@ const PlansPage = () => {
                       <CancelIcon sx={{ color: "error.main" }} />
                     )}
                   </Box>
+
+                  {/* Prize Display */}
+                  {summary.prizeID && prizes[summary.prizeID] && (
+                    <Box display="flex" alignItems="center" mb={2}>
+                      <MoneyIcon sx={{ color: "gold", mr: 1 }} />
+                      <Typography variant="body1" color="text.secondary">
+                        الجائزة: {prizes[summary.prizeID].prizeMoney}
+                      </Typography>
+                    </Box>
+                  )}
+
                   <Box
                     display="flex"
                     justifyContent="space-between"
@@ -351,9 +384,16 @@ const PlansPage = () => {
                     </Button>
                     <CompletionButton
                       completed={summary.isCompleted}
+                      loading={loadingCompletion[summary.planID]} // Pass loading state
                       onClick={() => handleCompletePlan(summary.planID)}
                     >
-                      {summary.isCompleted ? "مكتملة" : "تحديد كمكتملة"}
+                      {loadingCompletion[summary.planID] ? ( // Show loading indicator
+                        <CircularProgress size={20} color="inherit" />
+                      ) : summary.isCompleted ? (
+                        "مكتملة"
+                      ) : (
+                        "تحديد كمكتملة"
+                      )}
                     </CompletionButton>
                   </Box>
                 </CardContentStyled>
