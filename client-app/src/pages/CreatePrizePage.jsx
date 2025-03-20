@@ -1,4 +1,3 @@
-// client-app/src/pages/CreatePrizePage.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -7,12 +6,13 @@ import {
   Button,
   Paper,
   Alert,
-  Grid, // Import Grid
-  CircularProgress, // Optional: For loading state
+  Grid,
+  CircularProgress,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import api from "../services/api"; // Import the API client
 
 const CreatePrizePage = () => {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const CreatePrizePage = () => {
   });
   const [errors, setErrors] = useState({});
   const [submitStatus, setSubmitStatus] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Optional loading state
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
@@ -38,7 +38,14 @@ const CreatePrizePage = () => {
     if (!formData.prizeDate) {
       newErrors.prizeDate = "يرجى اختيار تاريخ الجائزة";
     } else if (formData.prizeDate < new Date()) {
-      newErrors.prizeDate = "يجب أن يكون تاريخ الجائزة في المستقبل";
+      //Corrected date comparision.  Need to strip the time portion for correct future-date check.
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Set time to 00:00:00 for accurate date-only comparison
+      const selectedDate = new Date(formData.prizeDate);
+      selectedDate.setHours(0, 0, 0, 0);
+      if (selectedDate < today) {
+        newErrors.prizeDate = "يجب أن يكون تاريخ الجائزة في المستقبل";
+      }
     }
 
     setErrors(newErrors);
@@ -63,43 +70,68 @@ const CreatePrizePage = () => {
 
     if (!validateForm()) return;
 
-    setIsSubmitting(true); // Start loading (optional)
-    setSubmitStatus(null); // Clear previous status
+    setIsSubmitting(true);
+    setSubmitStatus(null);
 
     try {
-      // This is where you'd typically make an API call to your backend
       const prizeData = {
-        prize_price: parseInt(formData.prizeValue),
-        prize_date: formData.prizeDate.toISOString().split("T")[0],
+        prizeMoney: parseInt(formData.prizeValue), // Corrected field name
+        date: formData.prizeDate.toISOString(), // Corrected format -  full ISO string for the API.
       };
 
-      // Simulated API call - replace with your actual API endpoint
-      console.log("Submitting prize:", prizeData);
-      // const response = await fetch('/api/prizes', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(prizeData)
-      // });
-      // await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
+      const response = await api.post("/api/Ghosn/Prizes/Add", prizeData); // Use the imported API client
 
-      setSubmitStatus({
-        type: "success",
-        message: "تم إنشاء الجائزة بنجاح! سيتم عرضها في صفحة الجوائز للعملاء",
-      });
+      if (response.status === 200 || response.status === 201) {
+        // Check for successful status codes (200 OK or 201 Created)
+        setSubmitStatus({
+          type: "success",
+          message: "تم إنشاء الجائزة بنجاح! سيتم عرضها في صفحة الجوائز للعملاء",
+        });
 
-      // Reset form
-      setFormData({ prizeValue: "", prizeDate: null });
-
-      // Optional: Redirect after a delay
-      setTimeout(() => navigate("/donor"), 2000);
+        setFormData({ prizeValue: "", prizeDate: null });
+        setTimeout(() => navigate("/donor"), 2000);
+      } else {
+        // Handle non-successful responses (e.g., 400, 500)
+        setSubmitStatus({
+          type: "error",
+          message: `حدث خطأ أثناء إنشاء الجائزة.  رمز الحالة: ${response.status}`,
+        });
+        console.error(
+          "Error creating prize: Status",
+          response.status,
+          response.data
+        );
+      }
     } catch (error) {
-      setSubmitStatus({
-        type: "error",
-        message: "حدث خطأ أثناء إنشاء الجائزة. يرجى المحاولة مرة أخرى",
-      });
-      console.error("Error creating prize:", error); // Log the error for debugging
+      // Handle network errors or errors thrown by axios
+      console.error("Error creating prize:", error);
+
+      let errorMessage = "حدث خطأ أثناء إنشاء الجائزة. يرجى المحاولة مرة أخرى";
+
+      // Check for different types of errors and provide more specific messages if possible
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+        console.error("Response headers:", error.response.headers);
+        errorMessage = `حدث خطأ من الخادم: ${error.response.status} - ${
+          error.response.data.message || "تفاصيل غير متوفرة"
+        }`; // Try to use server-provided error message if available.
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error("No response received:", error.request);
+        errorMessage =
+          "لا يوجد رد من الخادم.  يرجى التحقق من اتصالك بالإنترنت.";
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error("Request setup error:", error.message);
+        errorMessage = "خطأ في إعداد الطلب: " + error.message;
+      }
+
+      setSubmitStatus({ type: "error", message: errorMessage });
     } finally {
-      setIsSubmitting(false); // End loading (optional)
+      setIsSubmitting(false);
     }
   };
 
@@ -107,13 +139,11 @@ const CreatePrizePage = () => {
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Box
         sx={{
-          p: 3, // Reduced padding for overall box
+          p: 3,
           mx: "auto",
         }}
       >
         <Typography variant="h5" gutterBottom component="h2">
-          {" "}
-          {/* Changed to h5 and component for semantics */}
           إنشاء جائزة جديدة
         </Typography>
 
@@ -122,16 +152,12 @@ const CreatePrizePage = () => {
           sx={{
             p: 3,
             mt: 2,
-            backgroundColor: "background.paper", // Ensure paper background matches theme
+            backgroundColor: "background.paper",
           }}
         >
           <Box component="form" onSubmit={handleSubmit} noValidate>
             <Grid container spacing={3}>
-              {" "}
-              {/* Use Grid container */}
               <Grid item xs={12}>
-                {" "}
-                {/* Full width for prize value */}
                 <TextField
                   fullWidth
                   label="قيمة الجائزة"
@@ -144,8 +170,6 @@ const CreatePrizePage = () => {
                 />
               </Grid>
               <Grid item xs={12}>
-                {" "}
-                {/* Full width for date picker */}
                 <DatePicker
                   label="تاريخ الجائزة"
                   value={formData.prizeDate}
@@ -162,8 +186,6 @@ const CreatePrizePage = () => {
                 />
               </Grid>
               <Grid item xs={12}>
-                {" "}
-                {/* Full width for submit status */}
                 {submitStatus && (
                   <Alert severity={submitStatus.type} sx={{ mb: 2 }}>
                     {submitStatus.message}
@@ -171,32 +193,28 @@ const CreatePrizePage = () => {
                 )}
               </Grid>
               <Grid item xs={12} sm={6}>
-                {" "}
-                {/* Half width on small screens and up for submit button */}
                 <Button
                   type="submit"
                   variant="contained"
                   size="large"
-                  fullWidth // Take full width within the grid item
-                  disabled={isSubmitting} // Disable during submission (optional loading state)
+                  fullWidth
+                  disabled={isSubmitting}
                   startIcon={
                     isSubmitting && (
                       <CircularProgress size={20} color="inherit" />
                     )
-                  } // Optional loading icon
+                  }
                 >
                   إنشاء الجائزة
                 </Button>
               </Grid>
               <Grid item xs={12} sm={6}>
-                {" "}
-                {/* Half width on small screens and up for cancel button */}
                 <Button
                   variant="outlined"
                   size="large"
                   onClick={() => navigate("/donor")}
-                  fullWidth // Take full width within the grid item
-                  disabled={isSubmitting} // Disable during submission (optional loading state)
+                  fullWidth
+                  disabled={isSubmitting}
                 >
                   إلغاء
                 </Button>
@@ -207,7 +225,7 @@ const CreatePrizePage = () => {
 
         <Typography
           variant="body2"
-          sx={{ mt: 2, color: "text.secondary", textAlign: "center" }} // Centered text
+          sx={{ mt: 2, color: "text.secondary", textAlign: "center" }}
         >
           ملاحظة: يمكن جدولة جائزة واحدة فقط لكل يوم. ستظهر الجائزة في صفحة
           الجوائز للعملاء بمجرد إنشائها.
