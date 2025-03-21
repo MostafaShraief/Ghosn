@@ -30,3 +30,6 @@ Ghosn is an AI-driven smart farming platform designed to help farmers and agricu
 - **Backend**: C# (.NET)  
 - **AI**: Generative AI for farming plan recommendations  
 - **Database**: SQL Server
+
+this is diagram for tables created on sql server:
+![Ghosn](https://github.com/user-attachments/assets/38bc28aa-e711-4c44-9807-b8252f3c6acd)
