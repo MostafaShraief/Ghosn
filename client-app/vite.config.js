@@ -17,7 +17,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:5025",
+        target: "http://ghosnwebsite.runasp.net",
         changeOrigin: true,
         secure: false,
       },
